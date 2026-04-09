@@ -1,0 +1,14 @@
+{
+  "name": "vantage",
+  "version": "1.0.0",
+  "description": "VANTAGE — Autonomous Code Evolution Engine",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "electron .",
+    "build": "tsc",
+    "start": "electron ."
+  },
+  "keywords": ["cosmic", "aurora", "autonomous", "code-evolution"],
+  "author": "JourdanLabs",
+  "license": "Apache-2.0"
+}

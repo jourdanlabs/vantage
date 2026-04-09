@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VANTAGE — Autonomous Code Evolution</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b1a;
+      --surface: #0d1220;
+      --border: #1a2040;
+      --cyan: #4ff8ff;
+      --magenta: #ff4ffa;
+      --success: #3cff9b;
+      --warning: #ffcc00;
+      --error: #ff3c5f;
+      --text: #e8eaf0;
+      --muted: #6a7090;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* TOP BAR */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 2px;
+    }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .mode-badge {
+      background: var(--magenta);
+      color: var(--bg);
+      padding: 4px 12px;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    /* MAIN LAYOUT */
+    .container {
+      display: grid;
+      grid-template-columns: 240px 1fr 360px;
+      grid-template-rows: 1fr 200px;
+      height: calc(100vh - 48px);
+      margin-top: 48px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      grid-row: 1 / 3;
+    }
+    .sidebar-section {
+      margin-bottom: 24px;
+    }
+    .sidebar-title {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .sidebar-item {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      border-left: 2px solid transparent;
+      margin-left: -16px;
+      padding-left: 26px;
+      transition: all 0.15s;
+    }
+    .sidebar-item:hover, .sidebar-item.active {
+      border-left-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* EDITOR */
+    .editor {
+      background: var(--bg);
+      padding: 24px;
+      overflow: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .editor .line { display: flex; }
+    .editor .line-num {
+      color: var(--muted);
+      width: 40px;
+      text-align: right;
+      padding-right: 16px;
+      user-select: none;
+    }
+    .editor .highlight-bug {
+      background: rgba(255, 79, 250, 0.15);
+      border-left: 3px solid var(--magenta);
+    }
+    .editor .highlight-fix {
+      background: rgba(63, 255, 155, 0.15);
+      border-left: 3px solid var(--success);
+    }
+
+    /* VANTAGE PANEL */
+    .vantage-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      grid-row: 1 / 3;
+    }
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-tab {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .panel-tab:hover { color: var(--text); }
+    .panel-tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+    .panel-content {
+      flex: 1;
+      padding: 20px;
+      overflow: auto;
+    }
+    .panel-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .panel-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .panel-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .panel-value.cyan { color: var(--cyan); }
+    .panel-value.magenta { color: var(--magenta); }
+    .panel-value.success { color: var(--success); }
+
+    /* TERMINAL */
+    .terminal {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      overflow: auto;
+    }
+    .terminal-line {
+      margin-bottom: 4px;
+    }
+    .terminal-line.cyan { color: var(--cyan); }
+    .terminal-line.magenta { color: var(--magenta); }
+    .terminal-line.muted { color: var(--muted); }
+    .terminal-line.success { color: var(--success); }
+
+    /* PAGE CONTENT */
+    .page { display: none; padding: 80px 40px; max-width: 800px; margin: 0 auto; }
+    .page.active { display: block; }
+    .page h1 { font-size: 48px; margin-bottom: 16px; }
+    .page p { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+    .btn {
+      display: inline-block;
+      background: var(--cyan);
+      color: var(--bg);
+      padding: 16px 32px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 12px;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo">VANTAGE</div>
+    <nav class="nav-links">
+      <a href="#" onclick="showPage('home')">Home</a>
+      <a href="#" onclick="showPage('demo')">Demo</a>
+      <a href="#" onclick="showPage('how')">How It Works</a>
+      <a href="#" onclick="showPage('modes')">Modes</a>
+      <a href="#" onclick="showPage('enterprise')">Enterprise</a>
+    </nav>
+    <div class="topbar-status">
+      <span>Session: 01</span>
+      <span class="mode-badge">AUTO</span>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+    <h1>Code That Fixes Itself.</h1>
+    <p>VANTAGE detects, repairs, and learns from bugs — automatically.</p>
+    <div>
+      <a href="#" class="btn" onclick="showPage('demo')">Watch It Happen</a>
+      <a href="#" class="btn btn-secondary" onclick="showPage('how')">How It Works</a>
+    </div>
+  </div>
+
+  <!-- DEMO PAGE -->
+  <div id="demo" class="page">
+    <h1>The Moment</h1>
+    <p>Watch VANTAGE find and fix a bug in 30 seconds.</p>
+    <div style="background: var(--surface); border: 1px solid var(--border); padding: 24px; margin: 24px 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8;">
+      <div class="mono" style="color: var(--muted);">// payments-service.ts</div>
+      <div>&nbsp;</div>
+      <div><span style="color: var(--magenta);">retryAttempts = 1</span> // should be 3</div>
+      <div>&nbsp;</div>
+      <div style="color: var(--muted); margin-top: 16px;">// Confluence says: "System retries up to 3 times"</div>
+    </div>
+    <a href="#" class="btn" onclick="runDemo()">▶ Run Demo</a>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div id="how" class="page">
+    <h1>How It Works</h1>
+    <div style="display: grid; gap: 24px; margin-top: 32px;">
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">1. Detect</h3>
+        <p style="color: var(--muted);">Graph-based anomaly detection finds bugs static tools miss.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">2. Diagnose</h3>
+        <p style="color: var(--muted);">Causal inference identifies root cause, not just symptoms.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">3. Repair</h3>
+        <p style="color: var(--muted);">Generate fixes ranked by confidence score.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">4. Verify</h3>
+        <p style="color: var(--muted);">Sandbox tests prevent regressions.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--magenta); margin-bottom: 8px;">5. Learn</h3>
+        <p style="color: var(--muted);">Promote what works. Demote what doesn't. Get smarter.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODES PAGE -->
+  <div id="modes" class="page">
+    <h1>Modes</h1>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px;">
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 16px;">SAFE</h3>
+        <p style="color: var(--muted);">Detection only. No fixes. No changes to your code.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--warning); margin-bottom: 16px;">ASSIST</h3>
+        <p style="color: var(--muted);">Suggests fixes. You approve before anything changes.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--magenta);">
+        <h3 style="color: var(--magenta); margin-bottom: 16px;">AUTONOMOUS</h3>
+        <p style="color: var(--muted);">Auto-fixes above confidence threshold. Full loop enabled.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTERPRISE PAGE -->
+  <div id="enterprise" class="page">
+    <h1>Enterprise Trust</h1>
+    <div style="margin-top: 32px;">
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border); margin-bottom: 16px;">
+        <h3 style="color: var(--success);">HEIMDALL Audit Trails</h3>
+        <p style="color: var(--muted); margin-top: 8px;">Cryptographic verification of every decision. Hash of original code → fix → explanation → confidence.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border); margin-bottom: 16px;">
+        <h3 style="color: var(--success);">AURORA Approval Gates</h3>
+        <p style="color: var(--muted); margin-top: 8px;">Every fix passes confidence threshold before apply.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--success);">Full Explainability</h3>
+        <p style="color: var(--muted); margin-top: 8px;">Human-readable audit trail. Why it broke. Why this fix. Why confidence.</p>
+      </div>
+    </div>
+    <a href="#" class="btn" style="margin-top: 32px;" onclick="showPage('home')">Request Access</a>
+  </div>
+
+  <!-- APP VIEW (Hidden) -->
+  <div id="app" class="container" style="display: none;">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">SYSTEM</div>
+        <a href="#" class="sidebar-item active">Dashboard</a>
+        <a href="#" class="sidebar-item">Active Sessions</a>
+        <a href="#" class="sidebar-item">Repositories</a>
+        <a href="#" class="sidebar-item">Intel Graph</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">VANTAGE CORE</div>
+        <a href="#" class="sidebar-item">Detect</a>
+        <a href="#" class="sidebar-item">Diagnose</a>
+        <a href="#" class="sidebar-item">Fix Engine</a>
+        <a href="#" class="sidebar-item">Verification</a>
+        <a href="#" class="sidebar-item">Learning Loop</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">HISTORY</div>
+        <a href="#" class="sidebar-item">Fix Log</a>
+        <a href="#" class="sidebar-item">Pattern Library</a>
+        <a href="#" class="sidebar-item">Regression Map</a>
+      </div>
+    </div>
+
+    <div class="editor">
+      <div class="line"><span class="line-num">1</span><span style="color: var(--muted);">// payments-service.ts</span></div>
+      <div class="line"><span class="line-num">2</span><span></span></div>
+      <div class="line highlight-bug"><span class="line-num">3</span><span style="color: var(--magenta);">retryAttempts = 1</span><span style="color: var(--muted);"> // should be 3</span></div>
+      <div class="line"><span class="line-num">4</span><span></span></div>
+      <div class="line"><span class="line-num">5</span><span>export async function processPayment(amount: number) {</span></div>
+      <div class="line"><span class="line-num">6</span><span>  for (let i = 0; i < retryAttempts; i++) {</span></div>
+      <div class="line"><span class="line-num">7</span><span>    try {</span></div>
+      <div class="line"><span class="line-num">8</span><span>      return await fetch('/api/payments', {</span></div>
+      <div class="line"><span class="line-num">9</span><span>        method: 'POST',</span></div>
+      <div class="line"><span class="line-num">10</span><span>        body: JSON.stringify({ amount })</span></div>
+      <div class="line"><span class="line-num">11</span><span>      });</span></div>
+      <div class="line"><span class="line-num">12</span><span>    } catch (e) {</span></div>
+      <div class="line"><span class="line-num">13</span><span>      if (i === retryAttempts - 1) throw e;</span></div>
+      <div class="line"><span class="line-num">14</span><span>    }</span></div>
+      <div class="line"><span class="line-num">15</span><span>  }</span></div>
+      <div class="line"><span class="line-num">16</span><span>}</span></div>
+    </div>
+
+    <div class="vantage-panel">
+      <div class="panel-tabs">
+        <div class="panel-tab active">DETECT</div>
+        <div class="panel-tab">DIAGNOSE</div>
+        <div class="panel-tab">FIX</div>
+        <div class="panel-tab">VERIFY</div>
+        <div class="panel-tab">LEARN</div>
+      </div>
+      <div class="panel-content">
+        <div class="panel-card">
+          <div class="panel-label">DETECTED ANOMALY</div>
+          <div class="panel-value magenta">0.82</div>
+          <div style="color: var(--muted); font-size: 12px; margin-top: 4px;">Severity</div>
+        </div>
+        <div class="panel-card">
+          <div class="panel-label">Type</div>
+          <div style="color: var(--text);">Logic Mismatch</div>
+        </div>
+        <div class="panel-card">
+          <div class="panel-label">Explanation</div>
+          <div style="color: var(--muted); font-size: 13px;">Retry logic deviates from expected system behavior (doc says 3, code has 1).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-line muted">> VANTAGE v0.1.0-alpha initializing...</div>
+      <div class="terminal-line muted">> Loading Cosmos engines...</div>
+      <div class="terminal-line cyan">> METEOR ready</div>
+      <div class="terminal-line cyan">> NOVA ready</div>
+      <div class="terminal-line cyan">> ECLIPSE ready</div>
+      <div class="terminal-line cyan">> PULSAR ready</div>
+      <div class="terminal-line cyan">> AURORA ready</div>
+      <div class="terminal-line muted">> Repo loaded: payments-service</div>
+      <div class="terminal-line muted">> Scanning...</div>
+      <div class="terminal-line magenta">> ANOMALY DETECTED at line 3</div>
+      <div class="terminal-line success">> FIX APPLIED</div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 'home';
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(page).classList.add('active');
+      currentPage = page;
+    }
+    function runDemo() {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('app').style.display = 'grid';
+    }
+  </script>
+</body>
+</html>
