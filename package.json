@@ -3,12 +3,22 @@
   "version": "1.0.0",
   "description": "VANTAGE — Autonomous Code Evolution Engine",
   "main": "dist/main/index.js",
+  "bin": {
+    "vantage": "./bin/vantage.js"
+  },
   "scripts": {
     "dev": "electron .",
     "build": "tsc",
-    "start": "electron ."
+    "start": "electron .",
+    "cli": "ts-node src/cli.ts",
+    "analyze": "ts-node src/cli.ts run"
   },
   "keywords": ["cosmic", "aurora", "autonomous", "code-evolution"],
   "author": "JourdanLabs",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^22.15.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }

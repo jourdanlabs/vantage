@@ -1,91 +1,45 @@
-# VANTAGE
+# VANTAGE — Autonomous Code Evolution Engine
 
-**Autonomous Code Evolution Engine**
+Real static analysis CLI that runs a full COSMIC pipeline against any codebase.
 
-VANTAGE detects, repairs, verifies, and learns from bugs — automatically. Built on COSMIC (METEOR → COMET → ASTRAL → NEBULA → QUASAR → NOVA → ECLIPSE → PULSAR → AURORA → HEIMDALL).
+## What it does
 
-## The Problem
+VANTAGE walks your codebase and runs 5 real analysis engines:
 
-Software bugs cost enterprises $1.5T/year in debugging. Current tools:
-- **Static analyzers**: High false positives, no learning
-- **Linting**: Rule-based, manual updates
-- **Code review**: Slow, inconsistent
+- **METEOR** — file scanner: complexity, imports, functions, TODOs
+- **NOVA** — dependency graph: circular deps, tight coupling, god modules
+- **ECLIPSE** — risk scoring: 0.0–1.0 per file
+- **PULSAR** — adversarial stress test: async safety, null handling, error boundaries
+- **AURORA** — final verdict: ≥0.80 APPROVED, <0.80 REJECTED
 
-What's missing: A system that both **detects** bugs AND **learns what fixes work**.
-
-## What Is VANTAGE?
-
-VANTAGE = **Autonomous Code Evolution Engine**
-
-1. **Detect** — Graph-based anomaly detection finds bugs static tools miss
-2. **Diagnose** — Causal inference identifies root cause, not just symptoms
-3. **Repair** — Generate fixes ranked by confidence score
-4. **Verify** — Sandbox tests prevent regressions
-5. **Learn** — Promote what works. Demote what doesn't. Get smarter.
-
-## Modes
-
-| Mode | Description |
-|------|-------------|
-| **SAFE** | Detection only. No fixes. |
-| **ASSIST** | Suggests fixes. You approve. |
-| **AUTONOMOUS** | Auto-fixes above confidence threshold. |
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    VANTAGE                         │
-├─────────────────────────────────────────────────────┤
-│  METEOR ─ Cross-repo pattern detection              │
-│  COMET  ─ Code lineage + bug origin tracking       │
-│  ASTRAL ─ Schema/AST normalization                 │
-│  NEBULA ─ Uncertainty modeling                    │
-│  QUASAR ─ Fix ranking                            │
-│  NOVA   ─ Causal debugging                       │
-│  ECLIPSE ─ Temporal prediction                  │
-│  PULSAR ─ Adversarial validation                 │
-│  AURORA ─ Decision gate                         │
-│  HEIMDALL ─ Audit trail                         │
-└─────────────────────────────────────────────────────┘
-```
-
-## Quick Start
+## Usage
 
 ```bash
-git clone https://github.com/sokpyeon/vantage.git
-cd vantage
-npm install
-npm run dev
+npm run analyze /path/to/project
+npm run analyze /path/to/project -- --engine PULSAR
+npm run analyze /path/to/project -- --output report.json
 ```
 
-## Demo
+## Example output
 
-Watch VANTAGE find and fix a bug in 30 seconds:
+```
+VANTAGE — Autonomous Code Evolution Engine
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ METEOR   scanning 57 files...           ✓ 482 functions, 11,998 LOC
+▸ NOVA     building dependency graph...   ✓ 0 circular deps
+▸ ECLIPSE  scoring risk...                ✓ 3 high-risk files
+▸ PULSAR   adversarial stress test...     ✓ 6 TODOs flagged
+▸ AURORA   final audit...                 ✓ 93.9% APPROVED
 
-1. Load demo repo
-2. Watch detection
-3. See fix applied
-4. Observe learning
+━━━ AURORA VERDICT ━━━━━━━━━━━━━━━━━━━━━━
+Score: 0.939 / APPROVED ✓
+```
 
-## Why It Matters
+## Install
 
-> "Every bug fixed makes the next bug easier to fix."
+```bash
+npm install
+npm run analyze /path/to/your/project
+```
 
-VANTAGE is the first system that:
-- Doesn't just find bugs — it learns what fixes work
-- Improves over time without manual updates
-- Gives confidence scores, not just yes/no
-- Is built on COSMIC's proven self-improvement
-
-## License
-
-Apache 2.0 — See [LICENSE](LICENSE)
-
-## JourdanLabs
-
-Built by the team that brought you COSMIC Engine Suite, HELIX, OMNIS KEY, and more.
-
----
-
-**VANTAGE doesn't just find bugs. It makes sure they don't happen again.**
+Built by JourdanLabs.
