@@ -43,3 +43,21 @@ npm run analyze /path/to/your/project
 ```
 
 Built by JourdanLabs.
+
+---
+
+## Python Package (PyPI)
+
+```bash
+pip install vantage-x
+```
+
+```python
+from vantage import analyze
+
+report = analyze("/path/to/project")
+print(report.verdict)    # APPROVED or REJECTED
+print(report.score_pct)  # e.g. "87.4%"
+```
+
+Requires Node.js with `vantage` on PATH.

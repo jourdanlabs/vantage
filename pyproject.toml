@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vantage-x"
+version = "1.0.0"
+description = "VANTAGE X — Static code analysis pipeline. METEOR → NOVA → ECLIPSE → PULSAR → AURORA. Returns APPROVED/REJECTED verdict with scored breakdown."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+dependencies = []
+
+[project.scripts]
+vantage-py = "vantage.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vantage"]
