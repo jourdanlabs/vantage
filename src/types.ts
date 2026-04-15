@@ -3,7 +3,7 @@
 export interface FileInfo {
   path: string;
   relativePath: string;
-  language: 'typescript' | 'javascript' | 'swift' | 'python' | 'markdown' | 'other';
+  language: string;  // registry-driven; e.g. 'typescript', 'python', 'go', 'other'
   lines: number;
   content: string;
 }

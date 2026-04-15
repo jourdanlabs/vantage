@@ -5,20 +5,32 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { execSync } from 'child_process';
 import { MeteorOutput, NovaOutput, EclipseOutput, RiskEntry } from '../types';
+import { LANGUAGE_REGISTRY } from '../languages';
+
+// Build test-file matchers from the registry (computed once at startup)
+const ALL_TEST_SUFFIXES: string[] = LANGUAGE_REGISTRY.flatMap(l => l.testFileSuffixes);
+const ALL_TEST_DIR_PATTERNS: string[] = [
+  ...new Set(LANGUAGE_REGISTRY.flatMap(l => l.testDirPatterns))
+];
 
 function hasTestFile(filePath: string, allFiles: string[]): boolean {
   const base = path.basename(filePath, path.extname(filePath));
-  const dir = path.dirname(filePath);
 
-  const testPatterns = [
-    `${base}.test.ts`, `${base}.test.js`, `${base}.spec.ts`, `${base}.spec.js`,
-    `${base}Tests.swift`, `${base}_test.py`, `test_${base}.py`,
-    `${base}.test.tsx`
-  ];
+  // Build per-file candidate names from every language's suffixes
+  const candidateNames = new Set(
+    ALL_TEST_SUFFIXES.map(suffix => {
+      // suffix may be a prefix pattern like 'test_*.py' — handle separately
+      if (suffix.startsWith('test_')) return `test_${base}${path.extname(suffix.replace('test_', ''))}`;
+      return `${base}${suffix}`;
+    })
+  );
 
   return allFiles.some(f => {
     const fname = path.basename(f);
-    return testPatterns.some(p => fname === p) || f.includes('__tests__') || f.includes('/test/');
+    if (candidateNames.has(fname)) return true;
+    // Check dir-pattern membership
+    const normalized = f.replace(/\\/g, '/');
+    return ALL_TEST_DIR_PATTERNS.some(dp => normalized.includes(`/${dp}`) || normalized.includes(dp));
   });
 }
 

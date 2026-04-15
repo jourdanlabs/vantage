@@ -13,12 +13,23 @@
     "cli": "ts-node src/cli.ts",
     "analyze": "ts-node src/cli.ts run"
   },
-  "keywords": ["cosmic", "aurora", "autonomous", "code-evolution"],
+  "keywords": [
+    "cosmic",
+    "aurora",
+    "autonomous",
+    "code-evolution"
+  ],
   "author": "JourdanLabs",
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "^22.15.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
   }
 }

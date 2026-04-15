@@ -3,6 +3,21 @@
 
 import * as path from 'path';
 import { MeteorOutput, NovaOutput, CausalChain, CircularDep, CouplingIssue, GodModule } from '../types';
+import { LANGUAGE_REGISTRY } from '../languages';
+
+// Build normalisation regex and import extensions from the registry (once at startup)
+const ALL_EXTENSIONS: string[] = LANGUAGE_REGISTRY.flatMap(l => l.extensions);
+// Escape dots, join as alternation for the strip regex
+const EXT_PATTERN = ALL_EXTENSIONS.map(e => e.replace('.', '\\.')).join('|');
+const STRIP_EXT_RE = new RegExp(`(${EXT_PATTERN})$`);
+
+// All extensions to probe when resolving bare import paths
+const IMPORT_PROBE_EXTS: string[] = [
+  '',
+  ...new Set(LANGUAGE_REGISTRY.flatMap(l => l.importExtensions)),
+  '/index.ts',
+  '/index.js',
+];
 
 function resolveImportPath(fromFile: string, importSource: string): string | null {
   if (!importSource.startsWith('.')) return null; // external dep
@@ -10,18 +25,16 @@ function resolveImportPath(fromFile: string, importSource: string): string | nul
   const dir = path.dirname(fromFile);
   const resolved = path.resolve(dir, importSource);
 
-  // Try with various extensions
-  const exts = ['', '.ts', '.tsx', '.js', '.jsx', '.swift', '/index.ts', '/index.js'];
-  for (const ext of exts) {
+  // Return first probe candidate (we can't stat without fs here)
+  for (const ext of IMPORT_PROBE_EXTS) {
     const candidate = resolved + ext;
-    // We can't check if file exists here without fs, but return the canonical form
-    return candidate.replace(/\.(ts|tsx|js|jsx)$/, '');
+    return normalizeFilePath(candidate);
   }
-  return resolved;
+  return normalizeFilePath(resolved);
 }
 
 function normalizeFilePath(filePath: string): string {
-  return filePath.replace(/\.(ts|tsx|js|jsx|swift|py)$/, '');
+  return filePath.replace(STRIP_EXT_RE, '');
 }
 
 function detectCircularDeps(graph: Record<string, string[]>): CircularDep[] {
