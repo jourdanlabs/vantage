@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-04-16T09:14:24.107Z",
+  "generatedAt": "2026-04-16T09:33:31.621Z",
   "suiteA": [
     {
       "corpusId": "nodegoat",
       "label": "OWASP/NodeGoat",
       "pipelineStats": {
-        "files": 53,
-        "loc": 4113,
-        "functions": 55,
+        "files": 47,
+        "loc": 3382,
+        "functions": 46,
         "circularDeps": 0,
         "godModules": 0,
         "highRiskFiles": 0,
@@ -18,12 +18,12 @@
         "medFindings": 0,
         "lowFindings": 0
       },
-      "auroraScore": 0.7190749999999999,
-      "auroraVerdict": "REJECTED",
+      "auroraScore": 0.9431904644268774,
+      "auroraVerdict": "APPROVED",
       "auroraBreakdown": {
-        "complexityScore": 0,
+        "complexityScore": 0.8717391304347826,
         "dependencyScore": 0.95,
-        "riskScore": 0.9363,
+        "riskScore": 0.9610227272727273,
         "adversarialScore": 1
       },
       "tier1": {
@@ -80,13 +80,13 @@
           }
         ]
       },
-      "totalMs": 33.64945800000004,
+      "totalMs": 17.987291000000027,
       "engineMs": {
-        "METEOR": 22.20750000000004,
-        "NOVA": 0.5830830000000446,
-        "ECLIPSE": 2.1252920000000017,
-        "PULSAR": 0.08620799999999917,
-        "AURORA": 8.641458
+        "METEOR": 6.927665999999988,
+        "NOVA": 0.5946670000000154,
+        "ECLIPSE": 1.6185419999999908,
+        "PULSAR": 0.08462500000001683,
+        "AURORA": 8.75524999999999
       }
     },
     {
@@ -199,13 +199,13 @@
           }
         ]
       },
-      "totalMs": 117.09908300000001,
+      "totalMs": 103.56329199999993,
       "engineMs": {
-        "METEOR": 53.36862499999995,
-        "NOVA": 8.033374999999978,
-        "ECLIPSE": 55.420124999999985,
-        "PULSAR": 0.01974999999993088,
-        "AURORA": 0.2511250000000018
+        "METEOR": 38.56283300000001,
+        "NOVA": 6.046791999999982,
+        "ECLIPSE": 58.631125,
+        "PULSAR": 0.027166999999963082,
+        "AURORA": 0.2917499999999791
       }
     }
   ],
@@ -313,6 +313,6 @@
       "adversarialScore": 1
     },
     "pass": true,
-    "totalMs": 46.7209160000001
+    "totalMs": 35.969291
   }
 }

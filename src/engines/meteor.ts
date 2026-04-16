@@ -30,7 +30,7 @@ function isIgnored(filePath: string, rootDir: string, patterns: string[]): boole
   const parts = rel.split(path.sep);
 
   // Always ignore these
-  const alwaysIgnore = ['node_modules', '.git', 'dist', 'build', '.next', '__pycache__', '.DS_Store', 'Pods', '.build'];
+  const alwaysIgnore = ['node_modules', '.git', 'dist', 'build', '.next', '__pycache__', '.DS_Store', 'Pods', '.build', 'vendor'];
   if (parts.some(p => alwaysIgnore.includes(p))) return true;
 
   for (const pattern of patterns) {
@@ -59,6 +59,9 @@ function walkDir(dir: string, rootDir: string, ignorePatterns: string[]): string
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name).toLowerCase();
       if (SUPPORTED_EXTENSIONS.has(ext)) {
+        // Skip minified files — they produce phantom complexity and are not application code
+        const base = entry.name.toLowerCase();
+        if (base.endsWith('.min.js') || base.endsWith('.min.ts') || base.includes('-min.js')) continue;
         results.push(fullPath);
       }
     }
