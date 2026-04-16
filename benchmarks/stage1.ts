@@ -26,7 +26,14 @@ import { runPULSAR } from '../src/engines/pulsar';
 import { runAURORA } from '../src/engines/aurora';
 import { MeteorOutput, NovaOutput, EclipseOutput, PulsarOutput } from '../src/types';
 
-const CORPUS = JSON.parse(
+// ── CLI args: --skip <id,...>  --output <filename> ────────────────────────────
+const args = process.argv.slice(2);
+const skipIds = new Set(
+  (args[args.indexOf('--skip') + 1] ?? '').split(',').filter(Boolean)
+);
+const outputFile = args[args.indexOf('--output') + 1] ?? 'stage1.json';
+
+const ALL_CORPUS = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'corpus.json'), 'utf-8')
 ).corpora as Array<{
   id: string;
@@ -35,6 +42,8 @@ const CORPUS = JSON.parse(
   expectedLOC: string;
   sha: string;
 }>;
+
+const CORPUS = ALL_CORPUS.filter(c => !skipIds.has(c.id));
 
 const RUNS_PER_CORPUS = 3;
 const TIMEOUT_MS = 10 * 60 * 1000; // 10 min per run
@@ -365,9 +374,11 @@ async function benchmarkCorpus(
         peakRssBytes: rssBytes(),
         baselineRssBytes: rssBytes(),
         auroraScore: 0, auroraVerdict: 'ERROR',
+        auroraBreakdown: { complexityScore: 0, dependencyScore: 0, riskScore: 0, adversarialScore: 0 },
         fileCount: 0, locCount: 0, functionCount: 0,
         issuesBySeveity: { HIGH: 0, MED: 0, LOW: 0 },
         circularDeps: 0, godModules: 0,
+        unsupportedFiles: { count: 0, extensions: [] },
         error: e.message,
         timedOut: e.message.includes('TIMEOUT'),
       };
@@ -452,7 +463,7 @@ async function main() {
   }
 
   // Write results JSON
-  const outPath = path.join(__dirname, 'results', 'stage1.json');
+  const outPath = path.join(__dirname, 'results', outputFile);
   fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date().toISOString(), apiHealthy: apiOk, results }, null, 2));
   console.log(`\n\nResults written to: ${outPath}`);
 
