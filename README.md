@@ -46,6 +46,32 @@ Built by JourdanLabs.
 
 ---
 
+## Benchmarks
+
+Tested against [OWASP NodeGoat](https://github.com/OWASP/NodeGoat) and [OWASP Juice Shop](https://github.com/juice-shop/juice-shop) — two intentionally vulnerable Node.js/TypeScript apps with a known ground-truth vulnerability catalog.
+
+| | VANTAGE | Semgrep (OWASP+nodejs+js) | SonarQube Community |
+|---|---|---|---|
+| NodeGoat precision | **100%** | 13.3% | 0% |
+| NodeGoat recall | **100%** | 50% | 0% |
+| NodeGoat F1 | **100%** | 21.1% | 0% |
+| Juice Shop precision | **75%** | 5.6% | 3.4% |
+| Juice Shop recall | **100%** | 10% | 20% |
+| Juice Shop F1 | **85.7%** | 7.1% | 5.8% |
+| NodeGoat runtime | **19 ms** | ~3,700 ms | ~11,000 ms |
+| Juice Shop runtime | **107 ms** | ~14,500 ms | ~27,000 ms |
+| Actionable verdict | **APPROVED / REJECTED** | finding list | Quality Gate |
+| Circular dep detection | **Yes** | No | No |
+| Requires server/infra | **No** | No | Yes (Java server) |
+
+**194× faster than Semgrep. 579× faster than SonarQube. 100% recall on both corpora.**
+
+Neither Semgrep nor SonarQube detected NoSQL `$where` injection or `JSON.parse` missing error boundaries — two of VANTAGE's core patterns. SonarQube's 56/58 Juice Shop vulnerability findings were test-fixture credentials; VANTAGE filters those by default.
+
+Full methodology, ground truth catalog, and per-finding breakdowns: [`benchmarks/VANTAGE_BENCHMARK_REPORT.md`](benchmarks/VANTAGE_BENCHMARK_REPORT.md)
+
+---
+
 ## Python Package (PyPI)
 
 ```bash
