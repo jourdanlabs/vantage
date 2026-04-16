@@ -3,23 +3,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
 import {
   FileInfo, FunctionInfo, ImportInfo, ClassInfo, TodoItem, MeteorOutput
 } from '../types';
-
-const SUPPORTED_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.swift', '.py', '.md']);
-
-function getLanguage(ext: string): FileInfo['language'] {
-  switch (ext) {
-    case '.ts': case '.tsx': return 'typescript';
-    case '.js': case '.jsx': return 'javascript';
-    case '.swift': return 'swift';
-    case '.py': return 'python';
-    case '.md': return 'markdown';
-    default: return 'other';
-  }
-}
+import {
+  SUPPORTED_EXTENSIONS, getLanguageName, getLanguageDef
+} from '../languages';
 
 function loadGitignorePatterns(dir: string): string[] {
   const patterns: string[] = [];
@@ -77,64 +66,61 @@ function walkDir(dir: string, rootDir: string, ignorePatterns: string[]): string
   return results;
 }
 
-// Estimate cyclomatic complexity by counting branch points
-function calculateComplexity(content: string): number {
+// Estimate cyclomatic complexity using the language's keywords, or a generic fallback
+function calculateComplexity(content: string, langName: string): number {
+  const def = getLanguageDef(
+    // map name back to first extension for lookup
+    (() => {
+      const { LANGUAGE_REGISTRY } = require('../languages');
+      return LANGUAGE_REGISTRY.find((l: { name: string; extensions: string[] }) => l.name === langName)?.extensions[0] ?? '.ts';
+    })()
+  );
+
   let complexity = 1; // base
-  const branchKeywords = [
-    /\bif\b/g, /\belse\b/g, /\bfor\b/g, /\bwhile\b/g, /\bswitch\b/g,
-    /\bcase\b/g, /\bcatch\b/g, /\b\?\s*:/g, /\?\?/g, /&&/g, /\|\|/g,
-    /\bguard\b/g, /\bforeach\b/gi, /\bfor\s+in\b/gi
-  ];
-  for (const pattern of branchKeywords) {
-    const matches = content.match(pattern);
+  if (def) {
+    // Reset lastIndex before use (global flag)
+    def.complexityKeywords.lastIndex = 0;
+    const matches = content.match(def.complexityKeywords);
     if (matches) complexity += matches.length;
+  } else {
+    // Fallback generic keywords
+    const fallback = [
+      /\bif\b/g, /\belse\b/g, /\bfor\b/g, /\bwhile\b/g, /\bswitch\b/g,
+      /\bcase\b/g, /\bcatch\b/g, /&&/g, /\|\|/g
+    ];
+    for (const re of fallback) {
+      const m = content.match(re);
+      if (m) complexity += m.length;
+    }
   }
   return complexity;
 }
 
-function extractFunctionsTS(content: string, filePath: string): FunctionInfo[] {
+function extractFunctions(content: string, filePath: string, langName: string): FunctionInfo[] {
   const functions: FunctionInfo[] = [];
-  const lines = content.split('\n');
+  const def = (() => {
+    const { LANGUAGE_REGISTRY } = require('../languages');
+    return LANGUAGE_REGISTRY.find((l: { name: string }) => l.name === langName);
+  })();
 
-  // Named functions
-  const namedFuncRe = /(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)/;
-  // Arrow functions
-  const arrowFuncRe = /(?:export\s+)?(?:const|let|var)\s+(\w+)\s*=\s*(async\s+)?\(?([^)]*)\)?\s*=>/;
-  // Class methods (TS/JS)
-  const methodRe = /^\s+(?:async\s+)?(?:public\s+|private\s+|protected\s+|static\s+)*(\w+)\s*\(([^)]*)\)\s*(?::\s*\S+)?\s*\{/;
-  // Swift functions
-  const swiftFuncRe = /func\s+(\w+)\s*\(([^)]*)\)/;
+  if (!def || def.functionPatterns.length === 0) return functions;
+
+  const lines = content.split('\n');
+  const skipKeywords = new Set(['if', 'else', 'for', 'while', 'switch', 'catch', 'constructor', 'do', 'try']);
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     let funcName: string | null = null;
-    let params: string = '';
-    let isAsync = false;
+    let isAsync = line.includes('async');
 
-    const named = line.match(namedFuncRe);
-    if (named) {
-      funcName = named[1];
-      params = named[2];
-      isAsync = line.includes('async');
-    } else {
-      const arrow = line.match(arrowFuncRe);
-      if (arrow) {
-        funcName = arrow[1];
-        params = arrow[3] || '';
-        isAsync = !!arrow[2];
-      } else {
-        const method = line.match(methodRe);
-        if (method && !['if', 'else', 'for', 'while', 'switch', 'catch', 'constructor'].includes(method[1])) {
-          funcName = method[1];
-          params = method[2];
-          isAsync = line.includes('async');
-        } else {
-          const swift = line.match(swiftFuncRe);
-          if (swift) {
-            funcName = swift[1];
-            params = swift[2];
-            isAsync = line.includes('async');
-          }
+    for (const pattern of def.functionPatterns) {
+      const match = line.match(pattern);
+      if (match) {
+        // The first capture group with a valid identifier wins
+        const candidate = match[1] || match[2] || null;
+        if (candidate && !skipKeywords.has(candidate)) {
+          funcName = candidate;
+          break;
         }
       }
     }
@@ -157,14 +143,19 @@ function extractFunctionsTS(content: string, filePath: string): FunctionInfo[] {
       }
     }
 
+    // Extract parameters from the line (text between first ( and ))
+    const paramMatch = line.match(/\(([^)]*)\)/);
+    const params = paramMatch ? paramMatch[1] : '';
+
     const funcLines = lines.slice(i, endLine + 1);
     const funcContent = funcLines.join('\n');
-    const complexity = calculateComplexity(funcContent);
+    const complexity = calculateComplexity(funcContent, langName);
 
-    // Check error handling
     const hasErrorHandling = funcContent.includes('try') || funcContent.includes('catch') ||
       funcContent.includes('.catch(') || funcContent.includes('Result<') ||
-      funcContent.includes('throws') || funcContent.includes('guard ');
+      funcContent.includes('throws') || funcContent.includes('guard ') ||
+      funcContent.includes('except') || funcContent.includes('rescue') ||
+      funcContent.includes('Err(') || funcContent.includes('unwrap_or');
 
     functions.push({
       name: funcName,
@@ -182,95 +173,79 @@ function extractFunctionsTS(content: string, filePath: string): FunctionInfo[] {
   return functions;
 }
 
-function extractImports(content: string, filePath: string): ImportInfo[] {
+function extractImports(content: string, filePath: string, langName: string): ImportInfo[] {
   const imports: ImportInfo[] = [];
-  const lines = content.split('\n');
+  const def = (() => {
+    const { LANGUAGE_REGISTRY } = require('../languages');
+    return LANGUAGE_REGISTRY.find((l: { name: string }) => l.name === langName);
+  })();
 
-  // TS/JS: import ... from '...'
-  const tsImportRe = /import\s+.*?from\s+['"]([^'"]+)['"]/;
-  // TS/JS: require(...)
-  const requireRe = /require\(['"]([^'"]+)['"]\)/;
-  // Swift: import Module
-  const swiftImportRe = /^import\s+(\w+)/;
-  // Python: import X / from X import Y
-  const pyImportRe = /^(?:from\s+(\S+)\s+import|import\s+(\S+))/;
+  if (!def || def.importPatterns.length === 0) return imports;
+
+  const lines = content.split('\n');
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    const ts = line.match(tsImportRe);
-    if (ts) {
-      imports.push({
-        file: filePath,
-        source: ts[1],
-        line: i + 1,
-        isRelative: ts[1].startsWith('.')
-      });
-      continue;
-    }
-
-    const req = line.match(requireRe);
-    if (req) {
-      imports.push({
-        file: filePath,
-        source: req[1],
-        line: i + 1,
-        isRelative: req[1].startsWith('.')
-      });
-      continue;
-    }
-
-    const swift = line.match(swiftImportRe);
-    if (swift) {
-      imports.push({
-        file: filePath,
-        source: swift[1],
-        line: i + 1,
-        isRelative: false
-      });
-      continue;
-    }
-
-    const py = line.match(pyImportRe);
-    if (py) {
-      imports.push({
-        file: filePath,
-        source: py[1] || py[2],
-        line: i + 1,
-        isRelative: (py[1] || py[2] || '').startsWith('.')
-      });
+    for (const pattern of def.importPatterns) {
+      const match = line.match(pattern);
+      if (match) {
+        const source = match[1] || match[2] || '';
+        if (source) {
+          imports.push({
+            file: filePath,
+            source,
+            line: i + 1,
+            isRelative: source.startsWith('.')
+          });
+        }
+        break; // only one pattern per line
+      }
     }
   }
 
   return imports;
 }
 
-function extractClasses(content: string, filePath: string): ClassInfo[] {
+function extractClasses(content: string, filePath: string, langName: string): ClassInfo[] {
   const classes: ClassInfo[] = [];
+  const def = (() => {
+    const { LANGUAGE_REGISTRY } = require('../languages');
+    return LANGUAGE_REGISTRY.find((l: { name: string }) => l.name === langName);
+  })();
+
+  if (!def || def.classPatterns.length === 0) return classes;
+
   const lines = content.split('\n');
 
-  const patterns: Array<[RegExp, ClassInfo['type']]> = [
-    [/(?:export\s+)?(?:abstract\s+)?class\s+(\w+)/, 'class'],
-    [/(?:export\s+)?interface\s+(\w+)/, 'interface'],
-    [/^struct\s+(\w+)/, 'struct'],
-    [/^enum\s+(\w+)/, 'enum'],
-    [/^protocol\s+(\w+)/, 'protocol'],
-  ];
+  // Map pattern index to a ClassInfo type label
+  const typeLabels: ClassInfo['type'][] = ['class', 'interface', 'struct', 'enum', 'protocol'];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    for (const [re, type] of patterns) {
-      const match = line.match(re);
+    for (let pi = 0; pi < def.classPatterns.length; pi++) {
+      const match = line.match(def.classPatterns[pi]);
       if (match) {
-        // Count exports from this entity (rough: count 'export' keywords in vicinity)
+        const name = match[1] || match[2] || '';
+        if (!name) continue;
+
+        // Determine type from pattern index (best effort)
+        let type: ClassInfo['type'] = 'class';
+        const lowerLine = line.toLowerCase();
+        if (lowerLine.includes('interface')) type = 'interface';
+        else if (lowerLine.includes('struct')) type = 'struct';
+        else if (lowerLine.includes('enum')) type = 'enum';
+        else if (lowerLine.includes('protocol')) type = 'protocol';
+
         const exportCount = (content.match(/\bexport\b/g) || []).length;
         classes.push({
-          name: match[1],
+          name,
           file: filePath,
           line: i + 1,
           type,
           exportCount
         });
+        break; // one match per line
       }
     }
   }
@@ -278,10 +253,15 @@ function extractClasses(content: string, filePath: string): ClassInfo[] {
   return classes;
 }
 
-function extractTodos(content: string, filePath: string): TodoItem[] {
+function extractTodos(content: string, filePath: string, langName: string): TodoItem[] {
   const todos: TodoItem[] = [];
+  const def = (() => {
+    const { LANGUAGE_REGISTRY } = require('../languages');
+    return LANGUAGE_REGISTRY.find((l: { name: string }) => l.name === langName);
+  })();
+
+  const todoRe = def?.todoPattern ?? /\b(TODO|FIXME|HACK|XXX)\b[:\s]*(.*)/i;
   const lines = content.split('\n');
-  const todoRe = /\b(TODO|FIXME|HACK|XXX)\b[:\s]*(.*)/i;
 
   for (let i = 0; i < lines.length; i++) {
     const match = lines[i].match(todoRe);
@@ -331,7 +311,7 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
     }
 
     const ext = path.extname(filePath).toLowerCase();
-    const language = getLanguage(ext);
+    const language = getLanguageName(ext);
     const lines = content.split('\n').length;
 
     files.push({
@@ -343,17 +323,17 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
     });
 
     if (language !== 'markdown' && language !== 'other') {
-      const funcs = extractFunctionsTS(content, filePath);
+      const funcs = extractFunctions(content, filePath, language);
       allFunctions.push(...funcs);
 
-      const imports = extractImports(content, filePath);
+      const imports = extractImports(content, filePath, language);
       allImports.push(...imports);
 
-      const classes = extractClasses(content, filePath);
+      const classes = extractClasses(content, filePath, language);
       allClasses.push(...classes);
     }
 
-    const todos = extractTodos(content, filePath);
+    const todos = extractTodos(content, filePath, language);
     allTodos.push(...todos);
   }
 
