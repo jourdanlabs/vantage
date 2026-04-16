@@ -124,7 +124,7 @@ export interface AdversarialFinding {
   file: string;
   function?: string;
   line?: number;
-  type: 'null-safety' | 'async-race' | 'error-boundary' | 'edge-case' | 'coupling-risk';
+  type: 'null-safety' | 'async-race' | 'error-boundary' | 'edge-case' | 'coupling-risk' | 'injection' | 'hardcoded-secret';
   severity: 'HIGH' | 'MED' | 'LOW';
   description: string;
   testCase: string; // the adversarial scenario

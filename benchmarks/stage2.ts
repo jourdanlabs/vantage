@@ -79,44 +79,37 @@ const GROUND_TRUTH: CorpusGroundTruth[] = [
   {
     id: 'nodegoat',
     tier1: [
-      // NodeGoat uses Express callbacks (no async/await, no .then()).
-      // PULSAR's async-race and error-boundary patterns won't fire on callback code.
-      // No Tier-1 PULSAR-scope ground truth — this is itself a finding (see notes).
+      // eval() on user-controlled input — 3 adjacent lines, dedup collapses L33+L34 → 2 PULSAR findings
+      // (dedup uses floor(line/3) buckets; L32→10, L33→11, L34→11 → 2 unique findings expected)
+      {
+        file: 'app/routes/contributions.js',
+        type: 'injection',
+        description: 'eval() on user-controlled req.body.preTax — arbitrary JS execution (L32)',
+      },
+      {
+        file: 'app/routes/contributions.js',
+        type: 'injection',
+        description: 'eval() on user-controlled req.body.afterTax/roth (L33-34, dedup to 1 finding)',
+      },
+      // NoSQL $where injection
+      {
+        file: 'app/data/allocations-dao.js',
+        type: 'injection',
+        description: '$where query with template literal from userId — NoSQL injection (L73)',
+      },
+      {
+        file: 'app/data/allocations-dao.js',
+        type: 'injection',
+        description: '$where query with string concat from threshold — NoSQL injection (L78)',
+      },
     ],
     tier2SecurityVulns: [
+      // Remaining documented vulns still outside PULSAR scope
       {
-        file: 'app/routes/contributions.js',
-        line: 32,
-        category: 'code-injection',
-        description: 'eval() on user-controlled req.body.preTax — arbitrary JS execution',
-        pulsarDetectable: false,
-      },
-      {
-        file: 'app/routes/contributions.js',
-        line: 33,
-        category: 'code-injection',
-        description: 'eval() on user-controlled req.body.afterTax',
-        pulsarDetectable: false,
-      },
-      {
-        file: 'app/routes/contributions.js',
-        line: 34,
-        category: 'code-injection',
-        description: 'eval() on user-controlled req.body.roth',
-        pulsarDetectable: false,
-      },
-      {
-        file: 'app/data/allocations-dao.js',
-        line: 73,
-        category: 'nosql-injection',
-        description: '$where query with template literal from userId — NoSQL injection',
-        pulsarDetectable: false,
-      },
-      {
-        file: 'app/data/allocations-dao.js',
-        line: 78,
-        category: 'nosql-injection',
-        description: '$where query with string concat from threshold — NoSQL injection',
+        file: 'app/routes/session.js',
+        line: 0,
+        category: 'broken-authentication',
+        description: 'Weak session management and CSRF — PULSAR has no CSRF detection',
         pulsarDetectable: false,
       },
     ],
@@ -124,7 +117,35 @@ const GROUND_TRUTH: CorpusGroundTruth[] = [
   {
     id: 'juiceshop',
     tier1: [
-      // JSON.parse without try/catch — confirmed in source
+      // Hardcoded secrets — now detected by new patterns
+      {
+        file: 'lib/insecurity.ts',
+        type: 'hardcoded-secret',
+        description: 'RSA private key hardcoded (-----BEGIN RSA PRIVATE KEY-----) at L23',
+      },
+      {
+        file: 'lib/insecurity.ts',
+        type: 'hardcoded-secret',
+        description: 'HMAC secret "pa4qacea4VK9t9nGv7yZtwmj" via createHmac() at L44',
+      },
+      // NoSQL $where injection
+      {
+        file: 'routes/trackOrder.ts',
+        type: 'injection',
+        description: '$where: `this.orderId === \'${id}\'` — NoSQL injection via template literal (L18)',
+      },
+      {
+        file: 'routes/showProductReviews.ts',
+        type: 'injection',
+        description: "$where: 'this.product == ' + id — NoSQL injection via string concat (L36)",
+      },
+      // ReDoS
+      {
+        file: 'lib/codingChallenges.ts',
+        type: 'injection',
+        description: 'new RegExp() with user-controlled challengeKey — potential ReDoS (L76)',
+      },
+      // JSON.parse without try/catch — robustness findings
       {
         file: 'routes/languages.ts',
         type: 'error-boundary',
@@ -145,53 +166,33 @@ const GROUND_TRUTH: CorpusGroundTruth[] = [
         type: 'error-boundary',
         description: 'JSON.parse() on req.params.id without try/catch',
       },
-      // .then() chains without .catch() — confirmed in source
-      {
-        file: 'routes/trackOrder.ts',
-        type: 'error-boundary',
-        description: '.then() at L18 (NoSQL query result) without .catch()',
-      },
-      {
-        file: 'routes/showProductReviews.ts',
-        type: 'error-boundary',
-        description: '.then() at L36 (NoSQL query result) without .catch()',
-      },
     ],
     tier2SecurityVulns: [
+      // Still outside PULSAR detection scope
       {
-        file: 'lib/insecurity.ts',
-        line: 24,
-        category: 'hardcoded-secret',
-        description: 'RSA private key hardcoded in source (2048-bit, full PEM)',
+        file: 'routes/login.ts',
+        line: 34,
+        category: 'sql-injection',
+        description: 'Unparameterized Sequelize query: `SELECT * WHERE email = \'${req.body.email}\'` — SQL injection',
         pulsarDetectable: false,
       },
+      // Note: insecurity.ts PEM key, insecurity.ts HMAC, trackOrder.ts $where,
+      // showProductReviews.ts $where, and codingChallenges.ts ReDoS are now
+      // detected (tier1) — removed from tier2 to avoid double-counting.
+
       {
-        file: 'lib/insecurity.ts',
-        line: 46,
-        category: 'hardcoded-secret',
-        description: 'HMAC secret "pa4qacea4VK9t9nGv7yZtwmj" hardcoded',
-        pulsarDetectable: false,
+        file: 'routes/userProfile.ts',
+        line: 62,
+        category: 'code-injection',
+        description: 'eval(code) where code is from user-supplied profile field — username injection challenge',
+        pulsarDetectable: true,  // detected as MED (variable name not in user-controlled keyword list)
       },
       {
-        file: 'routes/trackOrder.ts',
-        line: 18,
-        category: 'nosql-injection',
-        description: '$where: `this.orderId === \'${id}\'` — NoSQL injection via template literal',
-        pulsarDetectable: false,
-      },
-      {
-        file: 'routes/showProductReviews.ts',
-        line: 36,
-        category: 'nosql-injection',
-        description: "$where: 'this.product == ' + id — NoSQL injection via string concat",
-        pulsarDetectable: false,
-      },
-      {
-        file: 'lib/codingChallenges.ts',
-        line: 76,
-        category: 'redos',
-        description: 'new RegExp() with user-controlled challengeKey — potential ReDoS',
-        pulsarDetectable: false,
+        file: 'routes/captcha.ts',
+        line: 22,
+        category: 'eval-safe',
+        description: 'eval(mathExpression) — expression is constructed from random numbers, NOT user-controlled',
+        pulsarDetectable: true,  // FP: VANTAGE flags MED (correctly uncertain); actual impact: none
       },
     ],
   },

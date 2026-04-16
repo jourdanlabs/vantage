@@ -319,7 +319,9 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
 
     const ext = path.extname(filePath).toLowerCase();
     const language = getLanguageName(ext);
-    const lines = content.split('\n').length;
+    // Subtract trailing empty element produced by files ending with \n
+    const rawLines = content.split('\n');
+    const lines = rawLines.length > 0 && rawLines[rawLines.length - 1] === '' ? rawLines.length - 1 : rawLines.length;
 
     files.push({
       path: filePath,

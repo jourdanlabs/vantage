@@ -34,10 +34,24 @@ export async function runAURORA(
     : 0;
   const riskScore = Math.max(0, 1 - avgRisk);
 
-  // Adversarial score: from PULSAR
-  const highFindings = pulsar.adversarialFindings.filter(f => f.severity === 'HIGH').length;
-  const medFindings = pulsar.adversarialFindings.filter(f => f.severity === 'MED').length;
-  const adversarialPenalty = Math.min(1, highFindings * 0.1 + medFindings * 0.04);
+  // Adversarial score: from PULSAR, weighted by ECLIPSE risk tier.
+  // Findings on high-risk files (per ECLIPSE) penalize more heavily than
+  // findings on low-risk files — same issue in a change-hotspot is more
+  // dangerous than in a stable low-touch file.
+  const highRiskFiles = new Set(eclipse.highRisk.map(r => r.file));
+  const medRiskFiles = new Set(eclipse.medRisk.map(r => r.file));
+
+  let adversarialPenalty = 0;
+  for (const f of pulsar.adversarialFindings) {
+    const inHighRisk = highRiskFiles.has(f.file);
+    const inMedRisk = medRiskFiles.has(f.file);
+    if (f.severity === 'HIGH') {
+      adversarialPenalty += inHighRisk ? 0.12 : inMedRisk ? 0.10 : 0.08;
+    } else if (f.severity === 'MED') {
+      adversarialPenalty += inHighRisk ? 0.05 : inMedRisk ? 0.04 : 0.025;
+    }
+  }
+  adversarialPenalty = Math.min(1, adversarialPenalty);
   const adversarialScore = Math.max(0, 1 - adversarialPenalty);
 
   // Weighted AURORA score

@@ -177,26 +177,190 @@ function findMissingErrorBoundaries(content: string, filePath: string, language:
   return findings;
 }
 
+// ── Injection vulnerability patterns ─────────────────────────────────────────
+
+function findInjectionVulnerabilities(content: string, filePath: string): AdversarialFinding[] {
+  const findings: AdversarialFinding[] = [];
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue;
+
+    // eval() on user-controlled input: eval(req., eval(process.argv., eval(params., eval(query., eval(body.
+    if (/\beval\s*\(/.test(line)) {
+      const evalArg = line.match(/\beval\s*\(\s*(.{0,80})/)?.[1] ?? '';
+      const isUserControlled = /req\.|process\.argv|params\.|query\.|body\.|input|user|payload|data/i.test(evalArg);
+      const severity = isUserControlled ? 'HIGH' : 'MED';
+      findings.push({
+        file: filePath,
+        line: i + 1,
+        type: 'injection',
+        severity,
+        description: isUserControlled
+          ? `eval() on user-controlled input — arbitrary code execution`
+          : `eval() detected — verify input is not user-controlled`,
+        testCase: `Pass \`process.exit(1)\` or \`require('child_process').execSync('...')\` as input — arbitrary code execution`,
+      });
+    }
+
+    // NoSQL $where injection: $where with template literal or string concat
+    if (line.includes('$where')) {
+      const hasTemplateLiteral = line.includes('$where') && line.includes('`') && /\$\{/.test(line);
+      const hasStringConcat = line.includes('$where') && /['"]\s*\+/.test(line);
+      if (hasTemplateLiteral || hasStringConcat) {
+        findings.push({
+          file: filePath,
+          line: i + 1,
+          type: 'injection',
+          severity: 'HIGH',
+          description: `NoSQL $where injection — user-controlled JS expression passed to MongoDB $where`,
+          testCase: `Set field to \`'; sleep(5000); //\` — causes server-side JS execution in MongoDB`,
+        });
+      }
+    }
+
+    // ReDoS: new RegExp() with user-controlled input
+    if (/new\s+RegExp\s*\(/.test(line)) {
+      const regexpArg = line.match(/new\s+RegExp\s*\(\s*(.{0,80})/)?.[1] ?? '';
+      const argTrimmed = regexpArg.trim();
+      // Flag if: (a) argument is a bare variable/expression, or
+      //          (b) argument is a template literal containing interpolation `...${...}`
+      const isPlainLiteral = /^['"]/.test(argTrimmed);
+      const isInterpolatedTemplate = argTrimmed.startsWith('`') && argTrimmed.includes('${');
+      if (!isPlainLiteral || isInterpolatedTemplate) {
+        findings.push({
+          file: filePath,
+          line: i + 1,
+          type: 'injection',
+          severity: 'MED',
+          description: `new RegExp() with non-literal argument — potential ReDoS if input is user-controlled`,
+          testCase: `Pass catastrophic backtracking pattern like \`(a+)+$\` — regex engine hangs`,
+        });
+      }
+    }
+  }
+
+  return findings;
+}
+
+// ── Hardcoded secret patterns ─────────────────────────────────────────────────
+
+function findHardcodedSecrets(content: string, filePath: string): AdversarialFinding[] {
+  const findings: AdversarialFinding[] = [];
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue;
+
+    // PEM private key block
+    if (line.includes('-----BEGIN') && /PRIVATE KEY|RSA PRIVATE|EC PRIVATE|DSA PRIVATE/.test(line)) {
+      findings.push({
+        file: filePath,
+        line: i + 1,
+        type: 'hardcoded-secret',
+        severity: 'HIGH',
+        description: `PEM private key hardcoded in source — key material exposed in version control`,
+        testCase: `Check git log — key is permanently in history even if later removed`,
+      });
+    }
+
+    // AWS access key: AKIA prefix (20-char uppercase)
+    if (/AKIA[0-9A-Z]{16}/.test(line)) {
+      findings.push({
+        file: filePath,
+        line: i + 1,
+        type: 'hardcoded-secret',
+        severity: 'HIGH',
+        description: `AWS access key ID detected (AKIA prefix) — credential exposure`,
+        testCase: `Run \`aws sts get-caller-identity\` with this key — if valid, full AWS account access`,
+      });
+    }
+
+    // Stripe live secret key: sk_live_
+    if (/sk_live_[a-zA-Z0-9]{20,}/.test(line)) {
+      findings.push({
+        file: filePath,
+        line: i + 1,
+        type: 'hardcoded-secret',
+        severity: 'HIGH',
+        description: `Stripe live secret key hardcoded (sk_live_ prefix) — billing account exposure`,
+        testCase: `Use key against Stripe API — full read/write access to payment data`,
+      });
+    }
+
+    // Generic: variable/constant whose name contains a sensitive keyword, assigned a literal string ≥20 chars.
+    // Require a declaration or assignment context (const/let/var/export, or identifier on lhs of = not inside a string).
+    // The negative lookbehind [^'"`\w] prevents matching SQL field names like `password = '...'` inside a template.
+    const secretAssign = line.match(/(?:^|[\s,(])(?:const|let|var|export\s+const)\s+\w*(?:secret|apikey|api_key|token|password|passwd|credential|hmac|signing)\w*\s*[=:]\s*['"`]([^'"`]{20,})['"`]/i)
+      ?? line.match(/\b(?:secret|apikey|api_key|hmac_?secret|signing_?secret|jwt_?secret|session_?secret)\s*[:=]\s*['"`]([^'"`]{20,})['"`]/i);
+    if (secretAssign) {
+      const value = secretAssign[1];
+      // Skip obvious placeholders and test values
+      if (!/placeholder|changeme|your_key|example|XXXXXX|insert_|test_|<YOUR|TODO|FIXME/i.test(value)) {
+        findings.push({
+          file: filePath,
+          line: i + 1,
+          type: 'hardcoded-secret',
+          severity: 'HIGH',
+          description: `Hardcoded secret/key/token value — sensitive credential in source`,
+          testCase: `Confirm the value is a real credential — if so, rotate immediately`,
+        });
+      }
+    }
+
+    // Hex string ≥32 chars assigned to identifier with sensitive name (same declaration-context requirement)
+    const hexAssign = line.match(/(?:^|[\s,(])(?:const|let|var|export\s+const)\s+\w*(?:secret|key|token|hash|salt|hmac|seed)\w*\s*=\s*['"`]([0-9a-fA-F]{32,})['"`]/i);
+    if (hexAssign && !secretAssign) {
+      findings.push({
+        file: filePath,
+        line: i + 1,
+        type: 'hardcoded-secret',
+        severity: 'HIGH',
+        description: `Hardcoded hex key/token (${hexAssign[1].length} chars) — cryptographic material in source`,
+        testCase: `Confirm this is a real key, not a test fixture — if real, rotate and remove from source`,
+      });
+    }
+
+    // Crypto function call with hardcoded literal key: createHmac, createCipher, createSign, etc.
+    const cryptoCall = line.match(/\.create(?:Hmac|Cipher|CipherIv|Sign|Verify)\s*\([^)]*,\s*['"`]([^'"`]{8,})['"`]/);
+    if (cryptoCall) {
+      const value = cryptoCall[1];
+      if (!/placeholder|changeme|example|XXXXXX|test_/i.test(value)) {
+        findings.push({
+          file: filePath,
+          line: i + 1,
+          type: 'hardcoded-secret',
+          severity: 'HIGH',
+          description: `Hardcoded key in crypto function call — secret embedded directly in code`,
+          testCase: `Confirm the value is a real key — extract to environment variable`,
+        });
+      }
+    }
+  }
+
+  return findings;
+}
+
 export async function runPULSAR(
   meteor: MeteorOutput,
   eclipse: EclipseOutput,
   onProgress?: (msg: string) => void
 ): Promise<PulsarOutput> {
-  onProgress?.('stress-testing high-risk files');
+  onProgress?.('scanning all files for adversarial patterns');
 
   const allFindings: AdversarialFinding[] = [];
   const missingGuards: string[] = [];
   const recommendations: string[] = [];
 
-  // Only stress-test high-risk files (plus medium to get coverage)
-  const targetFiles = new Set([
-    ...eclipse.highRisk.map(r => r.file),
-    ...eclipse.medRisk.map(r => r.file)
-  ]);
-
+  // PULSAR runs on every scanned file — ECLIPSE gating removed.
+  // ECLIPSE tier is still available to AURORA for weighted scoring (high-risk
+  // files with PULSAR findings penalize more heavily there).
   let processedCount = 0;
   for (const file of meteor.files) {
-    if (!targetFiles.has(file.path)) continue;
     if (file.language === 'markdown') continue;
 
     // Skip files whose language doesn't have reliable extraction — PULSAR
@@ -210,8 +374,10 @@ export async function runPULSAR(
     const nullFindings = findNullSafetyIssues(content, filePath);
     const edgeFindings = findEdgeCases(content, filePath);
     const boundaryFindings = findMissingErrorBoundaries(content, filePath, language);
+    const injectionFindings = findInjectionVulnerabilities(content, filePath);
+    const secretFindings = findHardcodedSecrets(content, filePath);
 
-    allFindings.push(...asyncFindings, ...nullFindings, ...edgeFindings, ...boundaryFindings);
+    allFindings.push(...asyncFindings, ...nullFindings, ...edgeFindings, ...boundaryFindings, ...injectionFindings, ...secretFindings);
     processedCount++;
   }
 
@@ -230,16 +396,37 @@ export async function runPULSAR(
   const asyncCount = deduped.filter(f => f.type === 'async-race').length;
   const nullCount = deduped.filter(f => f.type === 'null-safety').length;
   const boundaryCount = deduped.filter(f => f.type === 'error-boundary').length;
+  const injectionCount = deduped.filter(f => f.type === 'injection').length;
+  const secretCount = deduped.filter(f => f.type === 'hardcoded-secret').length;
 
   if (asyncCount > 0) missingGuards.push(`${asyncCount} async functions missing error handling`);
   if (nullCount > 0) missingGuards.push(`${nullCount} potential null/undefined dereferences`);
   if (boundaryCount > 0) missingGuards.push(`${boundaryCount} missing error boundaries`);
+  if (injectionCount > 0) missingGuards.push(`${injectionCount} injection vulnerabilities (eval/NoSQL/$where/ReDoS)`);
+  if (secretCount > 0) missingGuards.push(`${secretCount} hardcoded secrets/credentials`);
 
   // Build recommendations from findings
-  const highSeverity = deduped.filter(f => f.severity === 'HIGH');
-  if (highSeverity.length > 0) {
-    recommendations.push(`CRITICAL: Wrap ${asyncCount} async functions in try/catch before shipping`);
-    recommendations.push(`Add error boundaries to all API calls and network operations`);
+  if (secretCount > 0) {
+    recommendations.push(`CRITICAL: ${secretCount} hardcoded secret(s) found — rotate credentials and remove from source immediately`);
+  }
+
+  const evalFindings = deduped.filter(f => f.type === 'injection' && f.description.includes('eval()') && f.severity === 'HIGH');
+  if (evalFindings.length > 0) {
+    recommendations.push(`CRITICAL: ${evalFindings.length} eval() call(s) on user input — arbitrary code execution vector, remove eval() entirely`);
+  }
+
+  const nosqlFindings = deduped.filter(f => f.type === 'injection' && f.description.includes('$where'));
+  if (nosqlFindings.length > 0) {
+    recommendations.push(`CRITICAL: ${nosqlFindings.length} NoSQL $where injection(s) — replace with safe operators ($eq, $gt) and parameterized queries`);
+  }
+
+  const redosFindings = deduped.filter(f => f.type === 'injection' && f.description.includes('ReDoS'));
+  if (redosFindings.length > 0) {
+    recommendations.push(`${redosFindings.length} potential ReDoS via new RegExp() — validate pattern is not user-supplied`);
+  }
+
+  if (asyncCount > 0) {
+    recommendations.push(`Wrap ${asyncCount} async functions in try/catch or .catch() before shipping`);
   }
 
   const forceUnwraps = deduped.filter(f => f.type === 'null-safety' && f.description.includes('Force unwrap'));
