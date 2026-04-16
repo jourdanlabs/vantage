@@ -26,11 +26,19 @@ app.get('/vantage/health', (_req: Request, res: Response) => {
 // Full pipeline run. Accepts a target path and optional engine filter.
 
 app.post('/vantage/analyze', async (req: Request, res: Response) => {
-  const { path: targetPath, engine } = req.body as { path?: string; engine?: EngineFilter };
+  const { path: targetPath, engine, threshold } = req.body as {
+    path?: string;
+    engine?: EngineFilter;
+    threshold?: number;
+  };
 
   if (!targetPath) {
     return res.status(400).json({ error: 'Missing path' });
   }
+
+  const resolvedThreshold = (typeof threshold === 'number' && threshold > 0 && threshold <= 1)
+    ? threshold
+    : 0.80;
 
   const logs: string[] = [];
 
@@ -41,7 +49,8 @@ app.post('/vantage/analyze', async (req: Request, res: Response) => {
       (eng, msg) => {
         logs.push(`[${eng}] ${msg}`);
         console.log(`[VANTAGE] [${eng}] ${msg}`);
-      }
+      },
+      resolvedThreshold
     );
 
     return res.json({

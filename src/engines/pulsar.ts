@@ -3,6 +3,7 @@
 
 import * as path from 'path';
 import { MeteorOutput, EclipseOutput, PulsarOutput, AdversarialFinding } from '../types';
+import { isLanguageFullySupported } from '../languages';
 
 function findAsyncWithoutErrorHandling(content: string, filePath: string): AdversarialFinding[] {
   const findings: AdversarialFinding[] = [];
@@ -197,6 +198,11 @@ export async function runPULSAR(
   for (const file of meteor.files) {
     if (!targetFiles.has(file.path)) continue;
     if (file.language === 'markdown') continue;
+
+    // Skip files whose language doesn't have reliable extraction — PULSAR
+    // patterns are JS/TS/Swift-centric and produce noise on other syntaxes.
+    const ext = path.extname(file.path).toLowerCase();
+    if (!isLanguageFullySupported(ext)) continue;
 
     const { content, path: filePath, language } = file;
 

@@ -56,6 +56,12 @@ export interface MeteorOutput {
     largeFunctions: FunctionInfo[]; // >100 lines
     highComplexityFunctions: FunctionInfo[]; // complexity >15
   };
+  /** Files whose language is recognised but extraction is not yet reliable. */
+  unsupportedFiles: {
+    count: number;
+    extensions: string[];   // deduplicated list of extensions seen
+    filePaths: string[];     // full paths (capped at 100 for readability)
+  };
 }
 
 // NOVA output
@@ -151,6 +157,10 @@ export interface AuroraOutput {
     riskScore: number;
     adversarialScore: number;
   };
+  /** Present when unsupported-language files were found in the corpus. */
+  unsupportedFilesNote?: string;
+  /** The threshold used to determine APPROVED vs REJECTED (default 0.80). */
+  threshold: number;
 }
 
 // Full pipeline result

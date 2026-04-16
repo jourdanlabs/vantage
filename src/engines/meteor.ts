@@ -7,7 +7,7 @@ import {
   FileInfo, FunctionInfo, ImportInfo, ClassInfo, TodoItem, MeteorOutput
 } from '../types';
 import {
-  SUPPORTED_EXTENSIONS, getLanguageName, getLanguageDef
+  SUPPORTED_EXTENSIONS, getLanguageName, getLanguageDef, isLanguageFullySupported
 } from '../languages';
 
 function loadGitignorePatterns(dir: string): string[] {
@@ -302,6 +302,10 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
   const allClasses: ClassInfo[] = [];
   const allTodos: TodoItem[] = [];
 
+  // Track files in languages where extraction is not yet reliable
+  const unsupportedFilePaths: string[] = [];
+  const unsupportedExtsSeen = new Set<string>();
+
   for (const filePath of filePaths) {
     let content: string;
     try {
@@ -321,6 +325,17 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
       lines,
       content
     });
+
+    // If the language registry marks this extension as not fully supported,
+    // count it for LOC but skip function/import/class extraction entirely.
+    if (!isLanguageFullySupported(ext)) {
+      unsupportedFilePaths.push(filePath);
+      unsupportedExtsSeen.add(ext);
+      // Still extract TODOs — those are comment-based and language-agnostic
+      const todos = extractTodos(content, filePath, language);
+      allTodos.push(...todos);
+      continue;
+    }
 
     if (language !== 'markdown' && language !== 'other') {
       const funcs = extractFunctions(content, filePath, language);
@@ -342,6 +357,12 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
   const largeFunctions = allFunctions.filter(f => f.lines > 100);
   const highComplexityFunctions = allFunctions.filter(f => f.complexity > 15);
 
+  if (unsupportedFilePaths.length > 0) {
+    onProgress?.(
+      `WARNING: skipped extraction for ${unsupportedFilePaths.length} files in unsupported language(s): ${[...unsupportedExtsSeen].join(', ')} — LOC counted, no function/import/class data`
+    );
+  }
+
   onProgress?.(`${files.length} files scanned, ${allFunctions.length} functions found, ${allTodos.length} TODO/FIXME items`);
 
   return {
@@ -356,6 +377,11 @@ export async function runMETEOR(targetPath: string, onProgress?: (msg: string) =
       todoCount: allTodos.length,
       largeFunctions,
       highComplexityFunctions
-    }
+    },
+    unsupportedFiles: {
+      count: unsupportedFilePaths.length,
+      extensions: [...unsupportedExtsSeen].sort(),
+      filePaths: unsupportedFilePaths.slice(0, 100), // cap for readability
+    },
   };
 }

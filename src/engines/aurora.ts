@@ -9,7 +9,8 @@ export async function runAURORA(
   nova: NovaOutput,
   eclipse: EclipseOutput,
   pulsar: PulsarOutput,
-  onProgress?: (msg: string) => void
+  onProgress?: (msg: string) => void,
+  threshold = 0.80
 ): Promise<AuroraOutput> {
   onProgress?.('computing final audit score');
 
@@ -47,7 +48,7 @@ export async function runAURORA(
     adversarialScore * 0.20
   );
 
-  const verdict = score >= 0.80 ? 'APPROVED' : 'REJECTED';
+  const verdict = score >= threshold ? 'APPROVED' : 'REJECTED';
 
   // === Build top issues list ===
   const issues: AuroraIssue[] = [];
@@ -145,16 +146,29 @@ export async function runAURORA(
   ].filter(Boolean).slice(0, 10);
 
   // Summary
-  const summary = [
+  const summaryParts = [
     `Analyzed ${meteor.files.length} files, ${meteor.functions.length} functions, ${meteor.metrics.linesOfCode.toLocaleString()} lines of code.`,
     `Found ${nova.circularDeps.length} circular dependencies, ${nova.couplingIssues.length} coupling issues, ${nova.godModules.length} god modules.`,
     `${eclipse.highRisk.length} high-risk files identified. ${pulsar.adversarialFindings.filter(f => f.severity === 'HIGH').length} critical adversarial findings.`,
     verdict === 'APPROVED'
       ? `AURORA score ${(score * 100).toFixed(0)}% — codebase is ship-safe. Minor improvements recommended.`
       : `AURORA score ${(score * 100).toFixed(0)}% — codebase has ${topIssues.filter(i => i.severity === 'HIGH').length} HIGH severity issues blocking ship.`
-  ].join(' ');
+  ];
+  const summary = summaryParts.join(' ');
 
-  onProgress?.(`score ${score.toFixed(2)} → ${verdict}`);
+  // Unsupported files note
+  let unsupportedFilesNote: string | undefined;
+  if (meteor.unsupportedFiles.count > 0) {
+    const pct = meteor.files.length > 0
+      ? Math.round((meteor.unsupportedFiles.count / meteor.files.length) * 100)
+      : 100;
+    unsupportedFilesNote =
+      `${meteor.unsupportedFiles.count} of ${meteor.files.length} files (${pct}%) are in language(s) without reliable extraction: ${meteor.unsupportedFiles.extensions.join(', ')}. ` +
+      `LOC is counted; function/import/class analysis was skipped for these files. ` +
+      `Score and findings reflect only the ${meteor.files.length - meteor.unsupportedFiles.count} supported-language files.`;
+  }
+
+  onProgress?.(`score ${score.toFixed(2)} → ${verdict}${threshold !== 0.80 ? ` (threshold ${threshold})` : ''}`);
 
   return {
     score,
@@ -167,6 +181,8 @@ export async function runAURORA(
       dependencyScore,
       riskScore,
       adversarialScore
-    }
+    },
+    unsupportedFilesNote,
+    threshold,
   };
 }

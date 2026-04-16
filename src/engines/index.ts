@@ -19,9 +19,16 @@ export type EngineFilter = 'METEOR' | 'NOVA' | 'ECLIPSE' | 'PULSAR' | 'AURORA' |
 export async function runPipeline(
   targetPath: string,
   engineFilter: EngineFilter = null,
-  onProgress?: (engine: string, msg: string) => void
+  onProgress?: (engine: string, msg: string) => void,
+  threshold = 0.80
 ): Promise<VantageReport> {
   const progress = (engine: string) => (msg: string) => onProgress?.(engine, msg);
+  const stubAurora = (summary: string) => ({
+    score: 0, verdict: 'REJECTED' as const, topIssues: [], fixes: [], summary,
+    breakdown: { complexityScore: 0, dependencyScore: 0, riskScore: 0, adversarialScore: 0 },
+    threshold,
+  });
+  const stubMeteorUnsupported = { count: 0, extensions: [], filePaths: [] };
 
   const meteor = await runMETEOR(targetPath, progress('METEOR'));
   if (engineFilter === 'METEOR') {
@@ -32,7 +39,7 @@ export async function runPipeline(
       nova: { causalChains: [], dependencyGraph: {}, circularDeps: [], couplingIssues: [], godModules: [] },
       eclipse: { riskScores: {}, highRisk: [], medRisk: [], estimatedBugProbability: 0 },
       pulsar: { adversarialFindings: [], missingGuards: [], recommendations: [] },
-      aurora: { score: 0, verdict: 'REJECTED', topIssues: [], fixes: [], summary: 'METEOR only run', breakdown: { complexityScore: 0, dependencyScore: 0, riskScore: 0, adversarialScore: 0 } }
+      aurora: stubAurora('METEOR only run'),
     };
   }
 
@@ -45,7 +52,7 @@ export async function runPipeline(
       nova,
       eclipse: { riskScores: {}, highRisk: [], medRisk: [], estimatedBugProbability: 0 },
       pulsar: { adversarialFindings: [], missingGuards: [], recommendations: [] },
-      aurora: { score: 0, verdict: 'REJECTED', topIssues: [], fixes: [], summary: 'NOVA only run', breakdown: { complexityScore: 0, dependencyScore: 0, riskScore: 0, adversarialScore: 0 } }
+      aurora: stubAurora('NOVA only run'),
     };
   }
 
@@ -58,7 +65,7 @@ export async function runPipeline(
       nova,
       eclipse,
       pulsar: { adversarialFindings: [], missingGuards: [], recommendations: [] },
-      aurora: { score: 0, verdict: 'REJECTED', topIssues: [], fixes: [], summary: 'ECLIPSE only run', breakdown: { complexityScore: 0, dependencyScore: 0, riskScore: 0, adversarialScore: 0 } }
+      aurora: stubAurora('ECLIPSE only run'),
     };
   }
 
@@ -71,11 +78,11 @@ export async function runPipeline(
       nova,
       eclipse,
       pulsar,
-      aurora: { score: 0, verdict: 'REJECTED', topIssues: [], fixes: [], summary: 'PULSAR only run', breakdown: { complexityScore: 0, dependencyScore: 0, riskScore: 0, adversarialScore: 0 } }
+      aurora: stubAurora('PULSAR only run'),
     };
   }
 
-  const aurora = await runAURORA(meteor, nova, eclipse, pulsar, progress('AURORA'));
+  const aurora = await runAURORA(meteor, nova, eclipse, pulsar, progress('AURORA'), threshold);
 
   return {
     target: targetPath,

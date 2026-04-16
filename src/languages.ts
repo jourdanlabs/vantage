@@ -4,6 +4,13 @@
 export interface LanguageDef {
   extensions: string[];         // e.g. ['.go']
   name: string;                 // language label
+  /**
+   * Whether VANTAGE has reliable extraction for this language.
+   * false = LOC is counted but function/import/class extraction is skipped and
+   * files are reported in MeteorOutput.unsupportedFiles.
+   * Defaults to true when omitted.
+   */
+  fullySupported?: boolean;
   // Regex patterns for METEOR extraction
   functionPatterns: RegExp[];   // matches function/method declarations
   importPatterns: RegExp[];     // matches import/require/use/include statements
@@ -237,9 +244,14 @@ export const LANGUAGE_REGISTRY: LanguageDef[] = [
   },
 
   // ── C / C++ ──────────────────────────────────────────────────────────────────
+  // fullySupported: false — regex patterns require '{' on same line as signature,
+  // which fails for Allman-style C (the dominant kernel/systems style). LOC is
+  // still counted but function/import/class extraction is skipped. Tracked under
+  // MeteorOutput.unsupportedFiles. Real fix: tree-sitter-c (future work).
   {
     extensions: ['.c', '.cpp', '.cc', '.cxx', '.h', '.hpp', '.hxx'],
     name: 'cpp',
+    fullySupported: false,
     functionPatterns: [
       /\w+\s+\w+\s*\([^)]*\)\s*(?:const\s*)?\{/,
       /\w+::\w+\s*\([^)]*\)\s*(?:const\s*)?\{/,
@@ -397,3 +409,15 @@ export function getLanguageName(ext: string): string {
 export const ALL_IMPORT_EXTENSIONS: string[] = [
   ...new Set(LANGUAGE_REGISTRY.flatMap(l => l.importExtensions))
 ];
+
+/**
+ * Returns true if VANTAGE has reliable function/import/class extraction for
+ * the given file extension. Returns false for languages where extraction is
+ * known to be unreliable (e.g. C/C++ Allman-style). Defaults to true for
+ * unrecognised extensions (they won't be walked anyway).
+ */
+export function isLanguageFullySupported(ext: string): boolean {
+  const def = getLanguageDef(ext);
+  if (!def) return true; // unknown ext — won't be walked, irrelevant
+  return def.fullySupported !== false;
+}
