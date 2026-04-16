@@ -1,0 +1,318 @@
+{
+  "generatedAt": "2026-04-16T09:14:24.107Z",
+  "suiteA": [
+    {
+      "corpusId": "nodegoat",
+      "label": "OWASP/NodeGoat",
+      "pipelineStats": {
+        "files": 53,
+        "loc": 4113,
+        "functions": 55,
+        "circularDeps": 0,
+        "godModules": 0,
+        "highRiskFiles": 0,
+        "medRiskFiles": 0,
+        "pulsarTargetFiles": 0,
+        "totalPulsarFindings": 0,
+        "highFindings": 0,
+        "medFindings": 0,
+        "lowFindings": 0
+      },
+      "auroraScore": 0.7190749999999999,
+      "auroraVerdict": "REJECTED",
+      "auroraBreakdown": {
+        "complexityScore": 0,
+        "dependencyScore": 0.95,
+        "riskScore": 0.9363,
+        "adversarialScore": 1
+      },
+      "tier1": {
+        "groundTruthCount": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "tpDetails": [],
+        "fpDetails": [],
+        "fnDetails": []
+      },
+      "tier2CapabilityGap": {
+        "knownVulnCount": 5,
+        "pulsarDetectableCount": 0,
+        "pulsarUndetectableCount": 5,
+        "vulns": [
+          {
+            "file": "app/routes/contributions.js",
+            "line": 32,
+            "category": "code-injection",
+            "description": "eval() on user-controlled req.body.preTax — arbitrary JS execution",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "app/routes/contributions.js",
+            "line": 33,
+            "category": "code-injection",
+            "description": "eval() on user-controlled req.body.afterTax",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "app/routes/contributions.js",
+            "line": 34,
+            "category": "code-injection",
+            "description": "eval() on user-controlled req.body.roth",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "app/data/allocations-dao.js",
+            "line": 73,
+            "category": "nosql-injection",
+            "description": "$where query with template literal from userId — NoSQL injection",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "app/data/allocations-dao.js",
+            "line": 78,
+            "category": "nosql-injection",
+            "description": "$where query with string concat from threshold — NoSQL injection",
+            "pulsarDetectable": false
+          }
+        ]
+      },
+      "totalMs": 33.64945800000004,
+      "engineMs": {
+        "METEOR": 22.20750000000004,
+        "NOVA": 0.5830830000000446,
+        "ECLIPSE": 2.1252920000000017,
+        "PULSAR": 0.08620799999999917,
+        "AURORA": 8.641458
+      }
+    },
+    {
+      "corpusId": "juiceshop",
+      "label": "bkimminich/juice-shop",
+      "pipelineStats": {
+        "files": 385,
+        "loc": 33411,
+        "functions": 532,
+        "circularDeps": 11,
+        "godModules": 0,
+        "highRiskFiles": 0,
+        "medRiskFiles": 0,
+        "pulsarTargetFiles": 0,
+        "totalPulsarFindings": 0,
+        "highFindings": 0,
+        "medFindings": 0,
+        "lowFindings": 0
+      },
+      "auroraScore": 0.6697911654135338,
+      "auroraVerdict": "REJECTED",
+      "auroraBreakdown": {
+        "complexityScore": 0.906578947368421,
+        "dependencyScore": 0,
+        "riskScore": 0.9725857142857143,
+        "adversarialScore": 1
+      },
+      "tier1": {
+        "groundTruthCount": 6,
+        "tp": 0,
+        "fp": 0,
+        "fn": 6,
+        "precision": null,
+        "recall": 0,
+        "f1": null,
+        "tpDetails": [],
+        "fpDetails": [],
+        "fnDetails": [
+          {
+            "file": "routes/languages.ts",
+            "type": "error-boundary",
+            "description": "JSON.parse() at L18 without try/catch"
+          },
+          {
+            "file": "routes/verify.ts",
+            "type": "error-boundary",
+            "description": "JSON.parse() at L128 without try/catch"
+          },
+          {
+            "file": "routes/chatbot.ts",
+            "type": "error-boundary",
+            "description": "JSON.parse() of training set without try/catch"
+          },
+          {
+            "file": "routes/recycles.ts",
+            "type": "error-boundary",
+            "description": "JSON.parse() on req.params.id without try/catch"
+          },
+          {
+            "file": "routes/trackOrder.ts",
+            "type": "error-boundary",
+            "description": ".then() at L18 (NoSQL query result) without .catch()"
+          },
+          {
+            "file": "routes/showProductReviews.ts",
+            "type": "error-boundary",
+            "description": ".then() at L36 (NoSQL query result) without .catch()"
+          }
+        ]
+      },
+      "tier2CapabilityGap": {
+        "knownVulnCount": 5,
+        "pulsarDetectableCount": 0,
+        "pulsarUndetectableCount": 5,
+        "vulns": [
+          {
+            "file": "lib/insecurity.ts",
+            "line": 24,
+            "category": "hardcoded-secret",
+            "description": "RSA private key hardcoded in source (2048-bit, full PEM)",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "lib/insecurity.ts",
+            "line": 46,
+            "category": "hardcoded-secret",
+            "description": "HMAC secret \"pa4qacea4VK9t9nGv7yZtwmj\" hardcoded",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "routes/trackOrder.ts",
+            "line": 18,
+            "category": "nosql-injection",
+            "description": "$where: `this.orderId === '${id}'` — NoSQL injection via template literal",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "routes/showProductReviews.ts",
+            "line": 36,
+            "category": "nosql-injection",
+            "description": "$where: 'this.product == ' + id — NoSQL injection via string concat",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "lib/codingChallenges.ts",
+            "line": 76,
+            "category": "redos",
+            "description": "new RegExp() with user-controlled challengeKey — potential ReDoS",
+            "pulsarDetectable": false
+          }
+        ]
+      },
+      "totalMs": 117.09908300000001,
+      "engineMs": {
+        "METEOR": 53.36862499999995,
+        "NOVA": 8.033374999999978,
+        "ECLIPSE": 55.420124999999985,
+        "PULSAR": 0.01974999999993088,
+        "AURORA": 0.2511250000000018
+      }
+    }
+  ],
+  "suiteB": {
+    "circularDepTests": [
+      {
+        "id": "linear-no-cycle",
+        "description": "A imports B — no cycle",
+        "expectedCycles": 0,
+        "detectedCycles": 0,
+        "pass": true
+      },
+      {
+        "id": "two-cycle",
+        "description": "A → B → A (2-node cycle)",
+        "expectedCycles": 1,
+        "detectedCycles": 1,
+        "pass": true
+      },
+      {
+        "id": "three-cycle",
+        "description": "A → B → C → A (3-node cycle)",
+        "expectedCycles": 1,
+        "detectedCycles": 1,
+        "pass": true
+      },
+      {
+        "id": "diamond-no-cycle",
+        "description": "Diamond: A→B, A→C, B→D, C→D (no cycle)",
+        "expectedCycles": 0,
+        "detectedCycles": 0,
+        "pass": true
+      },
+      {
+        "id": "embedded-cycle",
+        "description": "A→B→C and B→A (cycle embedded in larger graph)",
+        "expectedCycles": 1,
+        "detectedCycles": 1,
+        "pass": true
+      }
+    ],
+    "passed": 5,
+    "total": 5
+  },
+  "suiteC": {
+    "godModuleTests": [
+      {
+        "id": "below-line-threshold",
+        "description": "499 lines + 9 exports — lines not > 500, should NOT fire",
+        "lines": 499,
+        "exports": 9,
+        "shouldBeGodModule": false,
+        "detectedAsGodModule": false,
+        "pass": true
+      },
+      {
+        "id": "at-line-threshold",
+        "description": "500 lines + 9 exports — lines = 500 not > 500, should NOT fire",
+        "lines": 500,
+        "exports": 9,
+        "shouldBeGodModule": false,
+        "detectedAsGodModule": true,
+        "pass": false,
+        "note": "Expected godModule=false, got true (actual lines=500)"
+      },
+      {
+        "id": "below-export-threshold",
+        "description": "501 lines + 8 exports — exports not > 8, should NOT fire",
+        "lines": 501,
+        "exports": 8,
+        "shouldBeGodModule": false,
+        "detectedAsGodModule": false,
+        "pass": true
+      },
+      {
+        "id": "both-above-threshold",
+        "description": "501 lines + 9 exports — both > threshold, SHOULD fire",
+        "lines": 501,
+        "exports": 9,
+        "shouldBeGodModule": true,
+        "detectedAsGodModule": true,
+        "pass": true
+      },
+      {
+        "id": "stress-large",
+        "description": "501 lines + 50 exports — stress case, SHOULD fire",
+        "lines": 501,
+        "exports": 50,
+        "shouldBeGodModule": true,
+        "detectedAsGodModule": true,
+        "pass": true
+      }
+    ],
+    "passed": 4,
+    "total": 5
+  },
+  "suiteD": {
+    "corpus": "expressjs/express",
+    "auroraScore": 0.9594053279541488,
+    "auroraVerdict": "APPROVED",
+    "auroraBreakdown": {
+      "complexityScore": 0.9829759217456734,
+      "dependencyScore": 0.9,
+      "riskScore": 0.974645390070922,
+      "adversarialScore": 1
+    },
+    "pass": true,
+    "totalMs": 46.7209160000001
+  }
+}
