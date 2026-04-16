@@ -345,20 +345,53 @@ function findHardcodedSecrets(content: string, filePath: string): AdversarialFin
   return findings;
 }
 
+// ── Test-file detection ───────────────────────────────────────────────────────
+
+function isTestFile(filePath: string): boolean {
+  const p = filePath.replace(/\\/g, '/');
+  return (
+    /\.(spec|test)\.[jt]sx?$/.test(p) ||
+    /\/__tests__\//.test(p) ||
+    /\/e2e\//.test(p) ||
+    /\/cypress\//.test(p) ||
+    /\/tests?\//.test(p)
+  );
+}
+
+// ── PULSAR options ────────────────────────────────────────────────────────────
+
+export interface PulsarOptions {
+  /** Skip injection + hardcoded-secret patterns on test/spec files. Default: true */
+  skipTestFilesForSecurityPatterns?: boolean;
+}
+
 export async function runPULSAR(
   meteor: MeteorOutput,
   eclipse: EclipseOutput,
-  onProgress?: (msg: string) => void
+  onProgress?: (msg: string) => void,
+  options: PulsarOptions = {}
 ): Promise<PulsarOutput> {
+  const skipTestFiles = options.skipTestFilesForSecurityPatterns !== false; // default true
+
   onProgress?.('scanning all files for adversarial patterns');
 
   const allFindings: AdversarialFinding[] = [];
   const missingGuards: string[] = [];
   const recommendations: string[] = [];
 
-  // PULSAR runs on every scanned file — ECLIPSE gating removed.
-  // ECLIPSE tier is still available to AURORA for weighted scoring (high-risk
-  // files with PULSAR findings penalize more heavily there).
+  // Tiered gating:
+  //   Security patterns (injection, hardcoded-secret, error-boundary):
+  //     run on ALL files (minus test files when skipTestFiles=true).
+  //   Quality patterns (async-race, edge-case, null-safety):
+  //     only run on ECLIPSE medium/high-risk files — these are noisy and benefit
+  //     from targeted scope.
+  //   null-safety additionally: never run on .ts/.tsx — TypeScript's type system
+  //     prevents the null-dereference classes this pattern targets on typed values.
+  const eclipseQualified = new Set([
+    ...eclipse.highRisk.map(r => r.file),
+    ...eclipse.medRisk.map(r => r.file),
+  ]);
+
   let processedCount = 0;
   for (const file of meteor.files) {
     if (file.language === 'markdown') continue;
@@ -369,15 +402,24 @@ export async function runPULSAR(
     if (!isLanguageFullySupported(ext)) continue;
 
     const { content, path: filePath, language } = file;
+    const isQualified = eclipseQualified.has(filePath);
+    const isTyped = ext === '.ts' || ext === '.tsx';
+    const isTest = skipTestFiles && isTestFile(filePath);
 
-    const asyncFindings = findAsyncWithoutErrorHandling(content, filePath);
-    const nullFindings = findNullSafetyIssues(content, filePath);
-    const edgeFindings = findEdgeCases(content, filePath);
-    const boundaryFindings = findMissingErrorBoundaries(content, filePath, language);
-    const injectionFindings = findInjectionVulnerabilities(content, filePath);
-    const secretFindings = findHardcodedSecrets(content, filePath);
+    // Security patterns — full coverage, test files optionally excluded
+    const boundaryFindings = !isTest ? findMissingErrorBoundaries(content, filePath, language) : [];
+    const injectionFindings = !isTest ? findInjectionVulnerabilities(content, filePath) : [];
+    const secretFindings = !isTest ? findHardcodedSecrets(content, filePath) : [];
 
-    allFindings.push(...asyncFindings, ...nullFindings, ...edgeFindings, ...boundaryFindings, ...injectionFindings, ...secretFindings);
+    // Quality patterns — ECLIPSE-gated; null-safety also skips .ts/.tsx
+    const asyncFindings = isQualified ? findAsyncWithoutErrorHandling(content, filePath) : [];
+    const nullFindings = isQualified && !isTyped ? findNullSafetyIssues(content, filePath) : [];
+    const edgeFindings = isQualified ? findEdgeCases(content, filePath) : [];
+
+    allFindings.push(
+      ...asyncFindings, ...nullFindings, ...edgeFindings,
+      ...boundaryFindings, ...injectionFindings, ...secretFindings
+    );
     processedCount++;
   }
 
