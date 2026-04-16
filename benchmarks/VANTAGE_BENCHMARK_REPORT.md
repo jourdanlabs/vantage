@@ -3,7 +3,7 @@
 **Version**: Post-Stage 2 final (tiered gating applied)  
 **Run date**: 2026-04-16  
 **Pipeline version**: COSMIC (METEOR → NOVA → ECLIPSE → PULSAR → AURORA)  
-**Comparison tools**: Semgrep 1.159.0 (`auto` ruleset), SonarQube Community 26.4.0 (Docker, JS/TS analysis)
+**Comparison tools**: Semgrep 1.159.0 (`p/owasp-top-ten + p/nodejs + p/javascript`), SonarQube Community 26.4.0 (Docker, JS/TS analysis)
 
 ---
 
@@ -21,26 +21,28 @@
 
 VANTAGE is a static analysis pipeline that produces a single actionable verdict (APPROVED / REJECTED) backed by a four-component score. Unlike Semgrep and SonarQube — pattern-matching scanners — VANTAGE integrates complexity, dependency, risk, and adversarial analysis into a unified score, and separates security-pattern findings from quality-pattern findings via tiered gating.
 
-| Metric | VANTAGE | Semgrep (`auto`) | SonarQube Community |
-|--------|---------|-----------------|---------------------|
-| NodeGoat precision | **100%** | 6.9% | 0% |
+Semgrep is benchmarked with `p/owasp-top-ten + p/nodejs + p/javascript` — the most security-relevant configuration for Node.js/TypeScript codebases.
+
+| Metric | VANTAGE | Semgrep (OWASP+nodejs+js) | SonarQube Community |
+|--------|---------|--------------------------|---------------------|
+| NodeGoat precision | **100%** | 13.3% | 0% |
 | NodeGoat recall | **100%** | 50% | 0% |
-| NodeGoat F1 | **100%** | 11.1% | 0% |
-| NodeGoat runtime | **19 ms** | ~5 s | ~11 s |
-| Juice Shop precision | **75%** | 7.9% | 3.4% |
-| Juice Shop recall | **100%** | 30% | 20% |
-| Juice Shop F1 | **85.7%** | 12.6% | 5.8% |
-| Juice Shop runtime | **107 ms** | ~19 s | ~27 s |
+| NodeGoat F1 | **100%** | 21.1% | 0% |
+| NodeGoat runtime | **19 ms** | ~3.7 s | ~11 s |
+| Juice Shop precision | **75%** | 5.6% | 3.4% |
+| Juice Shop recall | **100%** | 10% | 20% |
+| Juice Shop F1 | **85.7%** | 7.1% | 5.8% |
+| Juice Shop runtime | **107 ms** | ~14.5 s | ~27 s |
 | Produces APPROVED/REJECTED verdict | **Yes** | No | Quality Gate (limited) |
 | Detects architectural issues (circular deps, god modules) | **Yes** | No | No |
 | Requires server/daemon to run | **No** | No | **Yes (Java server)** |
 
 **Key findings**:
 
-- VANTAGE achieves 100% recall on both corpora; Semgrep misses 50% (NodeGoat) and 70% (Juice Shop); SonarQube misses 100% (NodeGoat) and 80% (Juice Shop) of tier-1 ground truth.
-- VANTAGE precision (75–100%) is 22–29× higher than SonarQube (0–3.4%) and 10–12× higher than Semgrep (7–9%).
-- VANTAGE is 580× faster than SonarQube and 263× faster than Semgrep on NodeGoat.
-- Neither Semgrep nor SonarQube detect NoSQL `$where` injection or `JSON.parse` missing error boundaries — two of VANTAGE's core tier-1 patterns.
+- VANTAGE achieves 100% recall on both corpora. The targeted Semgrep OWASP ruleset reaches 50% recall on NodeGoat and only 10% on Juice Shop; SonarQube reaches 0% and 20% respectively.
+- VANTAGE precision (75–100%) is 5–7× higher than the targeted Semgrep configuration (5.6–13.3%) and 22–29× higher than SonarQube (0–3.4%).
+- The OWASP+nodejs+javascript ruleset does not include hardcoded-secret or ReDoS detection, so it performs worse on Juice Shop than Semgrep's broad `auto` profile (which serendipitously includes those rules). Neither configuration detects NoSQL `$where` injection or `JSON.parse` missing error boundaries.
+- VANTAGE is 579× faster than SonarQube and 194× faster than Semgrep on NodeGoat.
 - SonarQube requires a running Java server; Semgrep requires internet access for rule downloads. VANTAGE runs fully offline with zero infrastructure.
 - VANTAGE produces a structural APPROVED/REJECTED verdict with a four-component score breakdown; neither competitor provides an equivalent.
 
@@ -200,21 +202,21 @@ Express has 0 ECLIPSE-qualified files (no file scores ≥ 0.40 risk), so quality
 ## 4. Stage 3 — VANTAGE vs. Semgrep vs. SonarQube Comparative Benchmarks
 
 **Semgrep version**: 1.159.0  
-**Semgrep ruleset**: `auto` (all available community rules)  
+**Semgrep ruleset**: `p/owasp-top-ten + p/nodejs + p/javascript` — the most security-relevant configuration for Node.js/TypeScript projects. See §5.5 for a comparison with the `auto` profile.  
 **SonarQube**: Community 26.4.0 running in Docker (`sonarqube:community`), JS/TS analysis via SonarJS plugin
 
 ### 4.1 NodeGoat — Three-Way Head-to-Head
 
-| Metric | VANTAGE | Semgrep | SonarQube |
-|--------|---------|---------|-----------|
-| Total findings | 4 | 29 | 3 (vulns) / 159 (all) |
+| Metric | VANTAGE | Semgrep (OWASP+nodejs+js) | SonarQube |
+|--------|---------|--------------------------|-----------|
+| Total findings | 4 | 15 | 3 (vulns) / 159 (all) |
 | True Positives (tier-1) | **4** | 2 | 0 |
-| False Positives | **0** | 27 | 3 |
+| False Positives | **0** | 13 | 3 |
 | False Negatives | **0** | 2 | **4** |
-| Precision | **100%** | 6.9% | 0% |
+| Precision | **100%** | 13.3% | 0% |
 | Recall | **100%** | 50% | 0% |
-| F1 | **100%** | 11.1% | 0% |
-| Runtime | **19 ms** | ~5,000 ms | ~11,000 ms |
+| F1 | **100%** | 21.1% | 0% |
+| Runtime | **19 ms** | ~3,700 ms | ~11,000 ms |
 | Produces verdict | **APPROVED 88%** | — | Quality Gate |
 
 **What each tool found on NodeGoat**:
@@ -222,48 +224,54 @@ Express has 0 ECLIPSE-qualified files (no file scores ≥ 0.40 risk), so quality
 | File | Finding | VANTAGE | Semgrep | SonarQube |
 |------|---------|---------|---------|-----------|
 | `data/allocations-dao.js:73,78` | NoSQL $where injection | ✓ HIGH | ✗ | ✗ |
-| `routes/contributions.js:32,33` | eval injection | ✓ HIGH | ✓ (WARNING) | ✗ |
-| `artifacts/cert/server.key:1` | Private key in repo | ✗ (non-code file) | ✓ ERROR | ✓ BLOCKER |
+| `routes/contributions.js:32,33` | eval injection | ✓ HIGH | ✓ ERROR | ✗ |
+| `artifacts/cert/server.key:1` | Private key in repo | ✗ (non-code file) | ✗ | ✓ BLOCKER |
 | `artifacts/db-reset.js:18` | Hardcoded password | ✗ | ✗ | ✓ MAJOR |
 | `server.js` cookie config | Missing secure/httpOnly | ✗ | ✓ (6 findings) | ✗ |
-| CSRF middleware | Missing csurf | ✗ | ✓ INFO | ✗ |
+| CSRF middleware | Missing csurf | ✗ | ✗ | ✗ |
+
+Semgrep's OWASP+nodejs profile does not include `detected-private-key` or `express-check-csurf-middleware-usage` — those rules are only in the broader `auto` pack.
 
 **SonarQube NodeGoat vulnerability findings (3 total, 0 TPs)**:
 - `artifacts/cert/server.key:1` — private key in repo (BLOCKER) — real issue, not in tier-1 GT
 - `artifacts/db-reset.js:18` — hardcoded password in test fixture (MAJOR) — benign test data
 - `server.js:121` — static middleware before session middleware (MINOR) — real config issue, not in tier-1 GT
 
-SonarQube found 0 of 4 ground truth entries. It has no rules for `eval()` injection or NoSQL `$where` injection in JavaScript.
+Both Semgrep and SonarQube missed the NoSQL `$where` injection in `allocations-dao.js` — neither tool includes rules for MongoDB operator injection in JavaScript.
 
 ### 4.2 Juice Shop — Three-Way Head-to-Head
 
-| Metric | VANTAGE | Semgrep | SonarQube |
-|--------|---------|---------|-----------|
-| Total findings | 16 | 38 | 58 (vulns) / 4,478 (all) |
-| True Positives (tier-1) | **12** | 3 | 2 |
-| False Positives | 4 | 35 | **56** |
-| False Negatives | **0** | 7 | 8 |
-| Precision | **75%** | 7.9% | 3.4% |
-| Recall | **100%** | 30% | 20% |
-| F1 | **85.7%** | 12.6% | 5.8% |
-| Runtime | **107 ms** | ~18,600 ms | ~27,000 ms |
+| Metric | VANTAGE | Semgrep (OWASP+nodejs+js) | SonarQube |
+|--------|---------|--------------------------|-----------|
+| Total findings | 16 | 18 | 58 (vulns) / 4,478 (all) |
+| True Positives (tier-1) | **12** | 1 | 2 |
+| False Positives | 4 | 17 | **56** |
+| False Negatives | **0** | 9 | 8 |
+| Precision | **75%** | 5.6% | 3.4% |
+| Recall | **100%** | 10% | 20% |
+| F1 | **85.7%** | 7.1% | 5.8% |
+| Runtime | **107 ms** | ~14,500 ms | ~27,000 ms |
 | Produces verdict | **REJECTED 55%** | — | Quality Gate |
 
 **Ground truth coverage by tool (Juice Shop)**:
 
-| GT Entry | VANTAGE | Semgrep | SonarQube |
-|----------|---------|---------|-----------|
+| GT Entry | VANTAGE | Semgrep (OWASP+nodejs+js) | SonarQube |
+|----------|---------|--------------------------|-----------|
 | `lib/insecurity.ts:23` PEM key | ✓ HIGH | ✗ | ✓ BLOCKER |
-| `lib/insecurity.ts:44` HMAC secret | ✓ HIGH | ✓ ERROR | ✓ BLOCKER |
+| `lib/insecurity.ts:44` HMAC secret | ✓ HIGH | ✗ | ✓ BLOCKER |
 | `routes/trackOrder.ts:18` $where | ✓ HIGH | ✗ | ✗ |
 | `routes/showProductReviews.ts:36` $where | ✓ HIGH | ✗ | ✗ |
-| `lib/codingChallenges.ts:76` ReDoS | ✓ MED | ✓ WARNING | ✗ |
-| `lib/codingChallenges.ts:78` ReDoS | ✓ MED | ✓ WARNING | ✗ |
+| `lib/codingChallenges.ts:76` ReDoS | ✓ MED | ✗ | ✗ |
+| `lib/codingChallenges.ts:78` ReDoS | ✓ MED | ✗ | ✗ |
 | `routes/languages.ts` error-boundary | ✓ MED | ✗ | ✗ |
 | `routes/verify.ts` error-boundary | ✓ MED | ✗ | ✗ |
-| `routes/chatbot.ts` error-boundary | ✓ MED | ✗ | ✗ |
+| `routes/chatbot.ts` error-boundary | ✓ MED | ✓ (raw-html-format†) | ✗ |
 | `routes/recycles.ts` error-boundary | ✓ MED | ✗ | ✗ |
-| **TPs** | **12** | **3** | **2** |
+| **TPs** | **12** | **1** | **2** |
+
+†`raw-html-format` at `chatbot.ts:205` is an XSS finding, not the error-boundary JSON.parse pattern in the GT. Counted as TP by file match (consistent with scoring methodology); see §5.6 for GT scope notes.
+
+The OWASP+nodejs+javascript packs do not include `hardcoded-hmac-key` or `detect-non-literal-regexp` — the two Semgrep rules that match `insecurity.ts:44` (HMAC secret) and `codingChallenges.ts:76,78` (ReDoS) respectively. Those rules exist only in the broader `auto` community pack. The targeted "security-focused" configuration thus performs worse on Juice Shop than `auto` for these specific vulnerability categories.
 
 **SonarQube Juice Shop FP breakdown (56 FPs)**:
 | Category | Count | Notes |
@@ -275,17 +283,17 @@ SonarQube found 0 of 4 ground truth entries. It has no rules for `eval()` inject
 
 Note: SonarQube does not filter test files for secret detection. 43 of 56 FPs are test credentials — the same problem VANTAGE's `skipTestFilesForSecurityPatterns` flag was introduced to address.
 
-**Common capability gaps (both Semgrep and SonarQube miss)**:
-- NoSQL `$where` injection (template literals and string concatenation)
-- `JSON.parse()` without try/catch error boundary
-- ReDoS via `new RegExp()` with interpolated input (SonarQube only; Semgrep catches this)
+**Capability gaps: patterns no competitor detects**:
+- NoSQL `$where` injection (template literals and string concatenation) — missed by both Semgrep and SonarQube
+- `JSON.parse()` without try/catch error boundary — missed by both Semgrep and SonarQube
+- ReDoS via `new RegExp()` with interpolated input — missed by SonarQube; `detect-non-literal-regexp` is in Semgrep `auto` but not in the OWASP/nodejs/javascript targeted packs
 
 ### 4.3 Runtime Comparison
 
-| Corpus | VANTAGE | Semgrep | SonarQube | VANTAGE vs Semgrep | VANTAGE vs SonarQube |
-|--------|---------|---------|-----------|-------------------|----------------------|
-| NodeGoat (47 files, 3.3K LOC) | **19 ms** | ~5,000 ms | ~11,000 ms | 263× faster | 579× faster |
-| Juice Shop (385 files, 33K LOC) | **107 ms** | ~18,600 ms | ~27,000 ms | 174× faster | 252× faster |
+| Corpus | VANTAGE | Semgrep (OWASP+nodejs+js) | SonarQube | VANTAGE vs Semgrep | VANTAGE vs SonarQube |
+|--------|---------|--------------------------|-----------|-------------------|----------------------|
+| NodeGoat (47 files, 3.3K LOC) | **19 ms** | ~3,700 ms | ~11,000 ms | 194× faster | 579× faster |
+| Juice Shop (385 files, 33K LOC) | **107 ms** | ~14,500 ms | ~27,000 ms | 136× faster | 252× faster |
 
 SonarQube runtime includes TypeScript compilation (spawns tsc for each tsconfig.json found) and server-side analysis. VANTAGE runtime includes all five engine passes.
 
@@ -350,21 +358,27 @@ SonarQube Community was run with the default out-of-box Quality Gate ("Sonar way
 
 ### 5.5 Semgrep Ruleset Sensitivity
 
-Results reported use `semgrep --config auto`, which pulls all community-maintained rules. Different results would be obtained with:
-- `p/owasp-top-ten` — OWASP-focused
-- `p/nodejs-scan` — Node.js-focused (returned 0 findings on NodeGoat in testing)
-- Custom rules targeting MongoDB `$where` and `JSON.parse` patterns
+The benchmark uses `semgrep --config=p/owasp-top-ten --config=p/nodejs --config=p/javascript` — the most security-relevant configuration for Node.js/TypeScript codebases. For reference, the `auto` profile (all community rules) was also run:
 
-A production Semgrep deployment with tuned rulesets would likely have higher recall at the cost of higher FP rate. However, even with custom rules, Semgrep cannot produce a composite risk verdict or detect architectural coupling issues.
+| Corpus | `auto` P/R/F1 | OWASP+nodejs+js P/R/F1 | Delta |
+|--------|--------------|------------------------|-------|
+| NodeGoat | 6.9% / 50% / 11.1% | 13.3% / 50% / 21.1% | Precision doubles; recall unchanged |
+| Juice Shop | 7.9% / 30% / 12.6% | 5.6% / 10% / 7.1% | Both precision and recall fall |
+
+The targeted ruleset improves NodeGoat precision (fewer noisy findings) but hurts Juice Shop coverage. The reason: `hardcoded-hmac-key` (catches `insecurity.ts:44`) and `detect-non-literal-regexp` (catches `codingChallenges.ts:76,78`) exist in `auto` community packs but are absent from `p/owasp-top-ten`, `p/nodejs`, and `p/javascript`. The OWASP-focused configuration has no hardcoded-secret or ReDoS detection, so the vulnerability corpus's two secret GT entries and two ReDoS GT entries become false negatives.
+
+This is a known challenge with Semgrep: there is no single canonical ruleset that covers all OWASP categories. Getting full coverage requires either `auto` (high noise) or custom rules per vulnerability class. For the NoSQL `$where` and `JSON.parse` error-boundary categories, no standard Semgrep ruleset provides detection — custom rules would need to be written.
+
+`p/nodejs-scan` was also tested and returned 0 findings on NodeGoat in isolation.
 
 ### 5.6 Ground Truth Scope
 
 The tier-1 ground truth covers PULSAR-detectable patterns only. It does not include:
-- Semgrep-detectable-but-PULSAR-undetectable findings (cookie config, CSRF, HTML injection)
+- Findings in non-code files (`artifacts/`, `*.key`, `*.yml`)
 - Intentionally vulnerable "challenge files" in Juice Shop (`data/static/codefixes/`)
-- Configuration-level issues (docker-compose security settings)
+- Configuration-level issues (docker-compose security settings, cookie config, CSRF middleware)
 
-Semgrep's precision on a broader ground truth that includes these categories would be higher than the 7.9% reported here.
+Semgrep's precision on a broader ground truth that includes these categories would be higher than the reported figures. The GT is intentionally narrow to enable a direct apples-to-apples comparison between tools on the same vulnerability classes.
 
 ---
 
@@ -397,48 +411,42 @@ Semgrep's precision on a broader ground truth that includes these categories wou
 
 ## Appendix B — Semgrep Raw Finding Counts
 
-### NodeGoat (29 findings)
+Ruleset: `semgrep --config=p/owasp-top-ten --config=p/nodejs --config=p/javascript --json`
 
-| Check | Count | Severity |
-|-------|-------|----------|
-| express-cookie-session-* | 6 | WARNING |
-| plaintext-http-link | 5 | WARNING |
-| eval-detected | 3 | WARNING |
-| code-string-concat | 3 | ERROR |
-| django-no-csrf-token | 3 | WARNING |
-| detected-bcrypt-hash | 3 | ERROR |
-| express-check-csurf-middleware-usage | 1 | INFO |
-| express-open-redirect | 1 | WARNING |
-| detected-private-key | 1 | ERROR |
-| no-new-privileges | 1 | WARNING |
-| writable-filesystem-service | 1 | WARNING |
-| using-http-server | 1 | WARNING |
+### NodeGoat (15 findings)
 
-### Juice Shop (38 findings)
+| Check | Count | Severity | GT match? |
+|-------|-------|----------|-----------|
+| express-cookie-session-* | 6 | WARNING | No (config, not in tier-1 GT) |
+| plaintext-http-link | 5 | WARNING | No |
+| code-string-concat | 3 | ERROR | Yes — contributions.js:32,33,34 (2 TPs + 1 adjacent line) |
+| express-open-redirect | 1 | WARNING | No |
 
-| Check | Count | Severity |
-|-------|-------|----------|
-| express-sequelize-injection | 6 | ERROR |
-| express-res-sendfile | 4 | WARNING |
-| express-check-directory-listing | 4 | WARNING |
-| detected-jwt-token | 3 | WARNING |
-| detect-replaceall-sanitization | 2 | WARNING |
-| detect-non-literal-regexp | 2 | WARNING |
-| hardcoded-hmac-key | 2 | ERROR |
-| eval-detected | 2 | WARNING |
-| unknown-value-with-script-tag | 2 | WARNING |
-| detected-generic-secret | 1 | ERROR |
-| prototype-pollution-loop | 1 | ERROR |
-| hardcoded-jwt-secret | 1 | ERROR |
-| express-detect-notevil-usage | 1 | WARNING |
-| raw-html-format | 1 | WARNING |
-| remote-property-injection | 1 | WARNING |
-| template-explicit-unescape | 1 | WARNING |
-| unsafe-formatstring | 1 | ERROR |
-| code-string-concat | 1 | WARNING |
-| express-open-redirect | 1 | WARNING |
-| express-libxml-vm-noent | 1 | WARNING |
+### Juice Shop (18 findings)
+
+| Check | Count | Severity | GT match? |
+|-------|-------|----------|-----------|
+| express-sequelize-injection | 6 | ERROR | No (SQL injection in ORM, not in tier-1 GT) |
+| express-res-sendfile | 4 | WARNING | No |
+| express-check-directory-listing | 4 | WARNING | No |
+| raw-html-format | 1 | WARNING | Partial† — chatbot.ts:205 (XSS, not error-boundary) |
+| hardcoded-jwt-secret | 1 | WARNING | No — insecurity.ts:56 (not in tier-1 GT) |
+| express-open-redirect | 1 | WARNING | No |
+| code-string-concat | 1 | ERROR | No — userProfile.ts:62 (real issue, not in tier-1 GT) |
+
+†See §5.6 on GT scope.
+
+### Appendix B.2 — Semgrep `auto` for Reference
+
+Ruleset: `semgrep --config auto --json` (all community rules)
+
+| Corpus | Total findings | TPs | FPs | Precision | Recall |
+|--------|---------------|-----|-----|-----------|--------|
+| NodeGoat | 29 | 2 | 27 | 6.9% | 50% |
+| Juice Shop | 38 | 3 | 35 | 7.9% | 30% |
+
+Notable rules in `auto` not present in OWASP+nodejs+javascript: `hardcoded-hmac-key`, `detect-non-literal-regexp`, `detected-private-key`, `detected-bcrypt-hash`, `prototype-pollution-loop`, `detected-jwt-token`, `express-detect-notevil-usage`.
 
 ---
 
-*Report generated by VANTAGE COSMIC pipeline. Semgrep findings collected with `semgrep --config auto --json`. All measurements taken on Apple M-series (arm64, macOS 25.2.0).*
+*Report generated by VANTAGE COSMIC pipeline. Semgrep findings collected with `semgrep --config=p/owasp-top-ten --config=p/nodejs --config=p/javascript --json`. SonarQube findings collected via REST API from `sonarqube:community` container. All measurements taken on Apple M-series (arm64, macOS 25.2.0).*
