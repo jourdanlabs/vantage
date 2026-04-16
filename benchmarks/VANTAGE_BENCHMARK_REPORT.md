@@ -3,8 +3,7 @@
 **Version**: Post-Stage 2 final (tiered gating applied)  
 **Run date**: 2026-04-16  
 **Pipeline version**: COSMIC (METEOR → NOVA → ECLIPSE → PULSAR → AURORA)  
-**Comparison tool**: Semgrep 1.59.0 (`auto` ruleset)  
-**SonarQube**: Not included — requires a running server (Docker daemon unavailable on this host); setup overhead is noted as a structural differentiator in §4.
+**Comparison tools**: Semgrep 1.159.0 (`auto` ruleset), SonarQube Community 26.4.0 (Docker, JS/TS analysis)
 
 ---
 
@@ -13,34 +12,37 @@
 1. [Executive Summary](#1-executive-summary)
 2. [Stage 1 — Scale & Architecture Benchmarks](#2-stage-1--scale--architecture-benchmarks)
 3. [Stage 2 — Correctness Benchmarks](#3-stage-2--correctness-benchmarks)
-4. [Stage 3 — VANTAGE vs. Semgrep Comparative Benchmarks](#4-stage-3--vantage-vs-semgrep-comparative-benchmarks)
+4. [Stage 3 — VANTAGE vs. Semgrep vs. SonarQube Comparative Benchmarks](#4-stage-3--vantage-vs-semgrep-vs-sonarqube-comparative-benchmarks)
 5. [Known Limitations](#5-known-limitations)
 
 ---
 
 ## 1. Executive Summary
 
-VANTAGE is a static analysis pipeline that produces a single actionable verdict (APPROVED / REJECTED) backed by a four-component score. Unlike Semgrep — a pattern-matching scanner — VANTAGE integrates complexity, dependency, risk, and adversarial analysis into a unified score, and separates security-pattern findings from quality-pattern findings via tiered gating.
+VANTAGE is a static analysis pipeline that produces a single actionable verdict (APPROVED / REJECTED) backed by a four-component score. Unlike Semgrep and SonarQube — pattern-matching scanners — VANTAGE integrates complexity, dependency, risk, and adversarial analysis into a unified score, and separates security-pattern findings from quality-pattern findings via tiered gating.
 
-| Metric | VANTAGE | Semgrep (`auto`) |
-|--------|---------|-----------------|
-| NodeGoat precision | **100%** | 6.9% |
-| NodeGoat recall | **100%** | 50% |
-| NodeGoat runtime | **19 ms** | ~5 s |
-| Juice Shop precision | **75%** | 7.9% |
-| Juice Shop recall | **100%** | 30% |
-| Juice Shop runtime | **107 ms** | ~19 s |
-| Produces APPROVED/REJECTED verdict | **Yes** | No |
-| Detects architectural issues (circular deps, god modules) | **Yes** | No |
-| Requires server/daemon to run | **No** | No |
+| Metric | VANTAGE | Semgrep (`auto`) | SonarQube Community |
+|--------|---------|-----------------|---------------------|
+| NodeGoat precision | **100%** | 6.9% | 0% |
+| NodeGoat recall | **100%** | 50% | 0% |
+| NodeGoat F1 | **100%** | 11.1% | 0% |
+| NodeGoat runtime | **19 ms** | ~5 s | ~11 s |
+| Juice Shop precision | **75%** | 7.9% | 3.4% |
+| Juice Shop recall | **100%** | 30% | 20% |
+| Juice Shop F1 | **85.7%** | 12.6% | 5.8% |
+| Juice Shop runtime | **107 ms** | ~19 s | ~27 s |
+| Produces APPROVED/REJECTED verdict | **Yes** | No | Quality Gate (limited) |
+| Detects architectural issues (circular deps, god modules) | **Yes** | No | No |
+| Requires server/daemon to run | **No** | No | **Yes (Java server)** |
 
 **Key findings**:
 
-- VANTAGE achieves 100% recall on both corpora; Semgrep misses 50% (NodeGoat) and 70% (Juice Shop) of tier-1 ground truth.
-- VANTAGE precision (75–100%) is 10–12× higher than Semgrep auto (7–9%) on these corpora.
-- Semgrep is 250–175× slower than VANTAGE at comparable corpus sizes.
-- VANTAGE produces a structural verdict (APPROVED/REJECTED) that neither Semgrep nor SonarQube provides.
-- SonarQube requires a running server, making it unsuitable for local CI gates without additional infrastructure.
+- VANTAGE achieves 100% recall on both corpora; Semgrep misses 50% (NodeGoat) and 70% (Juice Shop); SonarQube misses 100% (NodeGoat) and 80% (Juice Shop) of tier-1 ground truth.
+- VANTAGE precision (75–100%) is 22–29× higher than SonarQube (0–3.4%) and 10–12× higher than Semgrep (7–9%).
+- VANTAGE is 580× faster than SonarQube and 263× faster than Semgrep on NodeGoat.
+- Neither Semgrep nor SonarQube detect NoSQL `$where` injection or `JSON.parse` missing error boundaries — two of VANTAGE's core tier-1 patterns.
+- SonarQube requires a running Java server; Semgrep requires internet access for rule downloads. VANTAGE runs fully offline with zero infrastructure.
+- VANTAGE produces a structural APPROVED/REJECTED verdict with a four-component score breakdown; neither competitor provides an equivalent.
 
 ---
 
@@ -195,139 +197,125 @@ Express has 0 ECLIPSE-qualified files (no file scores ≥ 0.40 risk), so quality
 
 ---
 
-## 4. Stage 3 — VANTAGE vs. Semgrep Comparative Benchmarks
+## 4. Stage 3 — VANTAGE vs. Semgrep vs. SonarQube Comparative Benchmarks
 
-**Semgrep version**: 1.59.0  
+**Semgrep version**: 1.159.0  
 **Semgrep ruleset**: `auto` (all available community rules)  
-**SonarQube**: Not benchmarked — requires a running server/Docker daemon (see §5.4)
+**SonarQube**: Community 26.4.0 running in Docker (`sonarqube:community`), JS/TS analysis via SonarJS plugin
 
-### 4.1 NodeGoat — Head-to-Head
+### 4.1 NodeGoat — Three-Way Head-to-Head
 
-| Metric | VANTAGE | Semgrep |
-|--------|---------|---------|
-| Total findings | 4 | 29 |
-| True Positives (tier-1) | **4** | 2 |
-| False Positives | **0** | 27 |
-| False Negatives | **0** | 2 |
-| Precision | **100%** | 6.9% |
-| Recall | **100%** | 50% |
-| F1 | **100%** | 11.1% |
-| Runtime | **19 ms** | ~5,000 ms |
-| Produces verdict | **APPROVED 88%** | — |
+| Metric | VANTAGE | Semgrep | SonarQube |
+|--------|---------|---------|-----------|
+| Total findings | 4 | 29 | 3 (vulns) / 159 (all) |
+| True Positives (tier-1) | **4** | 2 | 0 |
+| False Positives | **0** | 27 | 3 |
+| False Negatives | **0** | 2 | **4** |
+| Precision | **100%** | 6.9% | 0% |
+| Recall | **100%** | 50% | 0% |
+| F1 | **100%** | 11.1% | 0% |
+| Runtime | **19 ms** | ~5,000 ms | ~11,000 ms |
+| Produces verdict | **APPROVED 88%** | — | Quality Gate |
 
-**What Semgrep missed**:
-- `data/allocations-dao.js:73,78` — NoSQL `$where` injection. Semgrep's `auto` ruleset has no MongoDB `$where` detection rule in this run.
+**What each tool found on NodeGoat**:
 
-**What Semgrep found that VANTAGE did not claim**:
-- `server.js` — express cookie config issues (no `secure`, no `httpOnly`, no expiry) — these are real security hygiene issues not in VANTAGE tier-1 ground truth. Semgrep found 6 such warnings.
-- `artifacts/cert/server.key:1` — private key in repo. VANTAGE found this in the `artifacts/` directory only if it scanned it; this file was excluded since METEOR only scans recognized code file extensions.
-- CSRF middleware missing — captured by Semgrep as an INFO finding; PULSAR has no CSRF detection (tier-2 gap for VANTAGE).
+| File | Finding | VANTAGE | Semgrep | SonarQube |
+|------|---------|---------|---------|-----------|
+| `data/allocations-dao.js:73,78` | NoSQL $where injection | ✓ HIGH | ✗ | ✗ |
+| `routes/contributions.js:32,33` | eval injection | ✓ HIGH | ✓ (WARNING) | ✗ |
+| `artifacts/cert/server.key:1` | Private key in repo | ✗ (non-code file) | ✓ ERROR | ✓ BLOCKER |
+| `artifacts/db-reset.js:18` | Hardcoded password | ✗ | ✗ | ✓ MAJOR |
+| `server.js` cookie config | Missing secure/httpOnly | ✗ | ✓ (6 findings) | ✗ |
+| CSRF middleware | Missing csurf | ✗ | ✓ INFO | ✗ |
 
-**Semgrep false positives (27)**:
+**SonarQube NodeGoat vulnerability findings (3 total, 0 TPs)**:
+- `artifacts/cert/server.key:1` — private key in repo (BLOCKER) — real issue, not in tier-1 GT
+- `artifacts/db-reset.js:18` — hardcoded password in test fixture (MAJOR) — benign test data
+- `server.js:121` — static middleware before session middleware (MINOR) — real config issue, not in tier-1 GT
+
+SonarQube found 0 of 4 ground truth entries. It has no rules for `eval()` injection or NoSQL `$where` injection in JavaScript.
+
+### 4.2 Juice Shop — Three-Way Head-to-Head
+
+| Metric | VANTAGE | Semgrep | SonarQube |
+|--------|---------|---------|-----------|
+| Total findings | 16 | 38 | 58 (vulns) / 4,478 (all) |
+| True Positives (tier-1) | **12** | 3 | 2 |
+| False Positives | 4 | 35 | **56** |
+| False Negatives | **0** | 7 | 8 |
+| Precision | **75%** | 7.9% | 3.4% |
+| Recall | **100%** | 30% | 20% |
+| F1 | **85.7%** | 12.6% | 5.8% |
+| Runtime | **107 ms** | ~18,600 ms | ~27,000 ms |
+| Produces verdict | **REJECTED 55%** | — | Quality Gate |
+
+**Ground truth coverage by tool (Juice Shop)**:
+
+| GT Entry | VANTAGE | Semgrep | SonarQube |
+|----------|---------|---------|-----------|
+| `lib/insecurity.ts:23` PEM key | ✓ HIGH | ✗ | ✓ BLOCKER |
+| `lib/insecurity.ts:44` HMAC secret | ✓ HIGH | ✓ ERROR | ✓ BLOCKER |
+| `routes/trackOrder.ts:18` $where | ✓ HIGH | ✗ | ✗ |
+| `routes/showProductReviews.ts:36` $where | ✓ HIGH | ✗ | ✗ |
+| `lib/codingChallenges.ts:76` ReDoS | ✓ MED | ✓ WARNING | ✗ |
+| `lib/codingChallenges.ts:78` ReDoS | ✓ MED | ✓ WARNING | ✗ |
+| `routes/languages.ts` error-boundary | ✓ MED | ✗ | ✗ |
+| `routes/verify.ts` error-boundary | ✓ MED | ✗ | ✗ |
+| `routes/chatbot.ts` error-boundary | ✓ MED | ✗ | ✗ |
+| `routes/recycles.ts` error-boundary | ✓ MED | ✗ | ✗ |
+| **TPs** | **12** | **3** | **2** |
+
+**SonarQube Juice Shop FP breakdown (56 FPs)**:
 | Category | Count | Notes |
 |----------|-------|-------|
-| Cookie security config | 6 | Real issues but not in tier-1 |
-| Plaintext HTTP links | 5 | In tutorial HTML files |
-| CSRF warnings | 4 | HTML template + middleware checks |
-| Bcrypt hash in test fixture | 3 | Benign |
-| Server configuration | 5 | `no-new-privileges`, writable filesystem (docker-compose), `using-http-server` |
-| Open redirect | 1 | Real issue, not in tier-1 |
-| JWT cookie default | 3 | Real issues, not in tier-1 |
+| Hardcoded passwords in test fixtures | 43 | `test/api/*Spec.ts` — all test credentials |
+| Auth token in spec files | 5 | `Authorization` header values in tests |
+| Non-GT production secrets | 5 | `insecurity.ts:56` (JWT), `insecurity.ts:152` (HMAC), `server.ts:289`, `routes/checkKeys.ts:10`, `login.component.ts:61` |
+| XSS / template injection | 3 | `userProfile.ts`, `videoHandler.ts` — real but not in tier-1 |
 
-### 4.2 Juice Shop — Head-to-Head
+Note: SonarQube does not filter test files for secret detection. 43 of 56 FPs are test credentials — the same problem VANTAGE's `skipTestFilesForSecurityPatterns` flag was introduced to address.
 
-| Metric | VANTAGE | Semgrep |
-|--------|---------|---------|
-| Total findings | 16 | 38 |
-| True Positives (tier-1) | **12** | 3 |
-| False Positives | 4 | **35** |
-| False Negatives | **0** | 7 |
-| Precision | **75%** | 7.9% |
-| Recall | **100%** | 30% |
-| F1 | **85.7%** | 12.6% |
-| Runtime | **107 ms** | ~18,600 ms |
-| Produces verdict | **REJECTED 55%** | — |
-
-**What Semgrep found (TPs)**:
-- `lib/insecurity.ts:44` — `hardcoded-hmac-key` ✓
-- `lib/codingChallenges.ts:76,78` — `detect-non-literal-regexp` ✓
-
-**What Semgrep missed (7 FNs)**:
-- `lib/insecurity.ts:23` — PEM private key (hardcoded `-----BEGIN RSA PRIVATE KEY-----`)
-- `routes/trackOrder.ts:18` — NoSQL `$where` template injection
-- `routes/showProductReviews.ts:36` — NoSQL `$where` string concat injection
-- `routes/languages.ts`, `routes/verify.ts`, `routes/recycles.ts` — JSON.parse without try/catch (error boundary)
-
-**Why Semgrep missed the PEM key**: Semgrep does have `detected-private-key` but did not fire it on `insecurity.ts:23`. The PEM block may not start at a line boundary in a way Semgrep's regex matches. VANTAGE's `findHardcodedSecrets()` matches the `-----BEGIN` header directly.
-
-**Why Semgrep missed the `$where` injections**: Semgrep's `auto` ruleset does not appear to include MongoDB `$where` injection rules for TypeScript template literals.
-
-**Why Semgrep missed `error-boundary` JSON.parse**: Semgrep doesn't have a rule matching bare `JSON.parse()` without `try/catch` in the standard ruleset. VANTAGE detects these explicitly.
-
-**Semgrep false positives breakdown**:
-| Category | Count | Notes |
-|----------|-------|-------|
-| SQL injection in Sequelize | 6 | 4 in `codefixes/` challenge files (intentionally vulnerable), 2 in production routes (real, but not in tier-1) |
-| Eval-detected | 2 | `captcha.ts:22` (math eval), `userProfile.ts:62` (real MED) — both real but not tier-1 |
-| Hardcoded secrets (non-GT) | 4 | `insecurity.ts:56` JWT secret (real), `insecurity.ts:152` HMAC (real), `users.yml:151` (data fixture), JWT in spec files |
-| Express security config | 8 | `res.sendfile`, `check-directory-listing`, open redirect, prototype pollution |
-| XSS / HTML | 4 | `videoHandler.ts`, `promotionVideo.pug`, `restfulXssChallenge_2.ts` (challenge file) |
-| Other | 11 | JWT tokens in spec files, unsafe format string, b2bOrder notevil, etc. |
+**Common capability gaps (both Semgrep and SonarQube miss)**:
+- NoSQL `$where` injection (template literals and string concatenation)
+- `JSON.parse()` without try/catch error boundary
+- ReDoS via `new RegExp()` with interpolated input (SonarQube only; Semgrep catches this)
 
 ### 4.3 Runtime Comparison
 
-| Corpus | VANTAGE | Semgrep | Speedup |
-|--------|---------|---------|---------|
-| NodeGoat (47 files, 3.3K LOC) | 19 ms | ~5,000 ms | **263×** |
-| Juice Shop (385 files, 33K LOC) | 107 ms | ~18,600 ms | **174×** |
+| Corpus | VANTAGE | Semgrep | SonarQube | VANTAGE vs Semgrep | VANTAGE vs SonarQube |
+|--------|---------|---------|-----------|-------------------|----------------------|
+| NodeGoat (47 files, 3.3K LOC) | **19 ms** | ~5,000 ms | ~11,000 ms | 263× faster | 579× faster |
+| Juice Shop (385 files, 33K LOC) | **107 ms** | ~18,600 ms | ~27,000 ms | 174× faster | 252× faster |
 
-VANTAGE runtime scales sublinearly with file count because ECLIPSE and PULSAR operate on a single in-memory AST produced by METEOR. Semgrep re-parses each file per rule and downloads the ruleset on first run.
+SonarQube runtime includes TypeScript compilation (spawns tsc for each tsconfig.json found) and server-side analysis. VANTAGE runtime includes all five engine passes.
 
-*Note*: Semgrep's network latency for rule download is excluded (ruleset was cached); raw analysis time only. VANTAGE includes all five engine passes (METEOR → NOVA → ECLIPSE → PULSAR → AURORA).
+*Note*: SonarQube runtime excludes container startup (~60 s first run) and server warm-up. Semgrep runtime excludes ruleset download (cached). Both comparisons are raw analysis time only.
 
 ### 4.4 Verdict vs. Finding List
 
-A key structural differentiator: VANTAGE produces a binary APPROVED/REJECTED verdict with a score breakdown. This makes it immediately actionable in CI pipelines — a build can fail on REJECTED without further interpretation.
+| Capability | VANTAGE | Semgrep | SonarQube |
+|-----------|---------|---------|-----------|
+| Binary pass/fail for CI | **Yes (`--threshold`)** | Wrapper script needed | Yes (Quality Gate) |
+| Score breakdown (4 components) | **Yes (AURORA)** | No | No |
+| Severity weighting by file risk | **Yes (ECLIPSE-tier)** | No | No |
+| Offline / no infrastructure | **Yes** | Partial (needs internet for rules) | No (needs server) |
+| Language-agnostic architecture | **Yes (registry-driven)** | Yes | Yes |
 
-Semgrep produces a list of findings. Translating a finding list into a gate condition requires:
-1. Choosing a severity threshold
-2. Defining acceptable finding counts per severity
-3. Writing wrapper scripts or using Semgrep App (requires sign-up)
-
-VANTAGE's AURORA threshold is configurable (`--threshold`, default 0.80) and encodes complexity, dependency, risk, and adversarial penalty into a single reproducible number.
+SonarQube's Quality Gate is structurally the closest to VANTAGE's APPROVED/REJECTED verdict — both provide a binary pass/fail. However, SonarQube's gate is configured by manually setting thresholds per metric (coverage %, issue count, etc.) and does not compute a composite risk score that weights security findings by file risk tier.
 
 ### 4.5 Architectural Analysis
 
-VANTAGE provides structural analysis that Semgrep does not:
+| Capability | VANTAGE | Semgrep | SonarQube |
+|-----------|---------|---------|-----------|
+| Circular dependency detection | **Yes (NOVA)** | No | No |
+| God module identification | **Yes (NOVA)** | No | No |
+| Per-file risk scoring | **Yes (ECLIPSE)** | No | No |
+| Cyclomatic complexity | **Yes (METEOR)** | No | Yes (cognitive complexity) |
+| Coupling hotspot identification | **Yes (NOVA)** | No | No |
+| Code duplication | No | No | Yes |
+| Test coverage integration | No | No | Yes |
 
-| Capability | VANTAGE | Semgrep |
-|-----------|---------|---------|
-| Circular dependency detection | Yes (NOVA) | No |
-| God module identification | Yes (NOVA) | No |
-| Per-file risk scoring | Yes (ECLIPSE) | No |
-| Complexity trend (avg cyclomatic) | Yes (METEOR) | No |
-| Coupling hotspot identification | Yes (NOVA) | No |
-| Actionable score breakdown | Yes (AURORA) | No |
-
-These outputs are valuable in code review contexts: a PR reviewer seeing "3 circular deps introduced, coupling score +2 files" can make a merge decision independent of any security finding.
-
-### 4.6 SonarQube — Setup Requirements
-
-SonarQube Community Edition was not benchmarked in this run. Key setup requirements:
-
-- A running SonarQube server (Java-based, default port 9000)
-- Typically deployed via Docker Compose or Kubernetes
-- `sonar-scanner` CLI is installed (`/opt/homebrew/bin/sonar-scanner` available) but requires `SONAR_HOST_URL` and `SONAR_TOKEN`
-- SonarCloud (hosted) is free for public repos but requires project registration and internet access
-
-Expected SonarQube characteristics based on published benchmarks and documentation:
-- Runtime: comparable to Semgrep for small corpora (5–60 s), slower on large ones
-- Precision: typically higher than Semgrep `auto` for supported languages; detects CSRF, XSS, SQL injection with lower FP rate
-- Recall: SonarQube has well-known blind spots for NoSQL injection and JavaScript `eval` chains
-- Verdict: SonarQube produces a "Quality Gate" pass/fail — structurally similar to VANTAGE APPROVED/REJECTED
-- Architecture analysis: SonarQube measures code duplication and cognitive complexity but does not detect circular dependencies or produce per-file risk scores
-
-**Recommendation**: A SonarQube comparison can be added in a future run using `docker run sonarqube:community` once Docker Desktop is available.
+SonarQube offers code duplication detection and test coverage integration that VANTAGE does not currently provide. For the security-focused recall benchmarks in this report, those capabilities are out of scope.
 
 ---
 
@@ -356,18 +344,18 @@ NOVA's circular dependency detection uses `endsWith()` path matching for bare im
 
 Juice Shop scores 0% on dependency due to the phantom-cycle issue above. This drives the 55% REJECTED score even though the codebase is intentionally vulnerable (not architecturally broken in the dependency sense). The security-focused rejection is correct; the dependency component attribution is inflated.
 
-### 5.4 SonarQube Not Benchmarked
+### 5.4 SonarQube Quality Gate Not Configured
 
-As noted in §4.6, SonarQube Community requires a running server. Docker Desktop was unavailable on this host. The SonarQube comparison is deferred to a future run.
+SonarQube Community was run with the default out-of-box Quality Gate ("Sonar way"). The default gate triggers on new code only (new bugs, new vulnerabilities, coverage on new code). Since all code is "new" in a fresh project scan, all findings are reported. A production SonarQube deployment with a custom Quality Gate calibrated to this codebase would yield different pass/fail results.
 
 ### 5.5 Semgrep Ruleset Sensitivity
 
 Results reported use `semgrep --config auto`, which pulls all community-maintained rules. Different results would be obtained with:
 - `p/owasp-top-ten` — OWASP-focused
 - `p/nodejs-scan` — Node.js-focused (returned 0 findings on NodeGoat in testing)
-- Custom rules targeting MongoDB `$where` and JSON.parse patterns
+- Custom rules targeting MongoDB `$where` and `JSON.parse` patterns
 
-A production Semgrep deployment with tuned rulesets would likely have higher recall at the cost of higher FP rate.
+A production Semgrep deployment with tuned rulesets would likely have higher recall at the cost of higher FP rate. However, even with custom rules, Semgrep cannot produce a composite risk verdict or detect architectural coupling issues.
 
 ### 5.6 Ground Truth Scope
 
