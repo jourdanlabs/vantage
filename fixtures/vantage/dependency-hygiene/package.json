@@ -1,0 +1,17 @@
+{
+  "name": "dependency-hygiene",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "shared": "^1.0.0",
+    "unstable": "*"
+  },
+  "devDependencies": {
+    "shared": "^1.0.0"
+  }
+}

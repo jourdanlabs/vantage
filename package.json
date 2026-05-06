@@ -1,0 +1,51 @@
+{
+  "name": "@jourdanlabs/vantage",
+  "version": "2.0.0-alpha.0",
+  "description": "VANTAGE 2.0 deterministic code auditor and wrecking-crew scanner.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist/src",
+    "fixtures/vantage",
+    "README.md"
+  ],
+  "bin": {
+    "vantage": "./dist/src/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "vantage": "tsx src/cli.ts"
+  },
+  "keywords": [
+    "code-audit",
+    "static-analysis",
+    "deterministic",
+    "vantage",
+    "clarion",
+    "jourdanlabs"
+  ],
+  "author": "JourdanLabs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jourdanlabs/vantage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jourdanlabs/vantage/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.2"
+  }
+}
