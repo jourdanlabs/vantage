@@ -52,7 +52,7 @@ Brick 3 stays in scoping until the auto-fix prototype is real. Premature investm
 
 What's the polyglot order? TS/JS is the demo language, but the iOS Helix work shows Swift is already a real target. Python is the obvious next given the data-science adjacency. Need to commit to a sequence so the semantic engine work isn't language-shaped to the wrong substrate.
 
-What's the licensing/open-source posture for the leaderboard and the benchmark harness? Open enough that competitors are forced to engage; closed enough that the moat stays. Probably MIT-licensed harness, CC-BY ground truth, with a hosted leaderboard as the commercial surface.
+Licensing: VANTAGE is proprietary. Ground-truth catalogs stay under their upstream licenses. The hosted leaderboard is the public surface; the engine is not open source.
 
 How does this interact with the COSMIC + thin-semantic-adapter track? Same company strategy, different product surface — needs its own plan, not folded into this one. Worth a separate consensus session.
 

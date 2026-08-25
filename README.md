@@ -192,6 +192,6 @@ npm link              # expose vantage + vantage-mcp globally
 
 ## License
 
-Apache-2.0. Benchmark ground-truth catalogs under CC-BY-4.0.
+Proprietary. Not open source. See `LICENSE`. Benchmark ground-truth catalogs remain under their own licenses (CC-BY-4.0 / upstream).
 
 Built by JourdanLabs.

@@ -63,7 +63,7 @@
     "aurora"
   ],
   "author": "JourdanLabs",
-  "license": "Apache-2.0",
+  "license": "UNLICENSED",
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.3",

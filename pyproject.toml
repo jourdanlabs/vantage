@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "VANTAGE — Autonomous Code Evolution Engine. Deterministic static analysis and verified auto-fix for JavaScript, TypeScript, and Python. METEOR → NOVA → NEBULA → ECLIPSE → PULSAR → AURORA."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "Apache-2.0" }
+license = { text = "UNLICENSED" }
 authors = [
   { name = "JourdanLabs", email = "hello@jourdanlabs.ai" },
 ]
@@ -28,7 +28,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Intended Audience :: Information Technology",
-  "License :: OSI Approved :: Apache Software License",
+  "License :: Other/Proprietary License",
   "Operating System :: POSIX",
   "Operating System :: MacOS :: MacOS X",
   "Operating System :: Microsoft :: Windows",

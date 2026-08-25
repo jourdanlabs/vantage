@@ -1,6 +1,6 @@
 # Contributing to VANTAGE
 
-Thanks for wanting to help. VANTAGE is open-source because the benchmark, the detection logic, and the fix templates all get better faster when the people who care about them can open PRs. This guide covers the three most common contribution types.
+VANTAGE is proprietary (Jourdan Labs). It is not open source. Outside contributions are by invitation only; do not treat a public clone as a grant to ship this as your own. This guide is for invited work on the three most common change types.
 
 ## Adding a NEBULA source/sink/sanitizer
 

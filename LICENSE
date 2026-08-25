@@ -1,70 +1,24 @@
-Apache License
-Version 2.0, January 2004
-http://www.apache.org/licenses/
+Jourdan Labs Proprietary License
+Copyright (c) 2026 Jourdan Labs and Leland "TJ" Jourdan II.
+All rights reserved.
 
-TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+This software is not open source. Publishing source on GitHub does not
+make it open source and does not grant any license except as written here.
 
-1. Definitions.
-   "License" shall mean the terms and conditions for use, reproduction,
-   and distribution as defined by Sections 1 through 9 of this document.
+You may clone, read, and run this software as published for personal
+evaluation or for work authorized by Jourdan Labs.
 
-   "Licensor" shall mean the copyright owner or entity authorized by
-   the copyright owner that is granting the License.
+You may not, without prior written permission from Jourdan Labs:
 
-   "Legal Entity" shall mean the union of the acting entity and all
-   other entities that control, are controlled by, or are under common
-   control with that entity.
+  - represent this software, or any derivative, as your original work
+  - remove or obscure copyright, patent, or license notices
+  - redistribute, sublicense, sell, or offer this software (modified or
+    not) as a product, service, or open-source project
+  - relicense this software
 
-   "You" (or "Your") shall mean an individual or Legal Entity
-   exercising permissions granted by the License.
+All patent rights are reserved. No patent license is granted.
 
-   "Source" form shall mean the preferred form for making modifications,
-   including but not limited to software source code, documentation
-   source, and configuration files.
+Third-party benchmark corpora (for example OWASP NodeGoat / Juice Shop)
+remain under their own licenses.
 
-   "Object" form shall mean any form resulting from mechanical
-   transformation or translation of a Source form.
-
-   "Work" shall mean the work of authorship, whether in Source or Object
-   form, made available under the License.
-
-2. Grant of Copyright License.
-   Subject to the terms and conditions of this License, each Contributor
-   hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,
-   royalty-free, irrevocable copyright license to reproduce, prepare
-   derivative works of, publicly display, publicly perform, sublicense,
-   and distribute the Work and such derivative works in Source and
-   Object form.
-
-3. Grant of Patent License.
-   Subject to the terms and conditions of this License, each Contributor
-   hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,
-   royalty-free, irrevocable patent license to make, have made, use,
-   offer to sell, sell, import, and otherwise transfer the Work.
-
-4. Redistribution.
-   You may reproduce and distribute copies of the Work or derivative
-   works thereof in any medium, with or without modifications.
-
-5. Submission of Contributions.
-   Unless You explicitly state otherwise, any Contribution intentionally
-   submitted for inclusion in the Work shall be under the terms and
-   conditions of this License.
-
-6. Trademarks.
-   This License does not grant permission to use the trade names,
-   trademarks, service marks, or product names of the Licensor.
-
-7. Disclaimer of Warranty.
-   THE WORK IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
-
-8. Limitation of Liability.
-   IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-   INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.
-
-9. Accepting Warranty or Additional Liability.
-   You may choose to offer, and charge a fee for, acceptance of support.
-
-=======================================================================
-Copyright 2026 JourdanLabs. All rights reserved.
-=======================================================================
+To request a license: hello@jourdanlabs.ai

@@ -81,7 +81,7 @@ vantage-bench run --tool <name> --clone
 
 ## License
 
-Harness: **MIT**  
+Harness: proprietary (Jourdan Labs). See the repo `LICENSE`.  
 Ground truth catalogs: **CC-BY-4.0**  
-OWASP NodeGoat: Apache-2.0  
-OWASP Juice Shop: MIT
+OWASP NodeGoat: Apache-2.0 (upstream)  
+OWASP Juice Shop: MIT (upstream)

@@ -4,7 +4,7 @@
   "description": "VANTAGE static analysis in VS Code — security + quality surfaces, AURORA verdict, Problems panel diagnostics. Same engine as the CLI and MCP server.",
   "version": "1.0.0",
   "publisher": "jourdanlabs",
-  "license": "Apache-2.0",
+  "license": "UNLICENSED",
   "engines": {
     "vscode": "^1.85.0"
   },

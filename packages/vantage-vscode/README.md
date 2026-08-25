@@ -79,4 +79,4 @@ Point `cliPath` at a build from tip `134a950`+ (surface split, real-world discip
 
 ## License
 
-Apache-2.0 · JourdanLabs
+Proprietary · JourdanLabs. See the repo `LICENSE`.

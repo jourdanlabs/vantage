@@ -67,7 +67,7 @@ Ship in this order. The delay between steps is intentional — earlier steps sho
 
 ## Notes on monetization
 
-v1.0 launches fully open-source under Apache-2.0. No premium tier, no closed fork, no cloud product at launch. Revenue lives in the future:
+v1.0 source is public and proprietary (not open source). No premium tier, no cloud product at launch. Revenue lives in the future:
 
 - **Hosted VANTAGE** — a SaaS that runs VANTAGE weekly against your codebase and sends a findings digest. Competes with Snyk, not GitHub Advanced Security. Needs customer-zero before design.
 - **VANTAGE for Enterprise** — on-prem deploy with private source/sink catalogs, integration with enterprise SSO / SCIM / audit. Standard open-core play.
