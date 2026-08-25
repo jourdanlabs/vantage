@@ -1,0 +1,32 @@
+{
+  "name": "@jourdanlabs/vantage-bench",
+  "version": "1.0.0",
+  "description": "VANTAGE Benchmark Harness — run any static analysis tool against standardized corpora",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "vantage-bench": "./bin/vantage-bench.js"
+  },
+  "scripts": {
+    "run": "node bin/vantage-bench.js run",
+    "build": "tsc",
+    "list-tools": "node bin/vantage-bench.js list-tools",
+    "list-corpora": "node bin/vantage-bench.js list-corpora"
+  },
+  "keywords": [
+    "static-analysis",
+    "benchmark",
+    "security",
+    "vantage",
+    "semgrep",
+    "sonarqube",
+    "codeql"
+  ],
+  "author": "JourdanLabs",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,9 @@
+# sca fixture — fake names only
+sca-fixture-pyleft==0.1.0
+-r other-reqs.txt
+-e .
+sca-fixture-unpinned
+sca-fixture-range>=2.0.0
+pytest[dev]
+sca-fixture-pyopt==1.4.0 ; python_version >= "3.8"
+!!!not-a-real-cve-wheel!!!==0.0.1-CORRUPT

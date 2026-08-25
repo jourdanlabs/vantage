@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "hash": {
+      "sha256": "00"
+    },
+    "pipfile-spec": 6,
+    "requires": {
+      "python_version": "3.11"
+    },
+    "sources": []
+  },
+  "default": {
+    "sca-fixture-pyleft": {
+      "version": "==0.2.0"
+    },
+    "sca-fixture-pylockonly": {
+      "version": "==4.0.1"
+    },
+    "!!!not-a-real-cve-wheel!!!": {
+      "version": "==0.0.1-CORRUPT"
+    }
+  },
+  "develop": {
+    "sca-fixture-pydev": {
+      "version": "==7.0.0"
+    }
+  }
+}

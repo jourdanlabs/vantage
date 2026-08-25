@@ -1,0 +1,74 @@
+---
+import type { LeaderboardEntry } from '../types';
+
+export interface Props {
+  tools: LeaderboardEntry[];
+  highlightFirst?: boolean;
+}
+
+const { tools, highlightFirst = true } = Astro.props;
+
+function pct(n: number | null): string {
+  if (n === null || n === undefined) return '—';
+  return `${(n * 100).toFixed(1)}%`;
+}
+
+function ms(n: number): string {
+  if (n < 1000) return `${n.toFixed(0)} ms`;
+  return `${(n / 1000).toFixed(1)} s`;
+}
+
+function f1Color(f1: number | null): string {
+  if (f1 === null) return '';
+  if (f1 >= 0.8) return 'color: var(--green)';
+  if (f1 >= 0.4) return 'color: var(--yellow)';
+  return 'color: var(--red)';
+}
+---
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Tool</th>
+      <th>Version</th>
+      <th>NodeGoat F1</th>
+      <th>Juice Shop F1</th>
+      <th>Aggregate F1</th>
+      <th>Median Runtime</th>
+      <th>Last Run</th>
+    </tr>
+  </thead>
+  <tbody>
+    {tools.map((tool, i) => {
+      const ngScore = tool.scores.find(s => s.corpus === 'nodegoat');
+      const jsScore = tool.scores.find(s => s.corpus === 'juice-shop');
+      const isFirst = i === 0 && highlightFirst && !tool.pendingRebench;
+      const dim = tool.pendingRebench ? 'opacity: 0.55' : '';
+      return (
+        <tr style={dim}>
+          <td style="color: var(--text2); width: 32px">{tool.rank}</td>
+          <td>
+            <a href={`/tools/${tool.name.toLowerCase()}`} style={isFirst ? 'font-weight:700' : ''}>
+              {tool.name}
+              {isFirst && <span class="badge badge-green" style="margin-left:8px">top</span>}
+              {tool.pendingRebench && (
+                <span
+                  class="badge"
+                  style="margin-left:8px; background: var(--bg2); color: var(--text2); font-size:0.7rem"
+                  title={tool.stalenessNote ?? 'Numbers from previous scoring revision; rerun pending'}
+                >pending rerun</span>
+              )}
+            </a>
+          </td>
+          <td style="font-family: var(--font); font-size: 0.8rem; color: var(--text2)">{tool.version}</td>
+          <td style={f1Color(ngScore?.f1 ?? null)}>{pct(ngScore?.f1 ?? null)}</td>
+          <td style={f1Color(jsScore?.f1 ?? null)}>{pct(jsScore?.f1 ?? null)}</td>
+          <td style={`font-weight: 700; ${f1Color(tool.aggregateF1)}`}>{pct(tool.aggregateF1)}</td>
+          <td style="font-family: var(--font); font-size: 0.85rem; color: var(--text2)">{ms(tool.medianDurationMs)}</td>
+          <td style="color: var(--text2); font-size: 0.8rem">{tool.runDate.slice(0, 10)}</td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>

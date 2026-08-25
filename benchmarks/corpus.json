@@ -1,0 +1,54 @@
+{
+  "corpora": [
+    {
+      "id": "express",
+      "label": "Small — expressjs/express",
+      "repo": "https://github.com/expressjs/express.git",
+      "sha": "8e022edc9185f540a3fcecaf5e56b850d919cdac",
+      "localPath": "/tmp/vantage-bench/express",
+      "targetSubdir": null,
+      "expectedLOC": "~21k",
+      "cloneStrategy": "full-depth-1"
+    },
+    {
+      "id": "react",
+      "label": "Medium — facebook/react (packages/react)",
+      "repo": "https://github.com/facebook/react.git",
+      "sha": "00f063c31d60308f8e4e0fd349b89ed043b9ea54",
+      "localPath": "/tmp/vantage-bench/react/packages/react",
+      "targetSubdir": "packages/react",
+      "expectedLOC": "~16.5k",
+      "cloneStrategy": "sparse"
+    },
+    {
+      "id": "typescript",
+      "label": "Large — microsoft/TypeScript (src/compiler)",
+      "repo": "https://github.com/microsoft/TypeScript.git",
+      "sha": "f1a9288c23c04e785bbfb092077a7b70747c5b76",
+      "localPath": "/tmp/vantage-bench/typescript/src/compiler",
+      "targetSubdir": "src/compiler",
+      "expectedLOC": "~192k",
+      "cloneStrategy": "sparse"
+    },
+    {
+      "id": "superset",
+      "label": "Polyglot — apache/superset (Python + TypeScript)",
+      "repo": "https://github.com/apache/superset.git",
+      "sha": "e7b9fb277eb68c1dae5e61432ded2c0c9dfc49d0",
+      "localPath": "/tmp/vantage-bench/superset",
+      "targetSubdir": "superset + superset-frontend/src",
+      "expectedLOC": "~555k",
+      "cloneStrategy": "sparse"
+    },
+    {
+      "id": "linux",
+      "label": "XL — torvalds/linux (drivers/net)",
+      "repo": "https://github.com/torvalds/linux.git",
+      "sha": "1d51b370a0f8f642f4fc84c795fbedac0fcdbbd2",
+      "localPath": "/tmp/vantage-bench/linux/drivers/net",
+      "targetSubdir": "drivers/net",
+      "expectedLOC": "~5.25M (actual — significantly above brief estimate)",
+      "cloneStrategy": "sparse"
+    }
+  ]
+}

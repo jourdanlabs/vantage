@@ -1,0 +1,182 @@
+name: VANTAGE Code Quality Gate
+description: Runs the VANTAGE COSMIC pipeline against your codebase and gates pull requests by AURORA score. Optionally auto-fixes resolvable findings and pushes the fix commits to the PR branch.
+author: JourdanLabs
+
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  target:
+    description: 'Path to analyze (default: repo root)'
+    required: false
+    default: '.'
+  threshold:
+    description: 'AURORA approval threshold 0.0–1.0 (default: 0.80)'
+    required: false
+    default: '0.80'
+  fail-on-reject:
+    description: 'Fail the workflow if AURORA verdict is REJECTED (default: true)'
+    required: false
+    default: 'true'
+  post-comment:
+    description: 'Post a PR comment with the verdict (default: true on pull_request events)'
+    required: false
+    default: 'true'
+  autofix:
+    description: |
+      If true and VANTAGE REJECTS the PR, attempt to auto-fix resolvable findings
+      (null-safety, error-boundary) and push fix commits to the PR branch.  Each
+      fix passes through verify_fix before being committed, so only patches that
+      actually resolve the finding without introducing new HIGH/CRITICAL issues
+      are applied.  Default: false — explicitly opt-in because it writes to your
+      branch.
+    required: false
+    default: 'false'
+  autofix-committer-name:
+    description: 'git committer name for auto-fix commits (default: "VANTAGE auto-fix")'
+    required: false
+    default: 'VANTAGE auto-fix'
+  autofix-committer-email:
+    description: 'git committer email for auto-fix commits'
+    required: false
+    default: 'vantage@jourdanlabs.ai'
+
+outputs:
+  verdict:
+    description: 'AURORA verdict: APPROVED or REJECTED'
+    value: ${{ steps.analyze.outputs.verdict }}
+  score:
+    description: 'AURORA score as a percentage string, e.g. "87.4%"'
+    value: ${{ steps.analyze.outputs.score }}
+  report-path:
+    description: 'Path to the full JSON report'
+    value: ${{ steps.analyze.outputs.report-path }}
+  fixes-applied:
+    description: 'Number of auto-fix commits applied to the branch'
+    value: ${{ steps.autofix.outputs.fixes-applied }}
+  post-autofix-verdict:
+    description: 'AURORA verdict after auto-fix commits (same as verdict if autofix=false)'
+    value: ${{ steps.autofix.outputs.post-verdict }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install VANTAGE
+      shell: bash
+      run: |
+        npm install -g vantage-cli vantage-mcp 2>/dev/null || \
+        (cd ${{ github.action_path }}/../../.. && npm install && echo "Using local VANTAGE")
+
+    - name: Run VANTAGE
+      id: analyze
+      shell: bash
+      run: |
+        TARGET="${{ inputs.target }}"
+        THRESHOLD="${{ inputs.threshold }}"
+        REPORT_PATH="${{ runner.temp }}/vantage-report.json"
+
+        set +e
+        vantage analyze "$TARGET" --output "$REPORT_PATH" 2>&1
+        set -e
+
+        if [ ! -f "$REPORT_PATH" ]; then
+          echo "verdict=ERROR" >> $GITHUB_OUTPUT
+          echo "score=0%" >> $GITHUB_OUTPUT
+          echo "report-path=" >> $GITHUB_OUTPUT
+          echo "::error::VANTAGE analysis failed to produce a report"
+          exit 1
+        fi
+
+        VERDICT=$(python3 -c "
+        import json
+        with open('$REPORT_PATH') as f:
+            d = json.load(f)
+        print(d.get('aurora',{}).get('verdict','ERROR'))
+        ")
+
+        SCORE=$(python3 -c "
+        import json
+        with open('$REPORT_PATH') as f:
+            d = json.load(f)
+        s = d.get('aurora',{}).get('score',0)
+        print(f'{s*100:.1f}%')
+        ")
+
+        echo "verdict=$VERDICT" >> $GITHUB_OUTPUT
+        echo "score=$SCORE" >> $GITHUB_OUTPUT
+        echo "report-path=$REPORT_PATH" >> $GITHUB_OUTPUT
+
+    # Auto-fix runs only when:
+    #   - autofix input is 'true'
+    #   - AURORA rejected the PR
+    #   - we're on a pull_request event (writing to main branches from
+    #     autofix would be unsafe)
+    - name: Auto-fix resolvable findings
+      id: autofix
+      if: ${{ inputs.autofix == 'true' && steps.analyze.outputs.verdict == 'REJECTED' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPORT_PATH: ${{ steps.analyze.outputs.report-path }}
+        TARGET: ${{ inputs.target }}
+        THRESHOLD: ${{ inputs.threshold }}
+        COMMITTER_NAME: ${{ inputs.autofix-committer-name }}
+        COMMITTER_EMAIL: ${{ inputs.autofix-committer-email }}
+      run: |
+        # Ensure we're on the PR head branch, not a detached HEAD
+        git config user.name "$COMMITTER_NAME"
+        git config user.email "$COMMITTER_EMAIL"
+        PR_BRANCH="${GITHUB_HEAD_REF}"
+        git fetch origin "$PR_BRANCH"
+        git checkout "$PR_BRANCH"
+
+        # Loop over top findings, try generate_fix via vantage-mcp's CLI.
+        # vantage-mcp exposes tool bodies via a simple `call` subcommand so the
+        # Action doesn't have to speak JSON-RPC manually. (See
+        # src/mcp/cli-shim.ts.)
+        node ${{ github.action_path }}/autofix.js \
+          --report "$REPORT_PATH" \
+          --target "$TARGET" \
+          --threshold "$THRESHOLD" \
+          --out /tmp/vantage-autofix-result.json
+
+        FIXES_APPLIED=$(python3 -c "import json; print(json.load(open('/tmp/vantage-autofix-result.json'))['fixesApplied'])")
+        POST_VERDICT=$(python3 -c "import json; print(json.load(open('/tmp/vantage-autofix-result.json'))['postVerdict'])")
+        echo "fixes-applied=$FIXES_APPLIED" >> $GITHUB_OUTPUT
+        echo "post-verdict=$POST_VERDICT" >> $GITHUB_OUTPUT
+
+        if [ "$FIXES_APPLIED" -gt 0 ]; then
+          git push origin "$PR_BRANCH"
+          echo "::notice::VANTAGE applied $FIXES_APPLIED auto-fix commit(s) to $PR_BRANCH. Post-fix verdict: $POST_VERDICT"
+        fi
+
+    - name: Post PR comment
+      if: ${{ inputs.post-comment == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPORT_PATH: ${{ steps.analyze.outputs.report-path }}
+        VERDICT: ${{ steps.analyze.outputs.verdict }}
+        SCORE: ${{ steps.analyze.outputs.score }}
+        FIXES_APPLIED: ${{ steps.autofix.outputs.fixes-applied }}
+        POST_VERDICT: ${{ steps.autofix.outputs.post-verdict }}
+      run: node ${{ github.action_path }}/post-comment.js
+
+    # Fail the workflow based on the post-autofix verdict when autofix ran,
+    # otherwise on the original verdict. This lets a successful autofix save
+    # a PR from a failing check.
+    - name: Fail on REJECTED
+      if: ${{ inputs.fail-on-reject == 'true' }}
+      shell: bash
+      run: |
+        FINAL_VERDICT="${{ steps.autofix.outputs.post-verdict || steps.analyze.outputs.verdict }}"
+        if [ "$FINAL_VERDICT" = "REJECTED" ]; then
+          echo "::error::VANTAGE REJECTED this PR (score: ${{ steps.analyze.outputs.score }}). Fix HIGH severity issues before merging."
+          exit 1
+        fi

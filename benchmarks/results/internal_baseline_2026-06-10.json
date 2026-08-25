@@ -1,0 +1,802 @@
+{
+  "meta": {
+    "label": "INTERNAL BASELINE 2026-06-10 — matched v2 scoring, internal eyes only",
+    "scoringVersion": "v2 (strict suffix path match, type match, ±5 line, scope field, null-propagating aggregate)",
+    "harnessCommit": "bd3050462075f02881f99c88fe0405ab2e5547da",
+    "corpora": {
+      "nodegoat": {
+        "sha": "c5cb68a7084e4ae7dcc60e6a98768720a81841e8",
+        "gtEntries": 4
+      },
+      "juice-shop": {
+        "sha": "160f3062d6d7c30033ec505596b5b54d32932d8f",
+        "gtEntries": 9
+      }
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "caveat": "Run under CPU contention (concurrent agent + luna watcher active). Durations are indicative only; TP/FP/FN counts are deterministic."
+    },
+    "notRun": {
+      "SonarQube": "no local server (docker daemon down); April numbers were v1-scored and must not be compared",
+      "CodeQL": "CLI not installed; runner never executed; GitHub CodeQL terms — internal-use caution, publication prohibited"
+    }
+  },
+  "results": [
+    {
+      "tool": "VANTAGE",
+      "toolVersion": "1.0.0",
+      "runDate": "2026-06-11T02:05:09.701Z",
+      "commitSha": "bd3050462075",
+      "scores": [
+        {
+          "tool": "VANTAGE",
+          "toolVersion": "1.0.0",
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "durationMs": 120,
+          "tpDetails": [
+            {
+              "file": "app/data/allocations-dao.js",
+              "line": 73,
+              "type": "injection"
+            },
+            {
+              "file": "app/data/allocations-dao.js",
+              "line": 78,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 32,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 33,
+              "type": "injection"
+            }
+          ],
+          "fpDetails": [],
+          "fnDetails": []
+        },
+        {
+          "tool": "VANTAGE",
+          "toolVersion": "1.0.0",
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 8,
+          "fp": 11,
+          "fn": 1,
+          "precision": 0.42105263157894735,
+          "recall": 0.8888888888888888,
+          "f1": 0.5714285714285714,
+          "durationMs": 252,
+          "tpDetails": [
+            {
+              "file": "lib/codingChallenges.ts",
+              "line": 76,
+              "type": "injection"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 23,
+              "type": "hardcoded-secret"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 44,
+              "type": "hardcoded-secret"
+            },
+            {
+              "file": "routes/languages.ts",
+              "line": 18,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/recycles.ts",
+              "line": 14,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/showProductReviews.ts",
+              "line": 36,
+              "type": "injection"
+            },
+            {
+              "file": "routes/trackOrder.ts",
+              "line": 18,
+              "type": "injection"
+            },
+            {
+              "file": "routes/verify.ts",
+              "line": 130,
+              "type": "error-boundary"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_1.ts",
+              "line": 63,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_2_correct.ts",
+              "line": 64,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_3.ts",
+              "line": 64,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_4.ts",
+              "line": 64,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "lib/codingChallenges.ts",
+              "line": 78,
+              "type": "injection",
+              "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled"
+            },
+            {
+              "file": "routes/captcha.ts",
+              "line": 22,
+              "type": "injection",
+              "description": "eval() detected — verify input is not user-controlled"
+            },
+            {
+              "file": "routes/chat.ts",
+              "line": 147,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "routes/languages.ts",
+              "line": 32,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "routes/userProfile.ts",
+              "line": 61,
+              "type": "injection",
+              "description": "eval() detected — verify input is not user-controlled"
+            },
+            {
+              "file": "rsn/rsnUtil.ts",
+              "line": 44,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "server.ts",
+              "line": 323,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError"
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "juiceshop-008",
+              "file": "routes/chatbot.ts",
+              "line": 47,
+              "type": "error-boundary",
+              "description": "JSON.parse() of training set data without try/catch — crash on malformed input"
+            }
+          ]
+        }
+      ],
+      "aggregateF1": 0.7272727272727273,
+      "medianDurationMs": 186
+    },
+    {
+      "tool": "VANTAGE-semantic",
+      "toolVersion": "1.0.0+nebula",
+      "runDate": "2026-06-11T02:05:10.442Z",
+      "commitSha": "bd3050462075",
+      "scores": [
+        {
+          "tool": "VANTAGE-semantic",
+          "toolVersion": "1.0.0+nebula",
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "precision": 0.6666666666666666,
+          "recall": 1,
+          "f1": 0.8,
+          "durationMs": 174,
+          "tpDetails": [
+            {
+              "file": "app/data/allocations-dao.js",
+              "line": 73,
+              "type": "injection"
+            },
+            {
+              "file": "app/data/allocations-dao.js",
+              "line": 78,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 32,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 33,
+              "type": "injection"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "app/routes/contributions.js",
+              "line": 34,
+              "type": "injection",
+              "description": "[NEBULA] Tainted value from Express req.body reaches eval — global eval — runs arbitrary javascript"
+            },
+            {
+              "file": "app/routes/index.js",
+              "line": 72,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Express URL query-string fields reaches express.res.redirect — express res.redirect with user-controlled url — open-redirect vector"
+            }
+          ],
+          "fnDetails": []
+        },
+        {
+          "tool": "VANTAGE-semantic",
+          "toolVersion": "1.0.0+nebula",
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 8,
+          "fp": 21,
+          "fn": 1,
+          "precision": 0.27586206896551724,
+          "recall": 0.8888888888888888,
+          "f1": 0.42105263157894735,
+          "durationMs": 554,
+          "tpDetails": [
+            {
+              "file": "lib/codingChallenges.ts",
+              "line": 76,
+              "type": "injection"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 23,
+              "type": "hardcoded-secret"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 44,
+              "type": "hardcoded-secret"
+            },
+            {
+              "file": "routes/languages.ts",
+              "line": 18,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/recycles.ts",
+              "line": 14,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/showProductReviews.ts",
+              "line": 36,
+              "type": "injection"
+            },
+            {
+              "file": "routes/trackOrder.ts",
+              "line": 18,
+              "type": "injection"
+            },
+            {
+              "file": "routes/verify.ts",
+              "line": 130,
+              "type": "error-boundary"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_1.ts",
+              "line": 63,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_2_correct.ts",
+              "line": 64,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_3.ts",
+              "line": 64,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "data/static/codefixes/chatbotGreedyInjectionChallenge_4.ts",
+              "line": 64,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "lib/codingChallenges.ts",
+              "line": 78,
+              "type": "injection",
+              "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled"
+            },
+            {
+              "file": "routes/captcha.ts",
+              "line": 22,
+              "type": "injection",
+              "description": "eval() detected — verify input is not user-controlled"
+            },
+            {
+              "file": "routes/chat.ts",
+              "line": 147,
+              "type": "injection",
+              "description": "NoSQL $where injection — user-controlled JS expression passed to MongoDB $where"
+            },
+            {
+              "file": "routes/languages.ts",
+              "line": 32,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "routes/userProfile.ts",
+              "line": 61,
+              "type": "injection",
+              "description": "eval() detected — verify input is not user-controlled"
+            },
+            {
+              "file": "rsn/rsnUtil.ts",
+              "line": 44,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "server.ts",
+              "line": 323,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "routes/profileImageFileUpload.ts",
+              "line": 43,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Express request cookies reaches fs.writeFile — fs.writefile with user-controlled path — arbitrary file write"
+            },
+            {
+              "file": "routes/profileImageFileUpload.ts",
+              "line": 57,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Environment variables reaches express.res.redirect — express res.redirect with user-controlled url — open-redirect vector"
+            },
+            {
+              "file": "routes/profileImageUrlUpload.ts",
+              "line": 24,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Express req.body reaches fetch — fetch(url) with user-controlled url"
+            },
+            {
+              "file": "routes/profileImageUrlUpload.ts",
+              "line": 49,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Environment variables reaches express.res.redirect — express res.redirect with user-controlled url — open-redirect vector"
+            },
+            {
+              "file": "routes/updateUserProfile.ts",
+              "line": 42,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Environment variables reaches express.res.redirect — express res.redirect with user-controlled url — open-redirect vector"
+            },
+            {
+              "file": "routes/userProfile.ts",
+              "line": 87,
+              "type": "injection",
+              "description": "[NEBULA] Tainted value from Express request cookies reaches pug.compile — pug template compile — code execution via unsanitized template"
+            },
+            {
+              "file": "routes/vulnCodeFixes.ts",
+              "line": 81,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Express req.body reaches fs.readFileSync — fs.readfilesync with user-controlled path"
+            },
+            {
+              "file": "routes/vulnCodeFixes.ts",
+              "line": 81,
+              "type": "injection",
+              "description": "[NEBULA] Tainted value from Express req.body reaches python.yaml.load — yaml.load without safeloader — deserializes arbitrary classes"
+            },
+            {
+              "file": "routes/vulnCodeSnippet.ts",
+              "line": 90,
+              "type": "edge-case",
+              "description": "[NEBULA] Tainted value from Express req.body reaches fs.readFileSync — fs.readfilesync with user-controlled path"
+            },
+            {
+              "file": "routes/vulnCodeSnippet.ts",
+              "line": 90,
+              "type": "injection",
+              "description": "[NEBULA] Tainted value from Express req.body reaches python.yaml.load — yaml.load without safeloader — deserializes arbitrary classes"
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "juiceshop-008",
+              "file": "routes/chatbot.ts",
+              "line": 47,
+              "type": "error-boundary",
+              "description": "JSON.parse() of training set data without try/catch — crash on malformed input"
+            }
+          ]
+        }
+      ],
+      "aggregateF1": 0.5517241379310345,
+      "medianDurationMs": 364
+    },
+    {
+      "tool": "Semgrep",
+      "toolVersion": "1.136.0",
+      "runDate": "2026-06-11T02:05:28.845Z",
+      "commitSha": "bd3050462075",
+      "scores": [
+        {
+          "tool": "Semgrep",
+          "toolVersion": "1.136.0",
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 2,
+          "fp": 13,
+          "fn": 2,
+          "precision": 0.13333333333333333,
+          "recall": 0.5,
+          "f1": 0.2105263157894737,
+          "durationMs": 4052,
+          "tpDetails": [
+            {
+              "file": "app/routes/contributions.js",
+              "line": 32,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 33,
+              "type": "injection"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "app/routes/contributions.js",
+              "line": 34,
+              "type": "injection",
+              "description": "Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible."
+            },
+            {
+              "file": "app/routes/index.js",
+              "line": 72,
+              "type": "javascript.express.security.audit.express-open-redirect.express-open-redirect",
+              "description": "The application redirects to a URL specified by user-supplied input `req` that is not validated. This could redirect users to malicious locations. Consider using an allow-list approach to validate URLs, or warn users they are being redirected to a third-party website."
+            },
+            {
+              "file": "app/views/tutorial/a2.html",
+              "line": 207,
+              "type": "xss",
+              "description": "This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible."
+            },
+            {
+              "file": "app/views/tutorial/a2.html",
+              "line": 209,
+              "type": "xss",
+              "description": "This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible."
+            },
+            {
+              "file": "app/views/tutorial/a2.html",
+              "line": 210,
+              "type": "xss",
+              "description": "This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible."
+            },
+            {
+              "file": "app/views/tutorial/a5.html",
+              "line": 50,
+              "type": "xss",
+              "description": "This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible."
+            },
+            {
+              "file": "app/views/tutorial/a5.html",
+              "line": 51,
+              "type": "xss",
+              "description": "This link points to a plaintext HTTP URL. Prefer an encrypted HTTPS URL if possible."
+            },
+            {
+              "file": "server.js",
+              "line": 78,
+              "type": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-default-name",
+              "description": "Don’t use the default session cookie name Using the default session cookie name can open your app to attacks. The security issue posed is similar to X-Powered-By: a potential attacker can use it to fingerprint the server and target attacks accordingly."
+            },
+            {
+              "file": "server.js",
+              "line": 78,
+              "type": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-domain",
+              "description": "Default session middleware settings: `domain` not set. It indicates the domain of the cookie; use it to compare against the domain of the server in which the URL is being requested. If they match, then check the path attribute next."
+            },
+            {
+              "file": "server.js",
+              "line": 78,
+              "type": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-expires",
+              "description": "Default session middleware settings: `expires` not set. Use it to set expiration date for persistent cookies."
+            },
+            {
+              "file": "server.js",
+              "line": 78,
+              "type": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-httponly",
+              "description": "Default session middleware settings: `httpOnly` not set. It ensures the cookie is sent only over HTTP(S), not client JavaScript, helping to protect against cross-site scripting attacks."
+            },
+            {
+              "file": "server.js",
+              "line": 78,
+              "type": "path-traversal",
+              "description": "Default session middleware settings: `path` not set. It indicates the path of the cookie; use it to compare against the request path. If this and domain match, then send the cookie in the request."
+            },
+            {
+              "file": "server.js",
+              "line": 78,
+              "type": "javascript.express.security.audit.express-cookie-settings.express-cookie-session-no-secure",
+              "description": "Default session middleware settings: `secure` not set. It ensures the browser only sends the cookie over HTTPS."
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "nodegoat-003",
+              "file": "app/data/allocations-dao.js",
+              "line": 73,
+              "type": "injection",
+              "description": "MongoDB $where query with template literal from userId — NoSQL injection"
+            },
+            {
+              "id": "nodegoat-004",
+              "file": "app/data/allocations-dao.js",
+              "line": 78,
+              "type": "injection",
+              "description": "MongoDB $where query with string concatenation from threshold — NoSQL injection"
+            }
+          ]
+        },
+        {
+          "tool": "Semgrep",
+          "toolVersion": "1.136.0",
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 0,
+          "fp": 22,
+          "fn": 9,
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "durationMs": 14340,
+          "tpDetails": [],
+          "fpDetails": [
+            {
+              "file": ".github/workflows/update-challenges-ebook.yml",
+              "line": 22,
+              "type": "injection",
+              "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\"."
+            },
+            {
+              "file": ".github/workflows/update-challenges-www-legacy.yml",
+              "line": 27,
+              "type": "injection",
+              "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\"."
+            },
+            {
+              "file": ".github/workflows/update-challenges-www-legacy.yml",
+              "line": 36,
+              "type": "injection",
+              "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\"."
+            },
+            {
+              "file": ".github/workflows/update-challenges-www.yml",
+              "line": 27,
+              "type": "injection",
+              "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\"."
+            },
+            {
+              "file": ".github/workflows/update-challenges-www.yml",
+              "line": 36,
+              "type": "injection",
+              "description": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\"."
+            },
+            {
+              "file": "data/static/codefixes/dbSchemaChallenge_1.ts",
+              "line": 5,
+              "type": "injection",
+              "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements."
+            },
+            {
+              "file": "data/static/codefixes/dbSchemaChallenge_3.ts",
+              "line": 11,
+              "type": "injection",
+              "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements."
+            },
+            {
+              "file": "data/static/codefixes/unionSqlInjectionChallenge_1.ts",
+              "line": 6,
+              "type": "injection",
+              "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements."
+            },
+            {
+              "file": "data/static/codefixes/unionSqlInjectionChallenge_3.ts",
+              "line": 10,
+              "type": "injection",
+              "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements."
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 56,
+              "type": "hardcoded-secret",
+              "description": "A hard-coded credential was detected. It is not recommended to store credentials in source-code, as this risks secrets being leaked and used by either an internal or external malicious adversary. It is recommended to use environment variables to securely provide credentials or retrieve credentials from a secure vault or HSM (Hardware Security Module)."
+            },
+            {
+              "file": "routes/fileServer.ts",
+              "line": 33,
+              "type": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+              "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing."
+            },
+            {
+              "file": "routes/keyServer.ts",
+              "line": 14,
+              "type": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+              "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing."
+            },
+            {
+              "file": "routes/logfileServer.ts",
+              "line": 14,
+              "type": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+              "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing."
+            },
+            {
+              "file": "routes/login.ts",
+              "line": 34,
+              "type": "injection",
+              "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements."
+            },
+            {
+              "file": "routes/quarantineServer.ts",
+              "line": 14,
+              "type": "javascript.express.security.audit.express-res-sendfile.express-res-sendfile",
+              "description": "The application processes user-input, this is passed to res.sendFile which can allow an attacker to arbitrarily read files on the system through path traversal. It is recommended to perform input validation in addition to canonicalizing the path. This allows you to validate the path against the intended directory it should be accessing."
+            },
+            {
+              "file": "routes/redirect.ts",
+              "line": 19,
+              "type": "javascript.express.security.audit.express-open-redirect.express-open-redirect",
+              "description": "The application redirects to a URL specified by user-supplied input `query` that is not validated. This could redirect users to malicious locations. Consider using an allow-list approach to validate URLs, or warn users they are being redirected to a third-party website."
+            },
+            {
+              "file": "routes/search.ts",
+              "line": 23,
+              "type": "injection",
+              "description": "Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it is recommended to use parameterized queries or prepared statements."
+            },
+            {
+              "file": "routes/userProfile.ts",
+              "line": 61,
+              "type": "injection",
+              "description": "Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable this can lead to execution of arbitrary system commands in the context of your application process. Avoid `eval` whenever possible."
+            },
+            {
+              "file": "server.ts",
+              "line": 269,
+              "type": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+              "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource."
+            },
+            {
+              "file": "server.ts",
+              "line": 273,
+              "type": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+              "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource."
+            },
+            {
+              "file": "server.ts",
+              "line": 277,
+              "type": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+              "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource."
+            },
+            {
+              "file": "server.ts",
+              "line": 281,
+              "type": "javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing",
+              "description": "Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and files. It is recommended to disable directory listing unless it is a public resource. If you need directory listing, ensure that sensitive files are inaccessible when querying the resource."
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "juiceshop-001",
+              "file": "lib/insecurity.ts",
+              "line": 23,
+              "type": "hardcoded-secret",
+              "description": "RSA private key hardcoded in source (-----BEGIN RSA PRIVATE KEY-----)"
+            },
+            {
+              "id": "juiceshop-002",
+              "file": "lib/insecurity.ts",
+              "line": 44,
+              "type": "hardcoded-secret",
+              "description": "HMAC secret hardcoded as literal string passed to crypto.createHmac()"
+            },
+            {
+              "id": "juiceshop-003",
+              "file": "routes/trackOrder.ts",
+              "line": 18,
+              "type": "injection",
+              "description": "MongoDB $where: `this.orderId === '${id}'` — NoSQL injection via template literal"
+            },
+            {
+              "id": "juiceshop-004",
+              "file": "routes/showProductReviews.ts",
+              "line": 36,
+              "type": "injection",
+              "description": "MongoDB $where: 'this.product == ' + id — NoSQL injection via string concatenation"
+            },
+            {
+              "id": "juiceshop-005",
+              "file": "lib/codingChallenges.ts",
+              "line": 76,
+              "type": "injection",
+              "description": "new RegExp() with user-controlled challengeKey — potential Regular Expression Denial of Service"
+            },
+            {
+              "id": "juiceshop-006",
+              "file": "routes/languages.ts",
+              "line": 18,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — unhandled parse error causes uncaught exception"
+            },
+            {
+              "id": "juiceshop-007",
+              "file": "routes/verify.ts",
+              "line": 128,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch — malformed input crashes the verification route"
+            },
+            {
+              "id": "juiceshop-008",
+              "file": "routes/chatbot.ts",
+              "line": 47,
+              "type": "error-boundary",
+              "description": "JSON.parse() of training set data without try/catch — crash on malformed input"
+            },
+            {
+              "id": "juiceshop-009",
+              "file": "routes/recycles.ts",
+              "line": 14,
+              "type": "error-boundary",
+              "description": "JSON.parse() on req.params.id without try/catch — user-controlled input causes crash"
+            }
+          ]
+        }
+      ],
+      "aggregateF1": 0,
+      "medianDurationMs": 9196
+    }
+  ]
+}

@@ -1,0 +1,579 @@
+{
+  "generatedAt": "2026-04-16T08:57:53.658Z",
+  "apiHealthy": true,
+  "results": [
+    {
+      "id": "express",
+      "label": "Regression — expressjs/express",
+      "sha": "8e022edc9185f540a3fcecaf5e56b850d919cdac",
+      "status": "OK",
+      "runs": [
+        {
+          "runIdx": 1,
+          "totalMs": 72.74616700000007,
+          "engineMs": {
+            "METEOR": 54.81616700000001,
+            "NOVA": 1.561666999999943,
+            "ECLIPSE": 7.572709000000032,
+            "PULSAR": 0.10795800000005329,
+            "AURORA": 8.612999999999943
+          },
+          "peakRssMB": 11.078125,
+          "score": 0.9594053279541488,
+          "verdict": "APPROVED",
+          "breakdown": {
+            "complexityScore": 0.9829759217456734,
+            "dependencyScore": 0.9,
+            "riskScore": 0.974645390070922,
+            "adversarialScore": 1
+          },
+          "threshold": 0.8,
+          "unsupportedFiles": {
+            "count": 0,
+            "extensions": [],
+            "filePaths": []
+          },
+          "fileCount": 145,
+          "locCount": 25688,
+          "functionCount": 1772,
+          "circularDeps": 0,
+          "godModules": 0,
+          "highRisk": 0,
+          "pulsarFindings": 0,
+          "issues": {
+            "HIGH": 0,
+            "MED": 5
+          }
+        },
+        {
+          "runIdx": 2,
+          "totalMs": 41.77995899999996,
+          "engineMs": {
+            "METEOR": 32.9163749999999,
+            "NOVA": 0.9982499999999845,
+            "ECLIPSE": 7.61095899999998,
+            "PULSAR": 0.029458999999974367,
+            "AURORA": 0.1502500000000282
+          },
+          "peakRssMB": 0.390625,
+          "score": 0.9594053279541488,
+          "verdict": "APPROVED",
+          "breakdown": {
+            "complexityScore": 0.9829759217456734,
+            "dependencyScore": 0.9,
+            "riskScore": 0.974645390070922,
+            "adversarialScore": 1
+          },
+          "threshold": 0.8,
+          "unsupportedFiles": {
+            "count": 0,
+            "extensions": [],
+            "filePaths": []
+          },
+          "fileCount": 145,
+          "locCount": 25688,
+          "functionCount": 1772,
+          "circularDeps": 0,
+          "godModules": 0,
+          "highRisk": 0,
+          "pulsarFindings": 0,
+          "issues": {
+            "HIGH": 0,
+            "MED": 5
+          }
+        },
+        {
+          "runIdx": 3,
+          "totalMs": 46.97416700000008,
+          "engineMs": {
+            "METEOR": 37.450417000000016,
+            "NOVA": 1.1262090000000171,
+            "ECLIPSE": 8.17904099999987,
+            "PULSAR": 0.012084000000186279,
+            "AURORA": 0.1685419999998885
+          },
+          "peakRssMB": 0.296875,
+          "score": 0.9594053279541488,
+          "verdict": "APPROVED",
+          "breakdown": {
+            "complexityScore": 0.9829759217456734,
+            "dependencyScore": 0.9,
+            "riskScore": 0.974645390070922,
+            "adversarialScore": 1
+          },
+          "threshold": 0.8,
+          "unsupportedFiles": {
+            "count": 0,
+            "extensions": [],
+            "filePaths": []
+          },
+          "fileCount": 145,
+          "locCount": 25688,
+          "functionCount": 1772,
+          "circularDeps": 0,
+          "godModules": 0,
+          "highRisk": 0,
+          "pulsarFindings": 0,
+          "issues": {
+            "HIGH": 0,
+            "MED": 5
+          }
+        }
+      ],
+      "medianTotalMs": 46.97416700000008,
+      "rep": {
+        "runIdx": 1,
+        "totalMs": 72.74616700000007,
+        "engineMs": {
+          "METEOR": 54.81616700000001,
+          "NOVA": 1.561666999999943,
+          "ECLIPSE": 7.572709000000032,
+          "PULSAR": 0.10795800000005329,
+          "AURORA": 8.612999999999943
+        },
+        "peakRssMB": 11.078125,
+        "score": 0.9594053279541488,
+        "verdict": "APPROVED",
+        "breakdown": {
+          "complexityScore": 0.9829759217456734,
+          "dependencyScore": 0.9,
+          "riskScore": 0.974645390070922,
+          "adversarialScore": 1
+        },
+        "threshold": 0.8,
+        "unsupportedFiles": {
+          "count": 0,
+          "extensions": [],
+          "filePaths": []
+        },
+        "fileCount": 145,
+        "locCount": 25688,
+        "functionCount": 1772,
+        "circularDeps": 0,
+        "godModules": 0,
+        "highRisk": 0,
+        "pulsarFindings": 0,
+        "issues": {
+          "HIGH": 0,
+          "MED": 5
+        }
+      },
+      "checkResults": {
+        "APPROVED": {
+          "pass": true,
+          "detail": "verdict=APPROVED"
+        },
+        "SCORE_STABLE": {
+          "pass": true,
+          "detail": "score=95.9%"
+        },
+        "BREAKDOWN_PRESENT": {
+          "pass": true,
+          "detail": "complexityScore=0.983"
+        }
+      }
+    },
+    {
+      "id": "vscode",
+      "label": "New large TS — microsoft/vscode (src/vs)",
+      "sha": "d0eea83269b1c1b4e868089e17032b108cecd8be",
+      "status": "OK",
+      "runs": [
+        {
+          "runIdx": 1,
+          "totalMs": 12708.929,
+          "engineMs": {
+            "METEOR": 1843.7226249999999,
+            "NOVA": 8791.21025,
+            "ECLIPSE": 2066.7611670000006,
+            "PULSAR": 3.840541999999914,
+            "AURORA": 3.3339169999999285
+          },
+          "peakRssMB": 132.90625,
+          "score": 0.5903930856044166,
+          "verdict": "REJECTED",
+          "breakdown": {
+            "complexityScore": 0.9072469121401817,
+            "dependencyScore": 0,
+            "riskScore": 0.9583254302774847,
+            "adversarialScore": 0.6199999999999999
+          },
+          "threshold": 0.8,
+          "unsupportedFiles": {
+            "count": 0,
+            "extensions": [],
+            "filePaths": []
+          },
+          "fileCount": 5729,
+          "locCount": 1884786,
+          "functionCount": 51438,
+          "circularDeps": 4856,
+          "godModules": 239,
+          "highRisk": 0,
+          "pulsarFindings": 51,
+          "issues": {
+            "HIGH": 4,
+            "MED": 6
+          }
+        },
+        {
+          "runIdx": 2,
+          "totalMs": 12609.551584000003,
+          "engineMs": {
+            "METEOR": 1895.6190419999984,
+            "NOVA": 8935.423209,
+            "ECLIPSE": 1772.2607500000013,
+            "PULSAR": 2.8750419999996666,
+            "AURORA": 3.316500000000815
+          },
+          "peakRssMB": 13.671875,
+          "score": 0.5903930856044166,
+          "verdict": "REJECTED",
+          "breakdown": {
+            "complexityScore": 0.9072469121401817,
+            "dependencyScore": 0,
+            "riskScore": 0.9583254302774847,
+            "adversarialScore": 0.6199999999999999
+          },
+          "threshold": 0.8,
+          "unsupportedFiles": {
+            "count": 0,
+            "extensions": [],
+            "filePaths": []
+          },
+          "fileCount": 5729,
+          "locCount": 1884786,
+          "functionCount": 51438,
+          "circularDeps": 4856,
+          "godModules": 239,
+          "highRisk": 0,
+          "pulsarFindings": 51,
+          "issues": {
+            "HIGH": 4,
+            "MED": 6
+          }
+        },
+        {
+          "runIdx": 3,
+          "totalMs": 12688.905209,
+          "engineMs": {
+            "METEOR": 1924.9280419999996,
+            "NOVA": 8877.459958000003,
+            "ECLIPSE": 1880.1943329999995,
+            "PULSAR": 2.8974579999994603,
+            "AURORA": 3.3580000000001746
+          },
+          "peakRssMB": 125.5,
+          "score": 0.5903930856044166,
+          "verdict": "REJECTED",
+          "breakdown": {
+            "complexityScore": 0.9072469121401817,
+            "dependencyScore": 0,
+            "riskScore": 0.9583254302774847,
+            "adversarialScore": 0.6199999999999999
+          },
+          "threshold": 0.8,
+          "unsupportedFiles": {
+            "count": 0,
+            "extensions": [],
+            "filePaths": []
+          },
+          "fileCount": 5729,
+          "locCount": 1884786,
+          "functionCount": 51438,
+          "circularDeps": 4856,
+          "godModules": 239,
+          "highRisk": 0,
+          "pulsarFindings": 51,
+          "issues": {
+            "HIGH": 4,
+            "MED": 6
+          }
+        }
+      ],
+      "medianTotalMs": 12688.905209,
+      "rep": {
+        "runIdx": 1,
+        "totalMs": 12708.929,
+        "engineMs": {
+          "METEOR": 1843.7226249999999,
+          "NOVA": 8791.21025,
+          "ECLIPSE": 2066.7611670000006,
+          "PULSAR": 3.840541999999914,
+          "AURORA": 3.3339169999999285
+        },
+        "peakRssMB": 132.90625,
+        "score": 0.5903930856044166,
+        "verdict": "REJECTED",
+        "breakdown": {
+          "complexityScore": 0.9072469121401817,
+          "dependencyScore": 0,
+          "riskScore": 0.9583254302774847,
+          "adversarialScore": 0.6199999999999999
+        },
+        "threshold": 0.8,
+        "unsupportedFiles": {
+          "count": 0,
+          "extensions": [],
+          "filePaths": []
+        },
+        "fileCount": 5729,
+        "locCount": 1884786,
+        "functionCount": 51438,
+        "circularDeps": 4856,
+        "godModules": 239,
+        "highRisk": 0,
+        "pulsarFindings": 51,
+        "issues": {
+          "HIGH": 4,
+          "MED": 6
+        }
+      },
+      "checkResults": {
+        "REJECTED": {
+          "pass": true,
+          "detail": "verdict=REJECTED"
+        },
+        "SCORE_IN_RANGE_0.60_0.80": {
+          "pass": false,
+          "detail": "score=59.0%"
+        },
+        "BREAKDOWN_PRESENT": {
+          "pass": true,
+          "detail": "complexityScore=0.907"
+        }
+      }
+    },
+    {
+      "id": "synthetic-c",
+      "label": "Unsupported language — 10 synthetic C files",
+      "sha": "synthetic (copied from linux/drivers/net)",
+      "status": "OK",
+      "runs": [
+        {
+          "runIdx": 1,
+          "totalMs": 14.833749999997963,
+          "engineMs": {
+            "METEOR": 14.119124999997439,
+            "NOVA": 0.43795800000225427,
+            "ECLIPSE": 0.1860000000015134,
+            "PULSAR": 0.014374999998835847,
+            "AURORA": 0.04404100000101607
+          },
+          "peakRssMB": 2,
+          "score": 0.9725000000000001,
+          "verdict": "APPROVED",
+          "breakdown": {
+            "complexityScore": 1,
+            "dependencyScore": 1,
+            "riskScore": 0.89,
+            "adversarialScore": 1
+          },
+          "threshold": 0.8,
+          "unsupportedFilesNote": "10 of 10 files (100%) are in language(s) without reliable extraction: .c. LOC is counted; function/import/class analysis was skipped for these files. Score and findings reflect only the 0 supported-language files.",
+          "unsupportedFiles": {
+            "count": 10,
+            "extensions": [
+              ".c"
+            ],
+            "filePaths": [
+              "/tmp/vantage-bench/synthetic-c/driver_1.c",
+              "/tmp/vantage-bench/synthetic-c/driver_10.c",
+              "/tmp/vantage-bench/synthetic-c/driver_2.c",
+              "/tmp/vantage-bench/synthetic-c/driver_3.c",
+              "/tmp/vantage-bench/synthetic-c/driver_4.c",
+              "/tmp/vantage-bench/synthetic-c/driver_5.c",
+              "/tmp/vantage-bench/synthetic-c/driver_6.c",
+              "/tmp/vantage-bench/synthetic-c/driver_7.c",
+              "/tmp/vantage-bench/synthetic-c/driver_8.c",
+              "/tmp/vantage-bench/synthetic-c/driver_9.c"
+            ]
+          },
+          "fileCount": 10,
+          "locCount": 53290,
+          "functionCount": 0,
+          "circularDeps": 0,
+          "godModules": 0,
+          "highRisk": 0,
+          "pulsarFindings": 0,
+          "issues": {
+            "HIGH": 0,
+            "MED": 0
+          }
+        },
+        {
+          "runIdx": 2,
+          "totalMs": 7.942291999999725,
+          "engineMs": {
+            "METEOR": 7.389083999994909,
+            "NOVA": 0.38708300000143936,
+            "ECLIPSE": 0.10679099999833852,
+            "PULSAR": 0.004791999999724794,
+            "AURORA": 0.028292000002693385
+          },
+          "peakRssMB": 1.5625,
+          "score": 0.9725000000000001,
+          "verdict": "APPROVED",
+          "breakdown": {
+            "complexityScore": 1,
+            "dependencyScore": 1,
+            "riskScore": 0.89,
+            "adversarialScore": 1
+          },
+          "threshold": 0.8,
+          "unsupportedFilesNote": "10 of 10 files (100%) are in language(s) without reliable extraction: .c. LOC is counted; function/import/class analysis was skipped for these files. Score and findings reflect only the 0 supported-language files.",
+          "unsupportedFiles": {
+            "count": 10,
+            "extensions": [
+              ".c"
+            ],
+            "filePaths": [
+              "/tmp/vantage-bench/synthetic-c/driver_1.c",
+              "/tmp/vantage-bench/synthetic-c/driver_10.c",
+              "/tmp/vantage-bench/synthetic-c/driver_2.c",
+              "/tmp/vantage-bench/synthetic-c/driver_3.c",
+              "/tmp/vantage-bench/synthetic-c/driver_4.c",
+              "/tmp/vantage-bench/synthetic-c/driver_5.c",
+              "/tmp/vantage-bench/synthetic-c/driver_6.c",
+              "/tmp/vantage-bench/synthetic-c/driver_7.c",
+              "/tmp/vantage-bench/synthetic-c/driver_8.c",
+              "/tmp/vantage-bench/synthetic-c/driver_9.c"
+            ]
+          },
+          "fileCount": 10,
+          "locCount": 53290,
+          "functionCount": 0,
+          "circularDeps": 0,
+          "godModules": 0,
+          "highRisk": 0,
+          "pulsarFindings": 0,
+          "issues": {
+            "HIGH": 0,
+            "MED": 0
+          }
+        },
+        {
+          "runIdx": 3,
+          "totalMs": 8.786542000001646,
+          "engineMs": {
+            "METEOR": 8.300541999997222,
+            "NOVA": 0.3173339999993914,
+            "ECLIPSE": 0.11604200000147102,
+            "PULSAR": 0.004542000002402347,
+            "AURORA": 0.023042000000714324
+          },
+          "peakRssMB": 1.5625,
+          "score": 0.9725000000000001,
+          "verdict": "APPROVED",
+          "breakdown": {
+            "complexityScore": 1,
+            "dependencyScore": 1,
+            "riskScore": 0.89,
+            "adversarialScore": 1
+          },
+          "threshold": 0.8,
+          "unsupportedFilesNote": "10 of 10 files (100%) are in language(s) without reliable extraction: .c. LOC is counted; function/import/class analysis was skipped for these files. Score and findings reflect only the 0 supported-language files.",
+          "unsupportedFiles": {
+            "count": 10,
+            "extensions": [
+              ".c"
+            ],
+            "filePaths": [
+              "/tmp/vantage-bench/synthetic-c/driver_1.c",
+              "/tmp/vantage-bench/synthetic-c/driver_10.c",
+              "/tmp/vantage-bench/synthetic-c/driver_2.c",
+              "/tmp/vantage-bench/synthetic-c/driver_3.c",
+              "/tmp/vantage-bench/synthetic-c/driver_4.c",
+              "/tmp/vantage-bench/synthetic-c/driver_5.c",
+              "/tmp/vantage-bench/synthetic-c/driver_6.c",
+              "/tmp/vantage-bench/synthetic-c/driver_7.c",
+              "/tmp/vantage-bench/synthetic-c/driver_8.c",
+              "/tmp/vantage-bench/synthetic-c/driver_9.c"
+            ]
+          },
+          "fileCount": 10,
+          "locCount": 53290,
+          "functionCount": 0,
+          "circularDeps": 0,
+          "godModules": 0,
+          "highRisk": 0,
+          "pulsarFindings": 0,
+          "issues": {
+            "HIGH": 0,
+            "MED": 0
+          }
+        }
+      ],
+      "medianTotalMs": 8.786542000001646,
+      "rep": {
+        "runIdx": 1,
+        "totalMs": 14.833749999997963,
+        "engineMs": {
+          "METEOR": 14.119124999997439,
+          "NOVA": 0.43795800000225427,
+          "ECLIPSE": 0.1860000000015134,
+          "PULSAR": 0.014374999998835847,
+          "AURORA": 0.04404100000101607
+        },
+        "peakRssMB": 2,
+        "score": 0.9725000000000001,
+        "verdict": "APPROVED",
+        "breakdown": {
+          "complexityScore": 1,
+          "dependencyScore": 1,
+          "riskScore": 0.89,
+          "adversarialScore": 1
+        },
+        "threshold": 0.8,
+        "unsupportedFilesNote": "10 of 10 files (100%) are in language(s) without reliable extraction: .c. LOC is counted; function/import/class analysis was skipped for these files. Score and findings reflect only the 0 supported-language files.",
+        "unsupportedFiles": {
+          "count": 10,
+          "extensions": [
+            ".c"
+          ],
+          "filePaths": [
+            "/tmp/vantage-bench/synthetic-c/driver_1.c",
+            "/tmp/vantage-bench/synthetic-c/driver_10.c",
+            "/tmp/vantage-bench/synthetic-c/driver_2.c",
+            "/tmp/vantage-bench/synthetic-c/driver_3.c",
+            "/tmp/vantage-bench/synthetic-c/driver_4.c",
+            "/tmp/vantage-bench/synthetic-c/driver_5.c",
+            "/tmp/vantage-bench/synthetic-c/driver_6.c",
+            "/tmp/vantage-bench/synthetic-c/driver_7.c",
+            "/tmp/vantage-bench/synthetic-c/driver_8.c",
+            "/tmp/vantage-bench/synthetic-c/driver_9.c"
+          ]
+        },
+        "fileCount": 10,
+        "locCount": 53290,
+        "functionCount": 0,
+        "circularDeps": 0,
+        "godModules": 0,
+        "highRisk": 0,
+        "pulsarFindings": 0,
+        "issues": {
+          "HIGH": 0,
+          "MED": 0
+        }
+      },
+      "checkResults": {
+        "NO_CRASH": {
+          "pass": true,
+          "detail": "pipeline completed without exception"
+        },
+        "UNSUPPORTED_10": {
+          "pass": true,
+          "detail": "unsupported=10"
+        },
+        "UNSUPPORTED_EXT_C": {
+          "pass": true,
+          "detail": "extensions=[\".c\"]"
+        },
+        "NOTE_PRESENT": {
+          "pass": true,
+          "detail": "note present"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import LeaderboardTable from '../components/LeaderboardTable.astro';
+import type { LeaderboardData } from '../types';
+import resultsJson from '../data/results.json';
+
+const data = resultsJson as LeaderboardData;
+const top = data.tools[0];
+const lastUpdated = data.generatedAt.slice(0, 10);
+---
+
+<Base title="Leaderboard">
+  <h1>Static Analysis Benchmark</h1>
+  <p>Ranked by precision, recall, F1, and speed on <strong>OWASP NodeGoat</strong> and <strong>OWASP Juice Shop</strong> — two intentionally-vulnerable Node.js/TypeScript apps with a ground-truth vulnerability catalog.</p>
+  <p class="updated">Last run: {lastUpdated} · <a href="/methodology">Methodology</a> · <a href="/submit">Add your tool</a></p>
+
+  <div class="stat-grid" style="margin: 28px 0">
+    <div class="stat">
+      <div class="stat-value">{data.tools.length}</div>
+      <div class="stat-label">Tools ranked</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">2</div>
+      <div class="stat-label">Corpora</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">13</div>
+      <div class="stat-label">GT vulnerabilities</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color: var(--green)">#{top.rank} {top.name}</div>
+      <div class="stat-label">Current leader</div>
+    </div>
+  </div>
+
+  <LeaderboardTable tools={data.tools} />
+
+  <div class="card" style="margin-top: 32px">
+    <h2 style="margin-top: 0">Key findings</h2>
+    <ul style="color: var(--text2); padding-left: 20px; line-height: 2">
+      <li>Only VANTAGE detects <strong>NoSQL <code>$where</code> injection</strong> and <strong>missing <code>JSON.parse</code> error boundaries</strong> — neither Semgrep nor SonarQube have rules for these patterns.</li>
+      <li>Semgrep's targeted OWASP/nodejs/javascript ruleset reaches <strong>50% recall on NodeGoat</strong> and only <strong>10% on Juice Shop</strong>. The broader <code>auto</code> profile improves Juice Shop recall to 30% by including hardcoded-hmac-key and detect-non-literal-regexp rules not in the OWASP packs.</li>
+      <li>SonarQube Community returns <strong>56 false positives on Juice Shop</strong> — 43 are test-fixture credentials in <code>*Spec.ts</code> files.</li>
+      <li>VANTAGE is <strong>194× faster than Semgrep</strong> and <strong>579× faster than SonarQube</strong> on NodeGoat, and runs fully offline with no infrastructure required.</li>
+    </ul>
+  </div>
+</Base>

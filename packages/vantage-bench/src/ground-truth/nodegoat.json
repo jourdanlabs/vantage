@@ -1,0 +1,62 @@
+{
+  "corpus": "nodegoat",
+  "label": "OWASP/NodeGoat",
+  "repo": "https://github.com/OWASP/NodeGoat",
+  "sha": "latest",
+  "license": "Apache-2.0",
+  "groundTruthLicense": "CC-BY-4.0",
+  "groundTruthVersion": "2026-04-16",
+  "vulnerabilities": [
+    {
+      "id": "nodegoat-001",
+      "file": "app/routes/contributions.js",
+      "line": 32,
+      "type": "injection",
+      "category": "eval-injection",
+      "cwe": "CWE-95",
+      "description": "eval() on user-controlled req.body.preTax — arbitrary JavaScript execution",
+      "owasp": "A03:2021-Injection"
+    },
+    {
+      "id": "nodegoat-002",
+      "file": "app/routes/contributions.js",
+      "line": 33,
+      "type": "injection",
+      "category": "eval-injection",
+      "cwe": "CWE-95",
+      "description": "eval() on user-controlled req.body.afterTax/roth — arbitrary JavaScript execution",
+      "owasp": "A03:2021-Injection"
+    },
+    {
+      "id": "nodegoat-003",
+      "file": "app/data/allocations-dao.js",
+      "line": 73,
+      "type": "injection",
+      "category": "nosql-injection",
+      "cwe": "CWE-943",
+      "description": "MongoDB $where query with template literal from userId — NoSQL injection",
+      "owasp": "A03:2021-Injection"
+    },
+    {
+      "id": "nodegoat-004",
+      "file": "app/data/allocations-dao.js",
+      "line": 78,
+      "type": "injection",
+      "category": "nosql-injection",
+      "cwe": "CWE-943",
+      "description": "MongoDB $where query with string concatenation from threshold — NoSQL injection",
+      "owasp": "A03:2021-Injection"
+    }
+  ],
+  "knownOutOfScope": [
+    {
+      "id": "nodegoat-oos-001",
+      "file": "app/routes/session.js",
+      "line": 0,
+      "category": "broken-authentication",
+      "cwe": "CWE-352",
+      "description": "Weak session management and missing CSRF protection",
+      "reason": "Architectural absence pattern — requires whole-app middleware ordering analysis"
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "date": "2026-08-02T13:53:48.821Z",
+  "driver": "run-v2-matched-oss-2026-08-02.js",
+  "scoring": "v2 packages/vantage-bench/src/scoring.ts (LINE_TOLERANCE=5, strict suffix path, type match)",
+  "vantageTip": "04ae7dc572fe3e624aa17e9b645ea9866a0cb18b",
+  "node": "v24.18.0",
+  "corpora": [
+    {
+      "id": "nodegoat",
+      "path": "/Users/sokpyeon/projects/vantage-recert-2026-08-02/corpus/owasp-pinned/NodeGoat",
+      "sha": "c5cb68a7084e4ae7dcc60e6a98768720a81841e8",
+      "expectedSha": "c5cb68a7084e4ae7dcc60e6a98768720a81841e8",
+      "shaMatch": true,
+      "gtCount": 4
+    },
+    {
+      "id": "juice-shop",
+      "path": "/Users/sokpyeon/projects/vantage-recert-2026-08-02/corpus/owasp-pinned/juice-shop",
+      "sha": "160f3062d6d7c30033ec505596b5b54d32932d8f",
+      "expectedSha": "160f3062d6d7c30033ec505596b5b54d32932d8f",
+      "shaMatch": true,
+      "gtCount": 9
+    }
+  ],
+  "rows": [
+    {
+      "tool": "VANTAGE-pattern",
+      "toolVersion": "1.0.0",
+      "corpus": "nodegoat",
+      "corpusLabel": "OWASP NodeGoat",
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "durationMs": 112,
+      "rawCount": 4,
+      "tpDetails": [
+        {
+          "file": "app/data/allocations-dao.js",
+          "line": 73,
+          "type": "injection"
+        },
+        {
+          "file": "app/data/allocations-dao.js",
+          "line": 78,
+          "type": "injection"
+        },
+        {
+          "file": "app/routes/contributions.js",
+          "line": 32,
+          "type": "injection"
+        },
+        {
+          "file": "app/routes/contributions.js",
+          "line": 33,
+          "type": "injection"
+        }
+      ],
+      "fnDetails": [],
+      "mode": "pattern"
+    },
+    {
+      "tool": "VANTAGE-pattern",
+      "toolVersion": "1.0.0",
+      "corpus": "juice-shop",
+      "corpusLabel": "OWASP Juice Shop",
+      "tp": 8,
+      "fp": 11,
+      "fn": 1,
+      "precision": 0.42105263157894735,
+      "recall": 0.8888888888888888,
+      "f1": 0.5714285714285714,
+      "durationMs": 253,
+      "rawCount": 19,
+      "tpDetails": [
+        {
+          "file": "lib/codingChallenges.ts",
+          "line": 76,
+          "type": "injection"
+        },
+        {
+          "file": "lib/insecurity.ts",
+          "line": 23,
+          "type": "hardcoded-secret"
+        },
+        {
+          "file": "lib/insecurity.ts",
+          "line": 44,
+          "type": "hardcoded-secret"
+        },
+        {
+          "file": "routes/languages.ts",
+          "line": 18,
+          "type": "error-boundary"
+        },
+        {
+          "file": "routes/recycles.ts",
+          "line": 14,
+          "type": "error-boundary"
+        },
+        {
+          "file": "routes/showProductReviews.ts",
+          "line": 36,
+          "type": "injection"
+        },
+        {
+          "file": "routes/trackOrder.ts",
+          "line": 18,
+          "type": "injection"
+        },
+        {
+          "file": "routes/verify.ts",
+          "line": 130,
+          "type": "error-boundary"
+        }
+      ],
+      "fnDetails": [
+        {
+          "id": "juiceshop-008",
+          "file": "routes/chatbot.ts",
+          "line": 47,
+          "type": "error-boundary"
+        }
+      ],
+      "mode": "pattern"
+    },
+    {
+      "tool": "VANTAGE",
+      "mode": "pattern",
+      "corpus": "aggregate",
+      "f1": 0.7272727272727273,
+      "note": "harmonic mean of per-corpus F1"
+    },
+    {
+      "tool": "VANTAGE-semantic",
+      "toolVersion": "1.0.0+nebula",
+      "corpus": "nodegoat",
+      "corpusLabel": "OWASP NodeGoat",
+      "tp": 4,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1,
+      "f1": 0.8,
+      "durationMs": 173,
+      "rawCount": 6,
+      "tpDetails": [
+        {
+          "file": "app/data/allocations-dao.js",
+          "line": 73,
+          "type": "injection"
+        },
+        {
+          "file": "app/data/allocations-dao.js",
+          "line": 78,
+          "type": "injection"
+        },
+        {
+          "file": "app/routes/contributions.js",
+          "line": 32,
+          "type": "injection"
+        },
+        {
+          "file": "app/routes/contributions.js",
+          "line": 33,
+          "type": "injection"
+        }
+      ],
+      "fnDetails": [],
+      "mode": "semantic"
+    },
+    {
+      "tool": "VANTAGE-semantic",
+      "toolVersion": "1.0.0+nebula",
+      "corpus": "juice-shop",
+      "corpusLabel": "OWASP Juice Shop",
+      "tp": 8,
+      "fp": 21,
+      "fn": 1,
+      "precision": 0.27586206896551724,
+      "recall": 0.8888888888888888,
+      "f1": 0.42105263157894735,
+      "durationMs": 568,
+      "rawCount": 29,
+      "tpDetails": [
+        {
+          "file": "lib/codingChallenges.ts",
+          "line": 76,
+          "type": "injection"
+        },
+        {
+          "file": "lib/insecurity.ts",
+          "line": 23,
+          "type": "hardcoded-secret"
+        },
+        {
+          "file": "lib/insecurity.ts",
+          "line": 44,
+          "type": "hardcoded-secret"
+        },
+        {
+          "file": "routes/languages.ts",
+          "line": 18,
+          "type": "error-boundary"
+        },
+        {
+          "file": "routes/recycles.ts",
+          "line": 14,
+          "type": "error-boundary"
+        },
+        {
+          "file": "routes/showProductReviews.ts",
+          "line": 36,
+          "type": "injection"
+        },
+        {
+          "file": "routes/trackOrder.ts",
+          "line": 18,
+          "type": "injection"
+        },
+        {
+          "file": "routes/verify.ts",
+          "line": 130,
+          "type": "error-boundary"
+        }
+      ],
+      "fnDetails": [
+        {
+          "id": "juiceshop-008",
+          "file": "routes/chatbot.ts",
+          "line": 47,
+          "type": "error-boundary"
+        }
+      ],
+      "mode": "semantic"
+    },
+    {
+      "tool": "VANTAGE",
+      "mode": "semantic",
+      "corpus": "aggregate",
+      "f1": 0.5517241379310345,
+      "note": "harmonic mean of per-corpus F1"
+    },
+    {
+      "tool": "Semgrep",
+      "toolVersion": "1.136.0",
+      "corpus": "nodegoat",
+      "corpusLabel": "OWASP NodeGoat",
+      "tp": 2,
+      "fp": 19,
+      "fn": 2,
+      "precision": 0.09523809523809523,
+      "recall": 0.5,
+      "f1": 0.16,
+      "durationMs": 4899,
+      "rawCount": 21,
+      "tpDetails": [
+        {
+          "file": "app/routes/contributions.js",
+          "line": 32,
+          "type": "injection"
+        },
+        {
+          "file": "app/routes/contributions.js",
+          "line": 33,
+          "type": "injection"
+        }
+      ],
+      "fnDetails": [
+        {
+          "id": "nodegoat-003",
+          "file": "app/data/allocations-dao.js",
+          "line": 73,
+          "type": "injection"
+        },
+        {
+          "id": "nodegoat-004",
+          "file": "app/data/allocations-dao.js",
+          "line": 78,
+          "type": "injection"
+        }
+      ],
+      "mode": "default-packs"
+    },
+    {
+      "tool": "Semgrep",
+      "toolVersion": "1.136.0",
+      "corpus": "juice-shop",
+      "corpusLabel": "OWASP Juice Shop",
+      "tp": 0,
+      "fp": 32,
+      "fn": 9,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "durationMs": 15517,
+      "rawCount": 32,
+      "tpDetails": [],
+      "fnDetails": [
+        {
+          "id": "juiceshop-001",
+          "file": "lib/insecurity.ts",
+          "line": 23,
+          "type": "hardcoded-secret"
+        },
+        {
+          "id": "juiceshop-002",
+          "file": "lib/insecurity.ts",
+          "line": 44,
+          "type": "hardcoded-secret"
+        },
+        {
+          "id": "juiceshop-003",
+          "file": "routes/trackOrder.ts",
+          "line": 18,
+          "type": "injection"
+        },
+        {
+          "id": "juiceshop-004",
+          "file": "routes/showProductReviews.ts",
+          "line": 36,
+          "type": "injection"
+        },
+        {
+          "id": "juiceshop-005",
+          "file": "lib/codingChallenges.ts",
+          "line": 76,
+          "type": "injection"
+        },
+        {
+          "id": "juiceshop-006",
+          "file": "routes/languages.ts",
+          "line": 18,
+          "type": "error-boundary"
+        },
+        {
+          "id": "juiceshop-007",
+          "file": "routes/verify.ts",
+          "line": 128,
+          "type": "error-boundary"
+        },
+        {
+          "id": "juiceshop-008",
+          "file": "routes/chatbot.ts",
+          "line": 47,
+          "type": "error-boundary"
+        },
+        {
+          "id": "juiceshop-009",
+          "file": "routes/recycles.ts",
+          "line": 14,
+          "type": "error-boundary"
+        }
+      ],
+      "mode": "default-packs"
+    },
+    {
+      "tool": "Semgrep",
+      "mode": "default-packs",
+      "corpus": "aggregate",
+      "f1": 0,
+      "note": "harmonic mean of per-corpus F1"
+    }
+  ],
+  "docker": "unavailable",
+  "sonarQube": {
+    "status": "scanner-not-found"
+  }
+}

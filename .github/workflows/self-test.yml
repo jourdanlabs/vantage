@@ -1,0 +1,22 @@
+name: VANTAGE self-test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  vantage-gate:
+    name: VANTAGE analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run VANTAGE against src/
+        uses: ./.github/actions/vantage
+        with:
+          target: src
+          threshold: '0.80'
+          fail-on-reject: 'true'
+          post-comment: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}

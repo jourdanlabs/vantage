@@ -1,0 +1,112 @@
+{
+  "corpus": "juice-shop",
+  "label": "OWASP Juice Shop",
+  "repo": "https://github.com/juice-shop/juice-shop",
+  "sha": "latest",
+  "license": "MIT",
+  "groundTruthLicense": "CC-BY-4.0",
+  "groundTruthVersion": "2026-04-16",
+  "vulnerabilities": [
+    {
+      "id": "juiceshop-001",
+      "file": "lib/insecurity.ts",
+      "line": 23,
+      "type": "hardcoded-secret",
+      "category": "private-key",
+      "cwe": "CWE-321",
+      "description": "RSA private key hardcoded in source (-----BEGIN RSA PRIVATE KEY-----)",
+      "owasp": "A02:2021-Cryptographic Failures"
+    },
+    {
+      "id": "juiceshop-002",
+      "file": "lib/insecurity.ts",
+      "line": 44,
+      "type": "hardcoded-secret",
+      "category": "hmac-secret",
+      "cwe": "CWE-321",
+      "description": "HMAC secret hardcoded as literal string passed to crypto.createHmac()",
+      "owasp": "A02:2021-Cryptographic Failures"
+    },
+    {
+      "id": "juiceshop-003",
+      "file": "routes/trackOrder.ts",
+      "line": 18,
+      "type": "injection",
+      "category": "nosql-injection",
+      "cwe": "CWE-943",
+      "description": "MongoDB $where: `this.orderId === '${id}'` — NoSQL injection via template literal",
+      "owasp": "A03:2021-Injection"
+    },
+    {
+      "id": "juiceshop-004",
+      "file": "routes/showProductReviews.ts",
+      "line": 36,
+      "type": "injection",
+      "category": "nosql-injection",
+      "cwe": "CWE-943",
+      "description": "MongoDB $where: 'this.product == ' + id — NoSQL injection via string concatenation",
+      "owasp": "A03:2021-Injection"
+    },
+    {
+      "id": "juiceshop-005",
+      "file": "lib/codingChallenges.ts",
+      "line": 76,
+      "type": "injection",
+      "category": "redos",
+      "cwe": "CWE-1333",
+      "description": "new RegExp() with user-controlled challengeKey — potential Regular Expression Denial of Service",
+      "owasp": "A06:2021-Vulnerable and Outdated Components"
+    },
+    {
+      "id": "juiceshop-006",
+      "file": "routes/languages.ts",
+      "line": 18,
+      "type": "error-boundary",
+      "category": "missing-error-handling",
+      "cwe": "CWE-390",
+      "description": "JSON.parse() without try/catch — unhandled parse error causes uncaught exception",
+      "owasp": "A09:2021-Security Logging and Monitoring Failures"
+    },
+    {
+      "id": "juiceshop-007",
+      "file": "routes/verify.ts",
+      "line": 128,
+      "type": "error-boundary",
+      "category": "missing-error-handling",
+      "cwe": "CWE-390",
+      "description": "JSON.parse() without try/catch — malformed input crashes the verification route",
+      "owasp": "A09:2021-Security Logging and Monitoring Failures"
+    },
+    {
+      "id": "juiceshop-008",
+      "file": "routes/chatbot.ts",
+      "line": 47,
+      "type": "error-boundary",
+      "category": "missing-error-handling",
+      "cwe": "CWE-390",
+      "description": "JSON.parse() of training set data without try/catch — crash on malformed input",
+      "owasp": "A09:2021-Security Logging and Monitoring Failures"
+    },
+    {
+      "id": "juiceshop-009",
+      "file": "routes/recycles.ts",
+      "line": 14,
+      "type": "error-boundary",
+      "category": "missing-error-handling",
+      "cwe": "CWE-390",
+      "description": "JSON.parse() on req.params.id without try/catch — user-controlled input causes crash",
+      "owasp": "A09:2021-Security Logging and Monitoring Failures"
+    }
+  ],
+  "knownOutOfScope": [
+    {
+      "id": "juiceshop-oos-001",
+      "file": "routes/login.ts",
+      "line": 34,
+      "category": "sql-injection",
+      "cwe": "CWE-89",
+      "description": "Unparameterized Sequelize.query with template literal — SQL injection",
+      "reason": "SQL injection pattern not yet in PULSAR detection scope (ROADMAP_V2 Item 1b)"
+    }
+  ]
+}

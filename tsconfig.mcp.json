@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "lib": ["ES2022"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src/mcp/**/*",
+    "src/engines/**/*",
+    "src/types.ts",
+    "src/languages.ts",
+    "src/vantage/**/*",
+    "src/cli.ts",
+    "src/sarif.ts",
+    "src/core/parsers/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/main",
+    "src/preload",
+    "src/renderer",
+    "src/api.ts",
+    "src/core/graph",
+    "src/core/engines"
+  ]
+}

@@ -1,0 +1,347 @@
+{
+  "generatedAt": "2026-04-16T09:50:54.997Z",
+  "suiteA": [
+    {
+      "corpusId": "nodegoat",
+      "label": "OWASP/NodeGoat",
+      "pipelineStats": {
+        "files": 47,
+        "loc": 3335,
+        "functions": 46,
+        "circularDeps": 0,
+        "godModules": 0,
+        "highRiskFiles": 0,
+        "medRiskFiles": 0,
+        "pulsarTargetFiles": 0,
+        "totalPulsarFindings": 4,
+        "highFindings": 4,
+        "medFindings": 0,
+        "lowFindings": 0
+      },
+      "auroraScore": 0.8791904644268774,
+      "auroraVerdict": "APPROVED",
+      "auroraBreakdown": {
+        "complexityScore": 0.8717391304347826,
+        "dependencyScore": 0.95,
+        "riskScore": 0.9610227272727273,
+        "adversarialScore": 0.6799999999999999
+      },
+      "tier1": {
+        "groundTruthCount": 4,
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1,
+        "tpDetails": [
+          {
+            "file": "/tmp/vantage-bench/nodegoat/app/data/allocations-dao.js",
+            "type": "injection",
+            "line": 73
+          },
+          {
+            "file": "/tmp/vantage-bench/nodegoat/app/data/allocations-dao.js",
+            "type": "injection",
+            "line": 78
+          },
+          {
+            "file": "/tmp/vantage-bench/nodegoat/app/routes/contributions.js",
+            "type": "injection",
+            "line": 32
+          },
+          {
+            "file": "/tmp/vantage-bench/nodegoat/app/routes/contributions.js",
+            "type": "injection",
+            "line": 33
+          }
+        ],
+        "fpDetails": [],
+        "fnDetails": []
+      },
+      "tier2CapabilityGap": {
+        "knownVulnCount": 1,
+        "pulsarDetectableCount": 0,
+        "pulsarUndetectableCount": 1,
+        "vulns": [
+          {
+            "file": "app/routes/session.js",
+            "line": 0,
+            "category": "broken-authentication",
+            "description": "Weak session management and CSRF — PULSAR has no CSRF detection",
+            "pulsarDetectable": false
+          }
+        ]
+      },
+      "totalMs": 19.258582999999987,
+      "engineMs": {
+        "METEOR": 6.743667000000016,
+        "NOVA": 0.5292079999999828,
+        "ECLIPSE": 1.6603750000000446,
+        "PULSAR": 1.846125000000029,
+        "AURORA": 8.473084000000028
+      }
+    },
+    {
+      "corpusId": "juiceshop",
+      "label": "bkimminich/juice-shop",
+      "pipelineStats": {
+        "files": 385,
+        "loc": 33113,
+        "functions": 532,
+        "circularDeps": 11,
+        "godModules": 0,
+        "highRiskFiles": 0,
+        "medRiskFiles": 0,
+        "pulsarTargetFiles": 0,
+        "totalPulsarFindings": 16,
+        "highFindings": 4,
+        "medFindings": 12,
+        "lowFindings": 0
+      },
+      "auroraScore": 0.5457697368421053,
+      "auroraVerdict": "REJECTED",
+      "auroraBreakdown": {
+        "complexityScore": 0.906578947368421,
+        "dependencyScore": 0,
+        "riskScore": 0.9725,
+        "adversarialScore": 0.3799999999999998
+      },
+      "tier1": {
+        "groundTruthCount": 9,
+        "tp": 12,
+        "fp": 4,
+        "fn": 0,
+        "precision": 0.75,
+        "recall": 1,
+        "f1": 0.8571428571428571,
+        "tpDetails": [
+          {
+            "file": "/tmp/vantage-bench/juiceshop/lib/codingChallenges.ts",
+            "type": "injection",
+            "line": 76
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/lib/codingChallenges.ts",
+            "type": "injection",
+            "line": 78
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/lib/insecurity.ts",
+            "type": "hardcoded-secret",
+            "line": 23
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/lib/insecurity.ts",
+            "type": "hardcoded-secret",
+            "line": 44
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/chatbot.ts",
+            "type": "error-boundary",
+            "line": 47
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/chatbot.ts",
+            "type": "error-boundary",
+            "line": 49
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/languages.ts",
+            "type": "error-boundary",
+            "line": 18
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/languages.ts",
+            "type": "error-boundary",
+            "line": 32
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/recycles.ts",
+            "type": "error-boundary",
+            "line": 14
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/showProductReviews.ts",
+            "type": "injection",
+            "line": 36
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/trackOrder.ts",
+            "type": "injection",
+            "line": 18
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/verify.ts",
+            "type": "error-boundary",
+            "line": 128
+          }
+        ],
+        "fpDetails": [
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/captcha.ts",
+            "type": "injection",
+            "line": 22
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/routes/userProfile.ts",
+            "type": "injection",
+            "line": 62
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/rsn/rsnUtil.ts",
+            "type": "error-boundary",
+            "line": 27
+          },
+          {
+            "file": "/tmp/vantage-bench/juiceshop/server.ts",
+            "type": "error-boundary",
+            "line": 323
+          }
+        ],
+        "fnDetails": []
+      },
+      "tier2CapabilityGap": {
+        "knownVulnCount": 3,
+        "pulsarDetectableCount": 2,
+        "pulsarUndetectableCount": 1,
+        "vulns": [
+          {
+            "file": "routes/login.ts",
+            "line": 34,
+            "category": "sql-injection",
+            "description": "Unparameterized Sequelize query: `SELECT * WHERE email = '${req.body.email}'` — SQL injection",
+            "pulsarDetectable": false
+          },
+          {
+            "file": "routes/userProfile.ts",
+            "line": 62,
+            "category": "code-injection",
+            "description": "eval(code) where code is from user-supplied profile field — username injection challenge",
+            "pulsarDetectable": true
+          },
+          {
+            "file": "routes/captcha.ts",
+            "line": 22,
+            "category": "eval-safe",
+            "description": "eval(mathExpression) — expression is constructed from random numbers, NOT user-controlled",
+            "pulsarDetectable": true
+          }
+        ]
+      },
+      "totalMs": 107.39133300000003,
+      "engineMs": {
+        "METEOR": 36.681708000000015,
+        "NOVA": 8.69120799999996,
+        "ECLIPSE": 55.145667,
+        "PULSAR": 6.612457999999947,
+        "AURORA": 0.2565839999999753
+      }
+    }
+  ],
+  "suiteB": {
+    "circularDepTests": [
+      {
+        "id": "linear-no-cycle",
+        "description": "A imports B — no cycle",
+        "expectedCycles": 0,
+        "detectedCycles": 0,
+        "pass": true
+      },
+      {
+        "id": "two-cycle",
+        "description": "A → B → A (2-node cycle)",
+        "expectedCycles": 1,
+        "detectedCycles": 1,
+        "pass": true
+      },
+      {
+        "id": "three-cycle",
+        "description": "A → B → C → A (3-node cycle)",
+        "expectedCycles": 1,
+        "detectedCycles": 1,
+        "pass": true
+      },
+      {
+        "id": "diamond-no-cycle",
+        "description": "Diamond: A→B, A→C, B→D, C→D (no cycle)",
+        "expectedCycles": 0,
+        "detectedCycles": 0,
+        "pass": true
+      },
+      {
+        "id": "embedded-cycle",
+        "description": "A→B→C and B→A (cycle embedded in larger graph)",
+        "expectedCycles": 1,
+        "detectedCycles": 1,
+        "pass": true
+      }
+    ],
+    "passed": 5,
+    "total": 5
+  },
+  "suiteC": {
+    "godModuleTests": [
+      {
+        "id": "below-line-threshold",
+        "description": "499 lines + 9 exports — lines not > 500, should NOT fire",
+        "lines": 499,
+        "exports": 9,
+        "shouldBeGodModule": false,
+        "detectedAsGodModule": false,
+        "pass": true
+      },
+      {
+        "id": "at-line-threshold",
+        "description": "500 lines + 9 exports — lines = 500 not > 500, should NOT fire",
+        "lines": 500,
+        "exports": 9,
+        "shouldBeGodModule": false,
+        "detectedAsGodModule": false,
+        "pass": true
+      },
+      {
+        "id": "below-export-threshold",
+        "description": "501 lines + 8 exports — exports not > 8, should NOT fire",
+        "lines": 501,
+        "exports": 8,
+        "shouldBeGodModule": false,
+        "detectedAsGodModule": false,
+        "pass": true
+      },
+      {
+        "id": "both-above-threshold",
+        "description": "501 lines + 9 exports — both > threshold, SHOULD fire",
+        "lines": 501,
+        "exports": 9,
+        "shouldBeGodModule": true,
+        "detectedAsGodModule": true,
+        "pass": true
+      },
+      {
+        "id": "stress-large",
+        "description": "501 lines + 50 exports — stress case, SHOULD fire",
+        "lines": 501,
+        "exports": 50,
+        "shouldBeGodModule": true,
+        "detectedAsGodModule": true,
+        "pass": true
+      }
+    ],
+    "passed": 5,
+    "total": 5
+  },
+  "suiteD": {
+    "corpus": "expressjs/express",
+    "auroraScore": 0.9594053279541488,
+    "auroraVerdict": "APPROVED",
+    "auroraBreakdown": {
+      "complexityScore": 0.9829759217456734,
+      "dependencyScore": 0.9,
+      "riskScore": 0.974645390070922,
+      "adversarialScore": 1
+    },
+    "pass": true,
+    "totalMs": 33.41199999999992
+  }
+}

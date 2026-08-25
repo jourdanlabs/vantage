@@ -1,0 +1,15 @@
+{
+  "name": "sca-fixture-npm-mini",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "sca-fixture-leftpad": "9.9.9",
+    "sca-fixture-caret": "^2.0.0",
+    "sca-fixture-star": "*",
+    "sca-fixture-git": "git+https://example.invalid/sca-fixture-git.git",
+    "!!!not-a-real-cve-pkg!!!": "9.9.9-CORRUPT"
+  },
+  "optionalDependencies": {
+    "sca-fixture-optional": "3.1.4"
+  }
+}

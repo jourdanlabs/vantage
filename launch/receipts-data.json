@@ -1,0 +1,906 @@
+{
+  "DVNA": {
+    "description": "Damn Vulnerable Node App",
+    "verdict": "APPROVED",
+    "scorePct": "93.4%",
+    "durationMs": 7,
+    "files": 34,
+    "loc": 2204,
+    "findingCount": 1,
+    "totalFindings": 2,
+    "findings": [
+      {
+        "severity": "HIGH",
+        "file": "core/appHandler.js",
+        "line": 197,
+        "type": "injection",
+        "description": "eval() on user-controlled input — arbitrary code execution",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "HIGH",
+        "file": "core/appHandler.js",
+        "line": 197,
+        "type": "risk",
+        "description": "eval() on user-controlled input — arbitrary code execution",
+        "source": "ECLIPSE"
+      }
+    ]
+  },
+  "NodeBB": {
+    "description": "NodeBB forum software",
+    "verdict": "REJECTED",
+    "scorePct": "47.3%",
+    "durationMs": 44,
+    "files": 942,
+    "loc": 153698,
+    "findingCount": 50,
+    "totalFindings": 100,
+    "findings": [
+      {
+        "severity": "MED",
+        "file": "loader.js",
+        "line": 162,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/ajaxify.js",
+        "line": 292,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/ajaxify.js",
+        "line": 563,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/modules/settings.js",
+        "line": 35,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/modules/topicThumbs.js",
+        "line": 63,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/activitypub/helpers.js",
+        "line": 350,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/api/helpers.js",
+        "line": 43,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/api/users.js",
+        "line": 630,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/index.js",
+        "line": 38,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/package-install.js",
+        "line": 37,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/package-install.js",
+        "line": 153,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/package-install.js",
+        "line": 165,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/package-install.js",
+        "line": 67,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/upgrade-plugins.js",
+        "line": 30,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/upgrade-plugins.js",
+        "line": 46,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/upgrade-plugins.js",
+        "line": 48,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/cli/upgrade-plugins.js",
+        "line": 72,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/controllers/404.js",
+        "line": 14,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/controllers/accounts/helpers.js",
+        "line": 187,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/controllers/authentication.js",
+        "line": 143,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/controllers/category.js",
+        "line": 233,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/controllers/errors.js",
+        "line": 17,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/database/mongo/main.js",
+        "line": 44,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/database/mongo/sorted.js",
+        "line": 549,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/database/postgres.js",
+        "line": 365,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/flags.js",
+        "line": 363,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/install.js",
+        "line": 482,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/languages.js",
+        "line": 21,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/meta/themes.js",
+        "line": 34,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/meta/themes.js",
+        "line": 103,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/middleware/admin.js",
+        "line": 78,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/middleware/headers.js",
+        "line": 44,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/plugins/data.js",
+        "line": 214,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/posts/queue.js",
+        "line": 31,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/posts/queue.js",
+        "line": 337,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/routes/index.js",
+        "line": 219,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/topics/posts.js",
+        "line": 17,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/upgrades/1.11.0/navigation_visibility_groups.js",
+        "line": 33,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/upgrades/1.12.1/moderation_notes_refactor.js",
+        "line": 22,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/upgrades/1.14.0/unescape_navigation_titles.js",
+        "line": 14,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/upgrades/1.19.0/navigation-enabled-hashes.js",
+        "line": 14,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/upgrades/1.5.0/flags_refactor.js",
+        "line": 41,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/upgrades/1.7.6/flatten_navigation_data.js",
+        "line": 13,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/user/picture.js",
+        "line": 232,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/user/profile.js",
+        "line": 137,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/user/profile.js",
+        "line": 262,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/widgets/index.js",
+        "line": 158,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/widgets/index.js",
+        "line": 298,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "src/widgets/index.js",
+        "line": 301,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "MED",
+        "file": "webpack.common.js",
+        "line": 38,
+        "type": "injection",
+        "description": "new RegExp() with non-literal argument — potential ReDoS if input is user-controlled",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/meta/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → configs → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/meta/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → themes → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/meta/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → css → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/meta/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → settings → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/meta/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → tags → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/api/helpers",
+        "type": "circular-dep",
+        "description": "Circular dependency: helpers → helpers → index → helpers",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/privileges/helpers",
+        "type": "circular-dep",
+        "description": "Circular dependency: helpers → global → helpers",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/privileges/helpers",
+        "type": "circular-dep",
+        "description": "Circular dependency: helpers → categories → helpers",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/user/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → email → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/user/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → notifications → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/user/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → reset → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/user/digest",
+        "type": "circular-dep",
+        "description": "Circular dependency: digest → index → digest",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/controllers/admin/info",
+        "type": "circular-dep",
+        "description": "Circular dependency: info → rooms → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/controllers/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → users → rooms",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/middleware/admin",
+        "type": "circular-dep",
+        "description": "Circular dependency: admin → index → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/middleware/header",
+        "type": "circular-dep",
+        "description": "Circular dependency: header → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/posts/attachments",
+        "type": "circular-dep",
+        "description": "Circular dependency: attachments → index → attachments",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/privileges/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → global",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/privileges/posts",
+        "type": "circular-dep",
+        "description": "Circular dependency: posts → categories",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/privileges/topics",
+        "type": "circular-dep",
+        "description": "Circular dependency: topics → categories",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/privileges/users",
+        "type": "circular-dep",
+        "description": "Circular dependency: users → global",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/admin/config",
+        "type": "circular-dep",
+        "description": "Circular dependency: config → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/admin/email",
+        "type": "circular-dep",
+        "description": "Circular dependency: email → email",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/admin",
+        "type": "circular-dep",
+        "description": "Circular dependency: admin → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/posts/tools",
+        "type": "circular-dep",
+        "description": "Circular dependency: tools → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/posts/votes",
+        "type": "circular-dep",
+        "description": "Circular dependency: votes → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/posts",
+        "type": "circular-dep",
+        "description": "Circular dependency: posts → votes",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/socket.io/uploads",
+        "type": "circular-dep",
+        "description": "Circular dependency: uploads → user → status → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/topics/index",
+        "type": "circular-dep",
+        "description": "Circular dependency: index → scheduled → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/upgrades/3.0.0/reset_bootswatch_skin",
+        "type": "circular-dep",
+        "description": "Circular dependency: reset_bootswatch_skin → css",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/upgrades/3.1.0/reset_user_bootswatch_skin",
+        "type": "circular-dep",
+        "description": "Circular dependency: reset_user_bootswatch_skin → css",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/user/jobs/export-profile",
+        "type": "circular-dep",
+        "description": "Circular dependency: export-profile → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/user/jobs/export-uploads",
+        "type": "circular-dep",
+        "description": "Circular dependency: export-uploads → index",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/api",
+        "type": "circular-dep",
+        "description": "Circular dependency: api → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/authentication",
+        "type": "circular-dep",
+        "description": "Circular dependency: authentication → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/controllers-admin",
+        "type": "circular-dep",
+        "description": "Circular dependency: controllers-admin → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/meta",
+        "type": "circular-dep",
+        "description": "Circular dependency: meta → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/posts",
+        "type": "circular-dep",
+        "description": "Circular dependency: posts → posts",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/rewards",
+        "type": "circular-dep",
+        "description": "Circular dependency: rewards → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/socket.io",
+        "type": "circular-dep",
+        "description": "Circular dependency: socket.io → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "test/topics",
+        "type": "circular-dep",
+        "description": "Circular dependency: topics → admin",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "src/meta/index",
+        "type": "risk",
+        "description": "Circular dependency: index → configs → index",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "CHANGELOG.md",
+        "type": "risk",
+        "description": "CHANGELOG.md — 15862 lines, 20 exports (god module)",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/admin/manage/users.js",
+        "type": "risk",
+        "description": "public/src/admin/manage/users.js — 795 lines, 26 exports (god module)",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "src/prestart",
+        "type": "risk",
+        "description": "prestart is imported by 7 modules — high coupling",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "src/meta/build",
+        "type": "risk",
+        "description": "build is imported by 6 modules — high coupling",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "src/file",
+        "type": "risk",
+        "description": "file is imported by 40 modules — high coupling",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/admin/dashboard.js",
+        "line": 148,
+        "type": "risk",
+        "description": "setupGraphs() is 282 lines long (limit: 100) — complexity 14",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/admin/extend/widgets.js",
+        "line": 48,
+        "type": "risk",
+        "description": "prepareWidgets() is 130 lines long (limit: 100) — complexity 10",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "public/src/admin/manage/category-analytics.js",
+        "line": 24,
+        "type": "risk",
+        "description": "init() is 126 lines long (limit: 100) — complexity 4",
+        "source": "ECLIPSE"
+      }
+    ]
+  },
+  "nestjs-samples": {
+    "description": "NestJS sample applications",
+    "verdict": "REJECTED",
+    "scorePct": "69.3%",
+    "durationMs": 8,
+    "files": 401,
+    "loc": 9937,
+    "findingCount": 1,
+    "totalFindings": 14,
+    "findings": [
+      {
+        "severity": "MED",
+        "file": "03-microservices/src/common/strategies/nats.strategy.ts",
+        "line": 16,
+        "type": "error-boundary",
+        "description": "JSON.parse() without try/catch — malformed JSON will throw SyntaxError",
+        "source": "PULSAR"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/posts/models/user.model",
+        "type": "circular-dep",
+        "description": "Circular dependency: user.model → post.model → user.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/app.module",
+        "type": "circular-dep",
+        "description": "Circular dependency: app.module → posts.module → posts.resolver → post.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/app.module",
+        "type": "circular-dep",
+        "description": "Circular dependency: app.module → posts.module → posts.service → post.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/app.module",
+        "type": "circular-dep",
+        "description": "Circular dependency: app.module → posts.module → users.resolver → post.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/posts/posts.resolver.spec",
+        "type": "circular-dep",
+        "description": "Circular dependency: posts.resolver.spec → post.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/posts/posts.service.spec",
+        "type": "circular-dep",
+        "description": "Circular dependency: posts.service.spec → posts.service",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/posts/users.resolver.spec",
+        "type": "circular-dep",
+        "description": "Circular dependency: users.resolver.spec → post.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "32-graphql-federation-schema-first/posts-application/src/posts/models/post.model",
+        "type": "circular-dep",
+        "description": "Circular dependency: post.model → user.model → post.model",
+        "source": "NOVA"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/posts/models/user.model",
+        "type": "risk",
+        "description": "Circular dependency: user.model → post.model → user.model",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "HIGH",
+        "file": "31-graphql-federation-code-first/posts-application/src/app.module",
+        "type": "risk",
+        "description": "Circular dependency: app.module → posts.module → posts.resolver → post.model",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "01-cats-app/src/cats/cats.service",
+        "type": "risk",
+        "description": "cats.service is imported by 5 modules — high coupling",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "12-graphql-schema-first/src/graphql.schema",
+        "type": "risk",
+        "description": "graphql.schema is imported by 9 modules — high coupling",
+        "source": "ECLIPSE"
+      },
+      {
+        "severity": "MED",
+        "file": "13-mongo-typeorm/src/photo/photo.entity",
+        "type": "risk",
+        "description": "photo.entity is imported by 5 modules — high coupling",
+        "source": "ECLIPSE"
+      }
+    ]
+  }
+}

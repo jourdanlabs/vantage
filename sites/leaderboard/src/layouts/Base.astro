@@ -1,0 +1,107 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = 'The open benchmark for static analysis tools — ranked by precision, recall, and speed.' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <title>{title} — VANTAGE Benchmark</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --yellow: #d29922;
+      --font: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+
+    html { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+    body { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
+
+    header {
+      padding: 28px 0 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo { font-family: var(--font); font-size: 1.1rem; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    nav a {
+      color: var(--text2);
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 0.9rem;
+      transition: color 0.15s;
+    }
+    nav a:hover, nav a.active { color: var(--text); }
+
+    main { padding-top: 40px; }
+    h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 1.25rem; font-weight: 600; margin: 32px 0 12px; color: var(--text); }
+    h3 { font-size: 1rem; font-weight: 600; margin: 24px 0 8px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+    p { color: var(--text2); margin-bottom: 16px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: var(--font); font-size: 0.85em; background: var(--bg3); padding: 2px 5px; border-radius: 4px; color: var(--text); }
+    pre { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 16px 0; }
+    pre code { background: none; padding: 0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 16px 0; }
+    th { text-align: left; color: var(--text2); font-weight: 500; padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg2); }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; font-family: var(--font); }
+    .badge-green { background: rgba(63, 185, 80, 0.15); color: var(--green); border: 1px solid rgba(63, 185, 80, 0.3); }
+    .badge-red { background: rgba(248, 81, 73, 0.15); color: var(--red); border: 1px solid rgba(248, 81, 73, 0.3); }
+    .badge-yellow { background: rgba(210, 153, 34, 0.15); color: var(--yellow); border: 1px solid rgba(210, 153, 34, 0.3); }
+    .badge-blue { background: rgba(88, 166, 255, 0.15); color: var(--accent); border: 1px solid rgba(88, 166, 255, 0.3); }
+
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin: 16px 0; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 20px 0; }
+    .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .stat-value { font-family: var(--font); font-size: 1.6rem; font-weight: 700; color: var(--text); }
+    .stat-label { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+
+    .updated { font-size: 0.8rem; color: var(--text2); }
+    footer { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 60px; font-size: 0.8rem; color: var(--text2); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/"><span>VANTAGE</span> Benchmark</a>
+    <nav>
+      <a href="/">Leaderboard</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/submit">Submit a Tool</a>
+      <a href="https://github.com/jourdanlabs/vantage" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+  <main>
+    <slot />
+  </main>
+  <footer>
+    <span>Ground truth licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>. Harness licensed MIT.</span>
+    <span>Built by <a href="https://jourdanlabs.dev">JourdanLabs</a></span>
+  </footer>
+</body>
+</html>

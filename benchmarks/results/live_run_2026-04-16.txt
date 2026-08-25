@@ -1,0 +1,154 @@
+
+████████████████████████████████████████████████████████████████████████
+  VANTAGE BENCHMARK SUITE
+████████████████████████████████████████████████████████████████████████
+  Started : 2026-04-16 21:54:52
+  API     : http://localhost:7474
+
+── Step 1 · API Health Check ─────────────────────────────────────────
+  Status  : OK
+  Engine  : VANTAGE
+  Pipeline: METEOR → NOVA → ECLIPSE → PULSAR → AURORA
+
+  ✓ API is UP — proceeding with benchmark run
+
+════════════════════════════════════════════════════════════════════════
+  STAGE 1 — PERFORMANCE BENCHMARK
+════════════════════════════════════════════════════════════════════════
+  Three corpora · Full pipeline · Timing + AURORA scores
+
+── Corpus · expressjs/express ────────────────────────────────────────
+  Path    : /tmp/vantage-bench/express
+  LOC     : 17,434
+  Expected: APPROVE ~96%
+  Running full pipeline...
+  Runtime : 0.090s
+  AURORA  : 95.9%  →  ✅ APPROVED
+  Summary : Analyzed 145 files, 1772 functions, 25,544 lines of code. Found 0 circ
+
+  Breakdown:
+    Complexity  : 98.3%
+    Dependency  : 90.0%
+    Risk        : 97.5%
+    Adversarial : 100.0%
+
+  Metrics : 145 files · 25,544 LOC · 1772 functions · 0 circular deps
+
+── Corpus · microsoft/TypeScript src/compiler ────────────────────────
+  Path    : /tmp/vantage-bench/typescript/src/compiler
+  LOC     : 176,214
+  Expected: REJECT ~62%  (under 1 second)
+  Running full pipeline...
+  Runtime : 0.928s
+  AURORA  : 77.9%  →  ❌ REJECTED
+  Summary : Analyzed 77 files, 8901 functions, 192,559 lines of code. Found 0 circ
+
+  Breakdown:
+    Complexity  : 82.0%
+    Dependency  : 75.0%
+    Risk        : 75.7%
+    Adversarial : 80.0%
+
+  Metrics : 77 files · 192,559 LOC · 8901 functions · 0 circular deps
+
+── Corpus · OWASP NodeGoat ───────────────────────────────────────────
+  Path    : /tmp/vantage-bench/nodegoat
+  LOC     : 3,291
+  Expected: APPROVE ~88%
+  Running full pipeline...
+  Runtime : 0.012s
+  AURORA  : 87.9%  →  ✅ APPROVED
+  Summary : Analyzed 47 files, 46 functions, 3,335 lines of code. Found 0 circular
+
+  Breakdown:
+    Complexity  : 87.2%
+    Dependency  : 95.0%
+    Risk        : 96.1%
+    Adversarial : 68.0%
+
+  Metrics : 47 files · 3,335 LOC · 46 functions · 0 circular deps
+
+════════════════════════════════════════════════════════════════════════
+  STAGE 2 — CORRECTNESS BENCHMARK
+════════════════════════════════════════════════════════════════════════
+  Two corpora · Ground-truth comparison · Precision / Recall / F1
+
+── Corpus · OWASP NodeGoat ───────────────────────────────────────────
+  Path           : /tmp/vantage-bench/nodegoat
+  Ground truth   : 4 known findings
+  Running pipeline...
+
+  Pipeline time  : 0.009s
+  Total findings : 4
+
+  FILE                                                     LINE  TYPE                  SEV
+  ─────────────────────────────────────────────────────── ─────  ────────────────────  ────
+  app/data/allocations-dao.js                                73  injection             HIGH    TP
+  app/data/allocations-dao.js                                78  injection             HIGH    TP
+  app/routes/contributions.js                                32  injection             HIGH    TP
+  app/routes/contributions.js                                33  injection             HIGH    TP
+
+  ────────────────────────────────────────────────────────────────────────
+  TP=4  FP=0  FN=0  🎯 100% recall
+
+  Precision : 1.000  (100.0%)
+  Recall    : 1.000  (100.0%)  🎯 100% recall
+  F1 Score  : 1.000  (100.0%)
+
+── Corpus · OWASP Juice Shop ─────────────────────────────────────────
+  Path           : /tmp/vantage-bench/juiceshop
+  Ground truth   : 9 known findings
+  Running pipeline...
+
+  Pipeline time  : 0.137s
+  Total findings : 16
+
+  FILE                                                     LINE  TYPE                  SEV
+  ─────────────────────────────────────────────────────── ─────  ────────────────────  ────
+  lib/codingChallenges.ts                                    76  injection             MED     TP
+  lib/codingChallenges.ts                                    78  injection             MED     TP
+  lib/insecurity.ts                                          23  hardcoded-secret      HIGH    TP
+  lib/insecurity.ts                                          44  hardcoded-secret      HIGH    TP
+  routes/captcha.ts                                          22  injection             MED     FP
+  routes/chatbot.ts                                          47  error-boundary        MED     TP
+  routes/chatbot.ts                                          49  error-boundary        MED     TP
+  routes/languages.ts                                        18  error-boundary        MED     TP
+  routes/languages.ts                                        32  error-boundary        MED     TP
+  routes/recycles.ts                                         14  error-boundary        MED     TP
+  routes/showProductReviews.ts                               36  injection             HIGH    FP
+  routes/trackOrder.ts                                       18  injection             HIGH    FP
+  routes/userProfile.ts                                      62  injection             MED     FP
+  routes/verify.ts                                          128  error-boundary        MED     FP
+  rsn/rsnUtil.ts                                             27  error-boundary        MED     FP
+  server.ts                                                 323  error-boundary        MED     FP
+
+  ────────────────────────────────────────────────────────────────────────
+  TP=9  FP=7  FN=0  🎯 100% recall
+
+  Precision : 0.562  (56.2%)
+  Recall    : 1.000  (100.0%)  🎯 100% recall
+  F1 Score  : 0.720  (72.0%)
+
+════════════════════════════════════════════════════════════════════════
+  BENCHMARK SUMMARY
+════════════════════════════════════════════════════════════════════════
+
+  CORPUS                                  LOC     TIME   SCORE  VERDICT
+  ─────────────────────────────────── ───────  ───────  ──────  ─────────────
+  expressjs/express                    25,544    0.09s   95.9%  ✅ APPROVED
+  microsoft/TypeScript src/compiler   192,559    0.93s   77.9%  ❌ REJECTED
+  OWASP NodeGoat                        3,335    0.01s   87.9%  ✅ APPROVED
+
+  ────────────────────────────────────────────────────────────────────────
+
+  CORPUS                  PREC    RECALL       F1    GT   TP   FP   FN
+  ──────────────────── ───────  ────────  ───────  ────  ───  ───  ───
+  OWASP NodeGoat         1.000     1.000    1.000     4    4    0    0  🎯
+  OWASP Juice Shop       0.562     1.000    0.720     9    9    7    0  🎯
+
+
+════════════════════════════════════════════════════════════════════════
+  RUN COMPLETE
+════════════════════════════════════════════════════════════════════════
+  Finished: 2026-04-16 21:54:53
+

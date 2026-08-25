@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VANTAGE — Autonomous Code Evolution</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b1a;
+      --surface: #0d1220;
+      --border: #1a2040;
+      --cyan: #4ff8ff;
+      --magenta: #ff4ffa;
+      --success: #3cff9b;
+      --warning: #ffcc00;
+      --error: #ff3c5f;
+      --text: #e8eaf0;
+      --muted: #6a7090;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* TOP BAR */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 2px;
+    }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .mode-badge {
+      background: var(--magenta);
+      color: var(--bg);
+      padding: 4px 12px;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+    .glow {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 5px var(--magenta), 0 0 10px var(--magenta); }
+      to { box-shadow: 0 0 10px var(--magenta), 0 0 20px var(--magenta); }
+    }
+
+    /* MAIN LAYOUT */
+    .container {
+      display: grid;
+      grid-template-columns: 240px 1fr 360px;
+      grid-template-rows: 1fr 200px;
+      height: calc(100vh - 48px);
+      margin-top: 48px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      grid-row: 1 / 3;
+    }
+    .sidebar-section {
+      margin-bottom: 24px;
+    }
+    .sidebar-title {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .sidebar-item {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      border-left: 2px solid transparent;
+      margin-left: -16px;
+      padding-left: 26px;
+      transition: all 0.15s;
+    }
+    .sidebar-item:hover, .sidebar-item.active {
+      border-left-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* EDITOR */
+    .editor {
+      background: var(--bg);
+      padding: 24px;
+      overflow: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .editor .line { display: flex; }
+    .editor .line-num {
+      color: var(--muted);
+      width: 40px;
+      text-align: right;
+      padding-right: 16px;
+      user-select: none;
+    }
+    .editor .highlight-bug {
+      background: rgba(255, 79, 250, 0.15);
+      border-left: 3px solid var(--magenta);
+    }
+    .editor .highlight-fix {
+      background: rgba(63, 255, 155, 0.15);
+      border-left: 3px solid var(--success);
+    }
+
+    /* VANTAGE PANEL */
+    .vantage-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      grid-row: 1 / 3;
+    }
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-tab {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .panel-tab:hover { color: var(--text); }
+    .panel-tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+    .panel-content {
+      flex: 1;
+      padding: 20px;
+      overflow: auto;
+    }
+    .panel-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .panel-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .panel-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .panel-value.cyan { color: var(--cyan); }
+    .panel-value.magenta { color: var(--magenta); }
+    .panel-value.success { color: var(--success); }
+
+    /* TERMINAL */
+    .terminal {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      overflow: auto;
+    }
+    .terminal-line {
+      margin-bottom: 4px;
+    }
+    .terminal-line.cyan { color: var(--cyan); }
+    .terminal-line.magenta { color: var(--magenta); }
+    .terminal-line.muted { color: var(--muted); }
+    .terminal-line.success { color: var(--success); }
+    .cursor {
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* PAGE CONTENT */
+    .page { display: none; padding: 80px 40px; max-width: 1200px; margin: 0 auto; }
+    .page.active { display: block; }
+    .page h1 { font-size: 48px; margin-bottom: 16px; }
+    .page p { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+    .btn {
+      display: inline-block;
+      background: var(--cyan);
+      color: var(--bg);
+      padding: 16px 32px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 12px;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .scenario-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .scenario-card:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(79, 248, 255, 0.08);
+    }
+    .scenario-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .scenario-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .scenario-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .scenario-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: rgba(79, 248, 255, 0.08);
+      border: 1px solid rgba(79, 248, 255, 0.2);
+      color: var(--cyan);
+      padding: 2px 8px;
+    }
+    .scenario-run {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      color: var(--cyan);
+    }
+    .scenario-card:hover .scenario-run { color: var(--magenta); }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-links a.active { color: var(--cyan); }
+
+    /* ========================================
+       DASHBOARD PAGE
+       ======================================== */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .metric-value.magenta { color: var(--magenta); }
+    .metric-delta {
+      font-size: 12px;
+      color: var(--success);
+      margin-top: 8px;
+    }
+    .chart-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .chart-title {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    .trend-chart {
+      width: 100%;
+      height: 200px;
+    }
+    .activity-feed {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      margin-right: 12px;
+    }
+    .activity-dot.cyan { background: var(--cyan); }
+    .activity-dot.magenta { background: var(--magenta); }
+    .activity-dot.success { background: var(--success); }
+    .activity-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* ========================================
+       ACTIVE SESSIONS PAGE
+       ======================================== */
+    .sessions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .session-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      transition: all 0.15s;
+    }
+    .session-card:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(79, 248, 255, 0.1);
+    }
+    .session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .session-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .status-badge {
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .status-badge.scanning {
+      background: rgba(79, 248, 255, 0.2);
+      color: var(--cyan);
+    }
+    .status-badge.fixing {
+      background: rgba(255, 79, 250, 0.2);
+      color: var(--magenta);
+    }
+    .status-badge.complete {
+      background: rgba(60, 255, 155, 0.2);
+      color: var(--success);
+    }
+    .session-lang {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .session-stats {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .session-stat-label { color: var(--muted); }
+    .session-stat-value { color: var(--text); }
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ========================================
+       PATTERN LIBRARY PAGE
+       ======================================== */
+    .search-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      outline: none;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .pattern-table {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .pattern-table th,
+    .pattern-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .pattern-table th {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .pattern-table tr:hover td {
+      background: rgba(79, 248, 255, 0.05);
+      border-left: 2px solid var(--cyan);
+    }
+    .pattern-name {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan);
+    }
+    .confidence-bar {
+      width: 60px;
+      height: 6px;
+      background: var(--border);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    .confidence-fill {
+      height: 100%;
+      background: var(--cyan);
+    }
+
+    /* ========================================
+       INTELLIGENCE GRAPH PAGE
+       ======================================== */
+    .graph-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .graph-svg {
+      width: 100%;
+      height: 500px;
+    }
+    .graph-node {
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .graph-node:hover {
+      filter: brightness(1.3);
+    }
+    .node-good { fill: var(--cyan); }
+    .node-buggy { fill: var(--magenta); }
+    .node-critical { fill: var(--error); }
+    .node-pulse {
+      animation: nodePulse 2s ease-in-out infinite;
+    }
+    @keyframes nodePulse {
+      0%, 100% { opacity: 1; r: 8; }
+      50% { opacity: 0.6; r: 12; }
+    }
+    .link-line {
+      stroke: var(--border);
+      stroke-width: 1.5;
+    }
+    .graph-legend {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ========================================
+       REGRESSION MAP PAGE
+       ======================================== */
+    .regression-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .regression-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .zoom-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .zoom-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .zoom-btn:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .regression-svg {
+      width: 100%;
+      height: 300px;
+    }
+    .timeline-axis {
+      stroke: var(--border);
+      stroke-width: 1;
+    }
+    .timeline-label {
+      fill: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+    }
+    .bug-dot {
+      fill: var(--magenta);
+    }
+    .bug-cluster {
+      fill: rgba(255, 79, 250, 0.3);
+    }
+    .predicted-zone {
+      fill: rgba(255, 79, 250, 0.15);
+      stroke: var(--magenta);
+      stroke-dasharray: 4 2;
+    }
+    .time-marker {
+      fill: var(--cyan);
+    }
+
+    /* ========================================
+       ANALYSIS SESSION (APP VIEW)
+       ======================================== */
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .app-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--cyan);
+    }
+    .app-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .app-meta span {
+      margin-right: 16px;
+    }
+    .typing-effect {
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typing 2s steps(40, end);
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    /* Odometer animation */
+    .odometer {
+      display: inline-block;
+    }
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .count-animate {
+      animation: countUp 0.5s ease-out forwards;
+    }
+
+    /* Pulse animation for live elements */
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .live-indicator {
+      animation: livePulse 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo">VANTAGE</div>
+    <nav class="nav-links">
+      <a href="#" onclick="showPage('home')">Home</a>
+      <a href="#" onclick="showPage('demo')">Demo</a>
+      <a href="#" onclick="showPage('how')">How It Works</a>
+      <a href="#" onclick="showPage('modes')">Modes</a>
+      <a href="#" onclick="showPage('enterprise')">Enterprise</a>
+      <a href="#" onclick="showPage('dashboard')">Dashboard</a>
+      <a href="#" onclick="showPage('sessions')">Sessions</a>
+      <a href="#" onclick="showPage('patterns')">Patterns</a>
+      <a href="#" onclick="showPage('intelgraph')">Intel Graph</a>
+      <a href="#" onclick="showPage('regression')">Regression</a>
+      <a href="#" onclick="showPage('analysis')">Analysis</a>
+    </nav>
+    <div class="topbar-status">
+      <span>VANTAGE_CORE_RUNTIME</span>
+      <span>|</span>
+      <span>Session: 01</span>
+      <span class="mode-badge glow">AUTO</span>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+    <h1>Code That Fixes Itself.</h1>
+    <p>VANTAGE detects, repairs, and learns from bugs — automatically.</p>
+    <div>
+      <a href="#" class="btn" onclick="showPage('demo')">Watch It Happen</a>
+      <a href="#" class="btn btn-secondary" onclick="showPage('how')">How It Works</a>
+    </div>
+  </div>
+
+  <!-- DEMO PAGE -->
+  <div id="demo" class="page" style="padding-top: 80px;">
+    <h1 style="margin-bottom: 8px;">Select Scenario</h1>
+    <p style="margin-bottom: 40px; color: var(--muted);">Choose a scenario to run VANTAGE against.</p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+      <div class="scenario-card" onclick="runDemo('code-fix')">
+        <div class="scenario-num">01</div>
+        <div class="scenario-title">Code Fix</div>
+        <div class="scenario-desc">Classic retry logic bug. VANTAGE finds it, traces it, fixes it.</div>
+        <div class="scenario-tags"><span class="tag">METEOR</span><span class="tag">NOVA</span></div>
+        <div class="scenario-run">▶ Run Scenario</div>
+      </div>
+      <div class="scenario-card" onclick="runDemo('doc-drift')">
+        <div class="scenario-num">02</div>
+        <div class="scenario-title">Documentation Drift</div>
+        <div class="scenario-desc">Confluence says 3 retries. Code does 1. VANTAGE catches the intent gap.</div>
+        <div class="scenario-tags"><span class="tag">METEOR</span><span class="tag">AURORA</span></div>
+        <div class="scenario-run">▶ Run Scenario</div>
+      </div>
+      <div class="scenario-card" onclick="runDemo('repo-chaos')">
+        <div class="scenario-num">03</div>
+        <div class="scenario-title">Repo Chaos</div>
+        <div class="scenario-desc">Duplicate utils, bad folders, bad naming. VANTAGE maps the mess and proposes restructure.</div>
+        <div class="scenario-tags"><span class="tag">ASTRAL</span><span class="tag">NEBULA</span></div>
+        <div class="scenario-run">▶ Run Scenario</div>
+      </div>
+      <div class="scenario-card" onclick="runDemo('regression')">
+        <div class="scenario-num">04</div>
+        <div class="scenario-title">Regression Prediction</div>
+        <div class="scenario-desc">No current failure — but ECLIPSE sees the storm forming. Predicts the outage before it happens.</div>
+        <div class="scenario-tags"><span class="tag">ECLIPSE</span><span class="tag">PULSAR</span></div>
+        <div class="scenario-run">▶ Run Scenario</div>
+      </div>
+      <div class="scenario-card" onclick="runDemo('multi-service')">
+        <div class="scenario-num">05</div>
+        <div class="scenario-title">Multi-Service Failure</div>
+        <div class="scenario-desc">Auth → Payment → Webhook timeout chain. VANTAGE traces across service boundaries.</div>
+        <div class="scenario-tags"><span class="tag">QUASAR</span><span class="tag">NOVA</span></div>
+        <div class="scenario-run">▶ Run Scenario</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div id="how" class="page">
+    <h1>How It Works</h1>
+    <div style="display: grid; gap: 24px; margin-top: 32px;">
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">1. Detect</h3>
+        <p style="color: var(--muted);">Graph-based anomaly detection finds bugs static tools miss.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">2. Diagnose</h3>
+        <p style="color: var(--muted);">Causal inference identifies root cause, not just symptoms.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">3. Repair</h3>
+        <p style="color: var(--muted);">Generate fixes ranked by confidence score.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 8px;">4. Verify</h3>
+        <p style="color: var(--muted);">Sandbox tests prevent regressions.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--magenta); margin-bottom: 8px;">5. Learn</h3>
+        <p style="color: var(--muted);">Promote what works. Demote what doesn't. Get smarter.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODES PAGE -->
+  <div id="modes" class="page">
+    <h1>Modes</h1>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px;">
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--cyan); margin-bottom: 16px;">SAFE</h3>
+        <p style="color: var(--muted);">Detection only. No fixes. No changes to your code.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--warning); margin-bottom: 16px;">ASSIST</h3>
+        <p style="color: var(--muted);">Suggests fixes. You approve before anything changes.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--magenta);">
+        <h3 style="color: var(--magenta); margin-bottom: 16px;">AUTONOMOUS</h3>
+        <p style="color: var(--muted);">Auto-fixes above confidence threshold. Full loop enabled.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTERPRISE PAGE -->
+  <div id="enterprise" class="page">
+    <h1>Enterprise Trust</h1>
+    <div style="margin-top: 32px;">
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border); margin-bottom: 16px;">
+        <h3 style="color: var(--success);">HEIMDALL Audit Trails</h3>
+        <p style="color: var(--muted); margin-top: 8px;">Cryptographic verification of every decision. Hash of original code → fix → explanation → confidence.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border); margin-bottom: 16px;">
+        <h3 style="color: var(--success);">AURORA Approval Gates</h3>
+        <p style="color: var(--muted); margin-top: 8px;">Every fix passes confidence threshold before apply.</p>
+      </div>
+      <div style="background: var(--surface); padding: 24px; border: 1px solid var(--border);">
+        <h3 style="color: var(--success);">Full Explainability</h3>
+        <p style="color: var(--muted); margin-top: 8px;">Human-readable audit trail. Why it broke. Why this fix. Why confidence.</p>
+      </div>
+    </div>
+    <a href="#" class="btn" style="margin-top: 32px;" onclick="showPage('home')">Request Access</a>
+  </div>
+
+  <!-- ========================================
+       DASHBOARD PAGE
+       ======================================== -->
+  <div id="dashboard" class="page">
+    <h1>Dashboard</h1>
+    <p>System overview and key metrics</p>
+
+    <div class="dashboard-grid">
+      <div class="metric-card">
+        <div class="metric-label">Bugs Detected</div>
+        <div class="metric-value" data-count="1247">0</div>
+        <div class="metric-delta">↑ 23 today</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Fixes Applied</div>
+        <div class="metric-value magenta" data-count="1089">0</div>
+        <div class="metric-delta">↑ 18 today</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Success Rate</div>
+        <div class="metric-value" data-count="94.2" data-suffix="%">0</div>
+        <div class="metric-delta">↑ 2.1% this week</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Confidence Score</div>
+        <div class="metric-value" data-count="0.87">0</div>
+        <div class="metric-delta">↑ 0.03 avg</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Success Rate Over Time</div>
+      <svg class="trend-chart" viewBox="0 0 800 200" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#4ff8ff;stop-opacity:0.3" />
+            <stop offset="100%" style="stop-color:#4ff8ff;stop-opacity:0" />
+          </linearGradient>
+        </defs>
+        <path d="M0,180 L50,170 L100,175 L150,160 L200,150 L250,140 L300,145 L350,130 L400,120 L450,110 L500,100 L550,90 L600,80 L650,70 L700,60 L750,50 L800,40" fill="none" stroke="#4ff8ff" stroke-width="2"/>
+        <path d="M0,180 L50,170 L100,175 L150,160 L200,150 L250,140 L300,145 L350,130 L400,120 L450,110 L500,100 L550,90 L600,80 L650,70 L700,60 L750,50 L800,40 L800,200 L0,200 Z" fill="url(#chartGradient)"/>
+        <text x="10" y="195" class="timeline-label">7d ago</text>
+        <text x="780" y="195" class="timeline-label">Now</text>
+      </svg>
+    </div>
+
+    <div class="activity-feed">
+      <div class="chart-title" style="margin-bottom: 16px;">Recent Activity</div>
+      <div class="activity-item">
+        <span class="activity-dot cyan"></span>
+        <span>auth-service: Pattern "null-check-guard" applied</span>
+        <span class="activity-time">2m ago</span>
+      </div>
+      <div class="activity-item">
+        <span class="activity-dot success"></span>
+        <span>payments-api: Fix verified, confidence 0.94</span>
+        <span class="activity-time">5m ago</span>
+      </div>
+      <div class="activity-item">
+        <span class="activity-dot magenta"></span>
+        <span>user-service: New anomaly detected at line 47</span>
+        <span class="activity-time">8m ago</span>
+      </div>
+      <div class="activity-item">
+        <span class="activity-dot cyan"></span>
+        <span>inventory-core: Regression check passed</span>
+        <span class="activity-time">12m ago</span>
+      </div>
+      <div class="activity-item">
+        <span class="activity-dot success"></span>
+        <span>api-gateway: 3 fixes applied successfully</span>
+        <span class="activity-time">15m ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       ACTIVE SESSIONS PAGE
+       ======================================== -->
+  <div id="sessions" class="page">
+    <h1>Active Sessions</h1>
+    <p>Repositories currently under analysis</p>
+
+    <div class="sessions-grid">
+      <div class="session-card">
+        <div class="session-header">
+          <span class="session-name">payments-service</span>
+          <span class="status-badge scanning">scanning</span>
+        </div>
+        <div class="session-lang">TypeScript · 2,847 lines</div>
+        <div class="session-stats">
+          <div>
+            <span class="session-stat-label">Bugs: </span>
+            <span class="session-stat-value">3</span>
+          </div>
+          <div>
+            <span class="live-dot"></span>
+            <span style="color: var(--success); font-size: 11px;">LIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-card">
+        <div class="session-header">
+          <span class="session-name">auth-service</span>
+          <span class="status-badge fixing">fixing</span>
+        </div>
+        <div class="session-lang">TypeScript · 1,203 lines</div>
+        <div class="session-stats">
+          <div>
+            <span class="session-stat-label">Bugs: </span>
+            <span class="session-stat-value">7</span>
+          </div>
+          <div>
+            <span class="live-dot"></span>
+            <span style="color: var(--success); font-size: 11px;">LIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-card">
+        <div class="session-header">
+          <span class="session-name">inventory-core</span>
+          <span class="status-badge complete">complete</span>
+        </div>
+        <div class="session-lang">Python · 4,521 lines</div>
+        <div class="session-stats">
+          <div>
+            <span class="session-stat-label">Bugs: </span>
+            <span class="session-stat-value">12</span>
+          </div>
+          <div>
+            <span style="color: var(--success); font-size: 11px;">FIXED</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-card">
+        <div class="session-header">
+          <span class="session-name">api-gateway</span>
+          <span class="status-badge scanning">scanning</span>
+        </div>
+        <div class="session-lang">Go · 892 lines</div>
+        <div class="session-stats">
+          <div>
+            <span class="session-stat-label">Bugs: </span>
+            <span class="session-stat-value">1</span>
+          </div>
+          <div>
+            <span class="live-dot"></span>
+            <span style="color: var(--success); font-size: 11px;">LIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-card">
+        <div class="session-header">
+          <span class="session-name">user-service</span>
+          <span class="status-badge complete">complete</span>
+        </div>
+        <div class="session-lang">TypeScript · 1,654 lines</div>
+        <div class="session-stats">
+          <div>
+            <span class="session-stat-label">Bugs: </span>
+            <span class="session-stat-value">5</span>
+          </div>
+          <div>
+            <span style="color: var(--success); font-size: 11px;">FIXED</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-card">
+        <div class="session-header">
+          <span class="session-name">notifications</span>
+          <span class="status-badge fixing">fixing</span>
+        </div>
+        <div class="session-lang">Python · 678 lines</div>
+        <div class="session-stats">
+          <div>
+            <span class="session-stat-label">Bugs: </span>
+            <span class="session-stat-value">2</span>
+          </div>
+          <div>
+            <span class="live-dot"></span>
+            <span style="color: var(--success); font-size: 11px;">LIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       PATTERN LIBRARY PAGE
+       ======================================== -->
+  <div id="patterns" class="page">
+    <h1>Pattern Library</h1>
+    <p>Learned fix patterns across all sessions</p>
+
+    <div class="search-bar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6a7090" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" class="search-input" placeholder="Search patterns...">
+    </div>
+
+    <table class="pattern-table">
+      <thead>
+        <tr>
+          <th>Pattern Name</th>
+          <th>Occurrences</th>
+          <th>Success Rate</th>
+          <th>Last Used</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="pattern-name">null-check-guard</td>
+          <td>247</td>
+          <td>97.2%</td>
+          <td>2 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 97%"></span></span>0.97</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">retry-loop-fix</td>
+          <td>189</td>
+          <td>94.1%</td>
+          <td>5 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 94%"></span></span>0.94</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">type-assertion-guard</td>
+          <td>156</td>
+          <td>91.3%</td>
+          <td>12 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 91%"></span></span>0.91</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">async-await-error</td>
+          <td>134</td>
+          <td>89.5%</td>
+          <td>18 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 90%"></span></span>0.90</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">array-boundary-check</td>
+          <td>98</td>
+          <td>93.8%</td>
+          <td>23 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 94%"></span></span>0.94</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">promise-rejection-handle</td>
+          <td>87</td>
+          <td>88.2%</td>
+          <td>31 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 88%"></span></span>0.88</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">env-var-default</td>
+          <td>76</td>
+          <td>96.1%</td>
+          <td>45 min ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 96%"></span></span>0.96</td>
+        </tr>
+        <tr>
+          <td class="pattern-name">config-mutation-guard</td>
+          <td>54</td>
+          <td>85.7%</td>
+          <td>1h ago</td>
+          <td><span class="confidence-bar"><span class="confidence-fill" style="width: 86%"></span></span>0.86</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================
+       INTELLIGENCE GRAPH PAGE
+       ======================================== -->
+  <div id="intelgraph" class="page">
+    <h1>Intelligence Graph</h1>
+    <p>Code dependency health visualization</p>
+
+    <div class="graph-container">
+      <svg class="graph-svg" viewBox="0 0 800 500">
+        <!-- Links -->
+        <line class="link-line" x1="150" y1="100" x2="300" y2="150"/>
+        <line class="link-line" x1="150" y1="100" x2="250" y2="250"/>
+        <line class="link-line" x1="300" y1="150" x2="450" y2="120"/>
+        <line class="link-line" x1="300" y1="150" x2="400" y2="280"/>
+        <line class="link-line" x1="450" y1="120" x2="600" y2="100"/>
+        <line class="link-line" x1="450" y1="120" x2="550" y2="220"/>
+        <line class="link-line" x1="250" y1="250" x2="400" y2="280"/>
+        <line class="link-line" x1="400" y1="280" x2="550" y2="220"/>
+        <line class="link-line" x1="400" y1="280" x2="500" y2="380"/>
+        <line class="link-line" x1="550" y1="220" x2="700" y2="180"/>
+        <line class="link-line" x1="600" y1="100" x2="700" y2="180"/>
+        <line class="link-line" x1="550" y1="220" x2="500" y2="380"/>
+        <line class="link-line" x1="700" y1="180" x2="650" y2="320"/>
+        <line class="link-line" x1="500" y1="380" x2="650" y2="320"/>
+        <line class="link-line" x1="650" y1="320" x2="750" y2="420"/>
+
+        <!-- Nodes -->
+        <g class="graph-node" transform="translate(150, 100)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">auth.module.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(300, 150)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">jwt.service.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(250, 250)">
+          <circle class="node-buggy node-pulse" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">token.util.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(450, 120)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">middleware.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(400, 280)">
+          <circle class="node-critical node-pulse" r="10"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">db.connection.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(600, 100)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">validation.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(550, 220)">
+          <circle class="node-buggy node-pulse" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">query.builder.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(700, 180)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">router.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(500, 380)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">cache.service.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(650, 320)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">api.client.ts</text>
+        </g>
+        <g class="graph-node" transform="translate(750, 420)">
+          <circle class="node-good" r="8"/>
+          <text x="15" y="4" fill="#e8eaf0" font-family="JetBrains Mono" font-size="10">metrics.ts</text>
+        </g>
+      </svg>
+
+      <div class="graph-legend">
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--cyan);"></span>
+          <span>Healthy</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--magenta);"></span>
+          <span>Buggy</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--error);"></span>
+          <span>Critical</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--magenta); animation: nodePulse 2s infinite;"></span>
+          <span>Hotspot</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       REGRESSION MAP PAGE
+       ======================================== -->
+  <div id="regression" class="page">
+    <h1>Regression Map</h1>
+    <p>Bug occurrence timeline with predicted failure zones</p>
+
+    <div class="regression-container">
+      <div class="regression-header">
+        <div class="chart-title">Bug Frequency Timeline</div>
+        <div class="zoom-controls">
+          <button class="zoom-btn">−</button>
+          <button class="zoom-btn">1x</button>
+          <button class="zoom-btn">2x</button>
+          <button class="zoom-btn">4x</button>
+        </div>
+      </div>
+
+      <svg class="regression-svg" viewBox="0 0 900 300">
+        <!-- Grid lines -->
+        <line x1="50" y1="250" x2="880" y2="250" class="timeline-axis"/>
+        <line x1="50" y1="50" x2="50" y2="250" class="timeline-axis"/>
+
+        <!-- Time labels -->
+        <text x="50" y="275" class="timeline-label">Jan</text>
+        <text x="180" y="275" class="timeline-label">Feb</text>
+        <text x="310" y="275" class="timeline-label">Mar</text>
+        <text x="440" y="275" class="timeline-label">Apr</text>
+        <text x="570" y="275" class="timeline-label">May</text>
+        <text x="700" y="275" class="timeline-label">Jun</text>
+        <text x="830" y="275" class="timeline-label">Jul</text>
+
+        <!-- Y-axis labels -->
+        <text x="35" y="250" class="timeline-label" text-anchor="end">0</text>
+        <text x="35" y="200" class="timeline-label" text-anchor="end">5</text>
+        <text x="35" y="150" class="timeline-label" text-anchor="end">10</text>
+        <text x="35" y="100" class="timeline-label" text-anchor="end">15</text>
+        <text x="35" y="50" class="timeline-label" text-anchor="end">20</text>
+
+        <!-- Bug clusters (bars) -->
+        <rect x="60" y="220" width="40" height="30" fill="rgba(255,79,250,0.3)"/>
+        <rect x="110" y="200" width="40" height="50" fill="rgba(255,79,250,0.3)"/>
+        <rect x="190" y="180" width="40" height="70" fill="rgba(255,79,250,0.3)"/>
+        <rect x="240" y="160" width="40" height="90" fill="rgba(255,79,250,0.3)"/>
+        <rect x="320" y="140" width="40" height="110" fill="rgba(255,79,250,0.3)"/>
+        <rect x="370" y="120" width="40" height="130" fill="rgba(255,79,250,0.3)"/>
+        <rect x="450" y="100" width="40" height="150" fill="rgba(255,79,250,0.3)"/>
+        <rect x="500" y="140" width="40" height="110" fill="rgba(255,79,250,0.3)"/>
+        <rect x="580" y="170" width="40" height="80" fill="rgba(255,79,250,0.3)"/>
+        <rect x="630" y="190" width="40" height="60" fill="rgba(255,79,250,0.3)"/>
+        <rect x="710" y="210" width="40" height="40" fill="rgba(255,79,250,0.3)"/>
+        <rect x="760" y="220" width="40" height="30" fill="rgba(255,79,250,0.3)"/>
+        <rect x="840" y="230" width="30" height="20" fill="rgba(255,79,250,0.3)"/>
+
+        <!-- Bug dots -->
+        <circle cx="80" cy="235" r="4" class="bug-dot"/>
+        <circle cx="130" cy="225" r="4" class="bug-dot"/>
+        <circle cx="210" cy="210" r="4" class="bug-dot"/>
+        <circle cx="260" cy="195" r="4" class="bug-dot"/>
+        <circle cx="340" cy="175" r="5" class="bug-dot"/>
+        <circle cx="390" cy="155" r="5" class="bug-dot"/>
+        <circle cx="470" cy="135" r="5" class="bug-dot"/>
+        <circle cx="520" cy="175" r="4" class="bug-dot"/>
+        <circle cx="600" cy="205" r="4" class="bug-dot"/>
+        <circle cx="650" cy="220" r="4" class="bug-dot"/>
+        <circle cx="730" cy="230" r="4" class="bug-dot"/>
+        <circle cx="780" cy="235" r="4" class="bug-dot"/>
+        <circle cx="855" cy="240" r="4" class="bug-dot"/>
+
+        <!-- Predicted failure zone -->
+        <rect x="320" y="60" width="200" height="180" class="predicted-zone"/>
+        <text x="420" y="85" fill="#ff4ffa" font-family="JetBrains Mono" font-size="10" text-anchor="middle">PREDICTED SURGE</text>
+
+        <!-- Current time marker -->
+        <line x1="720" y1="40" x2="720" y2="250" stroke="#4ff8ff" stroke-width="2" stroke-dasharray="4 2"/>
+        <circle cx="720" cy="40" r="4" class="time-marker"/>
+        <text x="720" y="30" fill="#4ff8ff" font-family="JetBrains Mono" font-size="10" text-anchor="middle">NOW</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ========================================
+       ANALYSIS SESSION PAGE (APP VIEW)
+       ======================================== -->
+  <div id="analysis" class="page" style="padding: 0; max-width: 100%; margin-top: 48px;">
+    <div class="app-header">
+      <span class="app-title">VANTAGE // ACTIVE ANALYSIS SESSION</span>
+      <span class="app-meta">
+        <span>Session: 01</span>
+        <span>Mode: <span class="glow" style="color: var(--magenta);">AUTO</span></span>
+        <span id="current-time"></span>
+      </span>
+    </div>
+
+    <div class="container" style="margin-top: 0; height: calc(100vh - 90px);">
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-title">SYSTEM</div>
+          <a href="#" class="sidebar-item active">Dashboard</a>
+          <a href="#" class="sidebar-item" onclick="showPage('sessions')">Active Sessions</a>
+          <a href="#" class="sidebar-item">Repositories</a>
+          <a href="#" class="sidebar-item" onclick="showPage('intelgraph')">Intel Graph</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">VANTAGE CORE</div>
+          <a href="#" class="sidebar-item active">Detect</a>
+          <a href="#" class="sidebar-item">Diagnose</a>
+          <a href="#" class="sidebar-item">Fix Engine</a>
+          <a href="#" class="sidebar-item">Verification</a>
+          <a href="#" class="sidebar-item">Learning Loop</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">HISTORY</div>
+          <a href="#" class="sidebar-item" onclick="showPage('patterns')">Pattern Library</a>
+          <a href="#" class="sidebar-item" onclick="showPage('regression')">Regression Map</a>
+          <a href="#" class="sidebar-item">Fix Log</a>
+        </div>
+      </div>
+
+      <div class="editor">
+        <div class="line"><span class="line-num">1</span><span style="color: var(--muted);">// payments-service.ts</span></div>
+        <div class="line"><span class="line-num">2</span><span style="color: var(--text);">import { PaymentProvider } from './providers';</span></div>
+        <div class="line highlight-bug"><span class="line-num">3</span><span style="color: var(--magenta);">retryAttempts = 1</span><span style="color: var(--muted);"> // should be 3</span></div>
+        <div class="line"><span class="line-num">4</span><span></span></div>
+        <div class="line"><span class="line-num">5</span><span style="color: var(--text);">export async function processPayment(amount: number) {</span></div>
+        <div class="line"><span class="line-num">6</span><span style="color: var(--text);">  for (let i = 0; i &lt; retryAttempts; i++) {</span></div>
+        <div class="line"><span class="line-num">7</span><span style="color: var(--text);">    try {</span></div>
+        <div class="line"><span class="line-num">8</span><span style="color: var(--text);">      return await fetch('/api/payments', {</span></div>
+        <div class="line"><span class="line-num">9</span><span style="color: var(--text);">        method: 'POST',</span></div>
+        <div class="line"><span class="line-num">10</span><span style="color: var(--text);">        body: JSON.stringify({ amount })</span></div>
+        <div class="line"><span class="line-num">11</span><span style="color: var(--text);">      });</span></div>
+        <div class="line"><span class="line-num">12</span><span style="color: var(--text);">    } catch (e) {</span></div>
+        <div class="line"><span class="line-num">13</span><span style="color: var(--text);">      if (i === retryAttempts - 1) throw e;</span></div>
+        <div class="line"><span class="line-num">14</span><span style="color: var(--text);">    }</span></div>
+        <div class="line"><span class="line-num">15</span><span style="color: var(--text);">  }</span></div>
+        <div class="line"><span class="line-num">16</span><span style="color: var(--text);">}</span></div>
+        <div class="line"><span class="line-num">17</span><span></span></div>
+        <div class="line"><span class="line-num">18</span><span style="color: var(--muted);">// Confluence: "Retries up to 3 times on failure"</span></div>
+      </div>
+
+      <div class="vantage-panel">
+        <div class="panel-tabs">
+          <div class="panel-tab active">DETECT</div>
+          <div class="panel-tab">DIAGNOSE</div>
+          <div class="panel-tab">FIX</div>
+          <div class="panel-tab">VERIFY</div>
+          <div class="panel-tab">LEARN</div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-card">
+            <div class="panel-label">ANOMALY SCORE</div>
+            <div class="panel-value magenta">0.82</div>
+            <div style="color: var(--muted); font-size: 12px; margin-top: 4px;">Severity</div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-label">Type</div>
+            <div style="color: var(--text);">Logic Mismatch</div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-label">Root Cause</div>
+            <div style="color: var(--text); font-size: 13px;">Constant value 1 contradicts documented retry count of 3</div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-label">Confidence</div>
+            <div class="panel-value success">0.94</div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-label">Suggested Fix</div>
+            <div style="color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 8px;">retryAttempts = 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-line muted">> VANTAGE v0.1.0-alpha initializing...</div>
+        <div class="terminal-line muted">> Loading Cosmos engines...</div>
+        <div class="terminal-line cyan">> METEOR ready</div>
+        <div class="terminal-line cyan">> NOVA ready</div>
+        <div class="terminal-line cyan">> ECLIPSE ready</div>
+        <div class="terminal-line cyan">> PULSAR ready</div>
+        <div class="terminal-line cyan">> AURORA ready</div>
+        <div class="terminal-line muted">> Repo loaded: payments-service</div>
+        <div class="terminal-line muted">> Scanning files...</div>
+        <div class="terminal-line magenta">> ANOMALY DETECTED at line 3</div>
+        <div class="terminal-line cyan">> Analyzing context...</div>
+        <div class="terminal-line cyan">> Root cause identified</div>
+        <div class="terminal-line success">> FIX APPLIED: retryAttempts = 3</div>
+        <div class="terminal-line muted">> Verifying fix integrity...<span class="cursor">_</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 'home';
+
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const targetPage = document.getElementById(page);
+      if (targetPage) {
+        targetPage.classList.add('active');
+        currentPage = page;
+      }
+      // Update nav active state
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('onclick')?.includes(page)) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    function jitter(base, pct) {
+      const r = base * (1 + (Math.random() * 2 - 1) * pct);
+      return Math.round(r);
+    }
+    
+    function addLine(text, cls, delay) {
+      return new Promise(resolve => setTimeout(() => {
+        const line = document.createElement('div');
+        line.className = 'terminal-line ' + cls;
+        if (text === '') { terminal.appendChild(document.createElement('br')); }
+        else { line.textContent = text; terminal.appendChild(line); terminal.scrollTop = terminal.scrollHeight; }
+        resolve();
+      }, delay));
+    }
+    
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+    
+    function flickerHighlight() {
+      const bugLine = document.querySelector('.highlight-bug');
+      if (!bugLine) return;
+      bugLine.style.opacity = '0';
+      setTimeout(() => { bugLine.style.opacity = '1'; }, 180);
+      setTimeout(() => { bugLine.style.opacity = '0.2'; }, 260);
+      setTimeout(() => { bugLine.style.opacity = '1'; }, 360);
+    }
+    
+    function glitchNumber(el) {
+      const orig = el.textContent;
+      let ticks = 0;
+      const iv = setInterval(() => {
+        el.textContent = (Math.random() > 0.5 ? '0.7' : '0.9') + Math.floor(Math.random() * 10) / 10;
+        ticks++;
+        if (ticks >= 4) { el.textContent = orig; clearInterval(iv); }
+      }, 80);
+    }
+    
+    // SCENARIO SYSTEM
+    var SCENARIOS = {
+      'code-fix': {
+        title: 'Code Fix \u2014 payments-service',
+        engines: ['METEOR', 'NOVA', 'ECLIPSE', 'PULSAR', 'AURORA'],
+        codeLines: [
+          '// payments-service.ts',
+          "import { PaymentProvider } from './providers';",
+          'retryAttempts = 1  \u2190 BUG: should be 3',
+          '',
+          'export async function processPayment(amount: number) {',
+          '  for (let i = 0; i < retryAttempts; i++) {',
+          "    try {",
+          "      return await fetch('/api/payments', { method: 'POST', body: JSON.stringify({ amount }) });",
+          '    } catch (e) {',
+          '      if (i === retryAttempts - 1) throw e;',
+          '    }',
+          '  }',
+          '}',
+          '',
+          '// Confluence: "System retries up to 3 times on failure"',
+        ],
+        detectScore: '0.82',
+        detectType: 'Logic Mismatch',
+        rootCause: 'Constant `retryAttempts=1` contradicts Confluence spec (3 retries)',
+        confidence: '0.94',
+        fixText: 'retryAttempts = 3',
+        auroraGate: '0.94 >= 0.80',
+        finalLine: 'Future occurrences will be auto-resolved.',
+        sequence: 'standard',
+      },
+      'doc-drift': {
+        title: 'Documentation Drift \u2014 auth-service',
+        engines: ['METEOR', 'AURORA'],
+        codeLines: [
+          '// auth-service.ts \u2014 token validation',
+          'const TOKEN_EXPIRY_MS = 3600000; // 1 hour',
+          '',
+          'export function validateToken(token: string): boolean {',
+          '  const elapsed = Date.now() - token.createdAt;',
+          '  return elapsed < TOKEN_EXPIRY_MS;',
+          '}',
+          '',
+          '// RFC 7519: "exp" claim MUST be validated.',
+          '// Security review: tokens valid for 24h per compliance.',
+        ],
+        detectScore: '0.91',
+        detectType: 'Spec Divergence',
+        rootCause: 'TOKEN_EXPIRY_MS=3600000 (1h) contradicts RFC 7519 + security review (24h)',
+        confidence: '0.97',
+        fixText: 'TOKEN_EXPIRY_MS = 86400000',
+        auroraGate: '0.97 >= 0.80',
+        finalLine: 'Spec violations will be flagged before merge.',
+        sequence: 'standard',
+      },
+      'repo-chaos': {
+        title: 'Repo Chaos \u2014 utils directory',
+        engines: ['ASTRAL', 'NEBULA'],
+        codeLines: [
+          '// Duplicate files detected:',
+          '//   utils/string.ts     (72 lines)',
+          '//   helpers/stringutil.js (89 lines)',
+          '//   lib/strings.js      (61 lines)',
+          '//   core/textutils.ts   (103 lines)',
+          '',
+          '// Duplicate function: capitalize()',
+          '//   Defined 4 times across 4 files.',
+          '',
+          '// Circular import: a -> b -> c -> a',
+          '',
+          '// No clear ownership boundary.',
+        ],
+        detectScore: '0.88',
+        detectType: 'Structural Inefficiency',
+        rootCause: '4 duplicate string libs, circular imports, no ownership boundary',
+        confidence: '0.83',
+        fixText: 'Consolidate -> /shared/strings.ts, break circular dep',
+        auroraGate: '0.83 >= 0.80',
+        finalLine: 'Codebase entropy will be continuously monitored.',
+        sequence: 'standard',
+      },
+      'regression': {
+        title: 'Regression Prediction \u2014 payment gateway',
+        engines: ['ECLIPSE', 'PULSAR'],
+        codeLines: [
+          '// commit: abc1234 \u2014 "refactor: extract retry logic"',
+          '// branch: feature/retry-v2',
+          '',
+          '// Current: retryAttempts = 3',
+          '// New path: exponential backoff with jitter',
+          '',
+          'async function retryWithBackoff(fn, maxAttempts = 3) {',
+          '  for (let i = 0; i < maxAttempts; i++) {',
+          '    try { return await fn(); }',
+          '    catch (e) {',
+          '      if (i === maxAttempts - 1) throw e;',
+          '      await sleep(2 ** i * 100 + Math.random() * 50);',
+          '    }',
+          '  }',
+          '}',
+          '',
+          '// WARNING: No tests cover the backoff edge case.',
+        ],
+        detectScore: '\u2014',
+        detectType: 'Regression Risk',
+        rootCause: 'ECLIPSE: 73% failure probability Friday deploy. PULSAR: backoff edge case not covered.',
+        confidence: '0.89',
+        fixText: 'Add backoff tests; shift deploy to Saturday 10AM',
+        auroraGate: '0.89 >= 0.80',
+        finalLine: 'Anomalies will be caught before they become outages.',
+        sequence: 'regression',
+      },
+      'multi-service': {
+        title: 'Multi-Service Failure \u2014 auth -> payment -> webhook',
+        engines: ['QUASAR', 'NOVA'],
+        codeLines: [
+          '// Service A: auth-service  | Timeout: 3000ms',
+          '// Service B: payment-service | Timeout: 5000ms',
+          '// Service C: webhook-handler | Timeout: 2000ms',
+          '',
+          '// Flow: auth (3s) -> payment (5s) -> webhook (2s)',
+          '// If auth > 3s, entire chain fails silently.',
+          '',
+          '// Current: no circuit breaker.',
+          '// Current: no dead-letter queue.',
+        ],
+        detectScore: '0.96',
+        detectType: 'Cross-Service Anomaly',
+        rootCause: 'QUASAR: auth-timeout chain creates 10s+ failure window. No fallback path.',
+        confidence: '0.92',
+        fixText: 'Add circuit breaker + dead-letter queue per service',
+        auroraGate: '0.92 >= 0.80',
+        finalLine: 'Cross-service anomalies will be auto-remediated.',
+        sequence: 'standard',
+      },
+    };
+
+    function runDemo(scenarioId) {
+      var scenario = SCENARIOS[scenarioId] || SCENARIOS['code-fix'];
+      showPage('analysis');
+
+      var terminal = document.querySelector('#analysis .terminal');
+      if (!terminal) return;
+      terminal.innerHTML = '';
+
+      document.querySelectorAll('.panel-tab').forEach(function(t, i) { t.classList.toggle('active', i === 0); });
+      document.querySelectorAll('.panel-value').forEach(function(el) { el.textContent = '\u2014'; el.style.color = ''; });
+      var bugLine = document.querySelector('.highlight-bug');
+      if (bugLine) bugLine.style.opacity = '0.3';
+
+      var editor = document.querySelector('#analysis .editor');
+      if (editor) {
+        editor.innerHTML = scenario.codeLines.map(function(line, i) {
+          var num = i + 1;
+          if (line.indexOf('BUG') !== -1 || line.indexOf('Problem') !== -1 || line.indexOf('No circuit') !== -1 || line.indexOf('Defined 4 times') !== -1) {
+            return '<div class="line highlight-bug"><span class="line-num">' + num + '</span><span style="color: var(--magenta);">' + line + '</span></div>';
+          }
+          if (line.indexOf('WARNING') !== -1) {
+            return '<div class="line"><span class="line-num">' + num + '</span><span style="color: var(--warning);">' + line + '</span></div>';
+          }
+          if (line.substring(0, 2) === '//') {
+            return '<div class="line"><span class="line-num">' + num + '</span><span style="color: var(--muted);">' + line + '</span></div>';
+          }
+          return '<div class="line"><span class="line-num">' + num + '</span><span>' + line + '</span></div>';
+        }).join('');
+      }
+
+      var appTitle = document.querySelector('.app-title');
+      if (appTitle) appTitle.textContent = 'VANTAGE // ' + scenario.title;
+
+      function jitter(base, pct) {
+        return Math.round(base * (1 + (Math.random() * 2 - 1) * pct));
+      }
+      function addLine(text, cls, delay) {
+        return new Promise(function(resolve) { setTimeout(function() {
+          var el = document.createElement('div');
+          el.className = 'terminal-line ' + cls;
+          if (text === '') { terminal.appendChild(document.createElement('br')); }
+          else { el.textContent = text; terminal.appendChild(el); terminal.scrollTop = terminal.scrollHeight; }
+          resolve();
+        }, delay); });
+      }
+      function delay(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+      function flickerHighlight() {
+        var el = document.querySelector('.highlight-bug');
+        if (!el) return;
+        el.style.opacity = '0';
+        setTimeout(function() { el.style.opacity = '1'; }, 180);
+        setTimeout(function() { el.style.opacity = '0.2'; }, 260);
+        setTimeout(function() { el.style.opacity = '1'; }, 360);
+      }
+
+      function glitchNumber(el) {
+        if (!el) return;
+        var orig = el.textContent;
+        var ticks = 0;
+        var iv = setInterval(function() {
+          el.textContent = (0.7 + Math.random() * 0.3).toFixed(2);
+          ticks++;
+          if (ticks >= 4) { el.textContent = orig; clearInterval(iv); }
+        }, 80);
+      }
+
+      function switchTab(idx) {
+        document.querySelectorAll('.panel-tab').forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+      }
+
+      var seq = scenario.sequence;
+      var t = 0;
+      var nt = function(ms) { t += ms; return t; };
+
+      (async function() {
+        // BOOT
+        await addLine('[BOOT] VANTAGE v0.2.0-alpha initializing...', 'muted', nt(jitter(200, 0.15)));
+        await delay(jitter(280, 0.15));
+        await addLine('[INFO] Loading COSMIC engine constellation...', 'muted', nt(jitter(120, 0.15)));
+        await addLine('[INFO] Mounting Pattern Library...', 'muted', nt(jitter(90, 0.15)));
+        await addLine('[INFO] Establishing trust graph...', 'muted', nt(jitter(150, 0.15)));
+        await delay(jitter(200, 0.15));
+        for (var ei = 0; ei < scenario.engines.length; ei++) {
+          var eng = scenario.engines[ei];
+          var padded = eng;
+          for (var k = eng.length; k < 10; k++) padded += ' ';
+          await addLine('  ' + padded + ' ..... OK', 'cyan', nt(jitter(250, 0.15)));
+          await delay(jitter(100, 0.15));
+        }
+        await delay(jitter(100, 0.15));
+        var targetName = scenario.title.split(' \u2014 ')[1] || scenario.title;
+        await addLine('[INFO] Target: ' + targetName, 'muted', nt(jitter(200, 0.15)));
+        await delay(jitter(300, 0.15));
+
+        // SCAN
+        await addLine('', 'muted', nt(jitter(100, 0.15)));
+        await addLine('[SCAN] Starting terrain analysis...', 'cyan', nt(jitter(200, 0.15)));
+        await addLine('[INFO] dependency-graph.json loaded (1,204 nodes)', 'muted', nt(jitter(180, 0.15)));
+        await delay(jitter(250, 0.15));
+        var modName = (targetName.split(' ')[0] || 'service').toLowerCase();
+        await addLine('[INFO] evaluating module: core/' + modName, 'muted', nt(jitter(140, 0.15)));
+        await addLine('[WARN] unresolved reference in legacy-utils (ignored)', 'muted', nt(jitter(190, 0.15)));
+        await addLine('[INFO] continuing analysis...', 'muted', nt(jitter(100, 0.15)));
+        await delay(jitter(200, 0.15));
+
+        if (seq === 'regression') {
+          // REGRESSION SEQUENCE
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[ECLIPSE] Temporal analysis: checking deploy window...', 'cyan', nt(jitter(400, 0.15)));
+          await addLine('[INFO] Recent commit: abc1234 \u2014 retry refactor', 'muted', nt(jitter(350, 0.15)));
+          await addLine('[INFO] Deploy scheduled: Friday 4PM \u2014 high-traffic period', 'muted', nt(jitter(300, 0.15)));
+          await delay(jitter(600, 0.15));
+          await addLine('[PULSAR] Stress-testing edge cases...', 'cyan', nt(jitter(400, 0.15)));
+          await delay(jitter(800, 0.15));
+          await addLine('[ECLIPSE] PREDICTED FAILURE: backoff edge case \u2014 73% chance', 'magenta', nt(jitter(500, 0.15)));
+          flickerHighlight();
+          await delay(jitter(400, 0.15));
+          await addLine('[ECLIPSE] Deploy window risk: HIGH', 'magenta', nt(jitter(300, 0.15)));
+          switchTab(0);
+          await delay(jitter(500, 0.15));
+          await addLine('[DIAGNOSE] Tracing causal chain...', 'cyan', nt(jitter(400, 0.15)));
+          await addLine('[INFO] Backoff formula: 2^i x 100 + jitter', 'muted', nt(jitter(350, 0.15)));
+          await addLine('[INFO] Edge case: i=0 -> sleep(100 +/- 50ms) -> race condition', 'muted', nt(jitter(400, 0.15)));
+          await delay(jitter(600, 0.15));
+          await addLine('[DIAGNOSE] ROOT CAUSE: No jitter guard on first attempt', 'cyan', nt(jitter(300, 0.15)));
+          switchTab(1);
+          await delay(jitter(400, 0.15));
+          await addLine('[FIX] Suggesting schedule shift...', 'cyan', nt(jitter(350, 0.15)));
+          await addLine('  Option 1: Add backoff test suite  [confidence: 0.89]  <- SELECTED', 'success', nt(jitter(400, 0.15)));
+          await addLine('  Option 2: Revert refactor  [confidence: 0.41]', 'muted', nt(jitter(200, 0.15)));
+          await addLine('[FIX] Recommend: Saturday 10AM deploy + test coverage', 'cyan', nt(jitter(350, 0.15)));
+          switchTab(2);
+          await addLine('[FIX APPLIED] Deploy window shifted', 'success', nt(jitter(300, 0.15)));
+          await delay(jitter(400, 0.15));
+          await addLine('[VERIFY] Running backoff edge-case tests...', 'cyan', nt(jitter(300, 0.15)));
+          await delay(jitter(400, 0.15));
+          await addLine('  [chk] Unit: backoff-timer \u2014 PASS', 'success', 0);
+          await delay(jitter(300, 0.15));
+          await addLine('  [chk] Integration: retry-chain \u2014 PASS', 'success', 0);
+          await delay(jitter(500, 0.15));
+          await addLine('  [chk] Load: 1000 concurrent retries \u2014 PASS', 'success', 0);
+          switchTab(3);
+          await addLine('[VERIFY] Complete \u2014 regression risk mitigated', 'success', nt(jitter(350, 0.15)));
+          await delay(jitter(300, 0.15));
+          await addLine('[LEARN] Pattern saved: ECLIPSE/DEPLOY_WINDOW', 'magenta', nt(jitter(300, 0.15)));
+          var lp = document.querySelectorAll('.panel-tab')[4];
+          if (lp) { lp.style.boxShadow = '0 0 20px var(--magenta)'; setTimeout(function() { lp.style.boxShadow = ''; }, 1500); }
+          await delay(jitter(500, 0.15));
+          switchTab(4);
+          await delay(jitter(500, 0.15));
+          await addLine('----------------------------------------------', 'muted', 0);
+          await addLine('AURORA GATE: PASSED  (' + scenario.auroraGate + ')', 'success', nt(jitter(400, 0.15)));
+          await delay(jitter(700, 0.15));
+          await addLine('Session complete. Confidence: ' + scenario.confidence, 'success', nt(jitter(350, 0.15)));
+          await delay(jitter(500, 0.15));
+          await addLine(scenario.finalLine, 'muted', nt(jitter(800, 0.15)));
+          await delay(jitter(600, 0.15));
+          await addLine('[SYSTEM] VANTAGE idle \u2014 awaiting next target.', 'muted', 0);
+        } else {
+          // STANDARD SEQUENCE
+          t = 0; nt(0);
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[DETECT] Anomaly signature matched \u2014 METEOR flagging...', 'cyan', nt(jitter(300, 0.15)));
+          await addLine('[INFO] evaluating anomaly confidence...', 'muted', nt(jitter(400, 0.15)));
+          await delay(jitter(600, 0.15));
+          await addLine('[DETECT] ANOMALY DETECTED', 'magenta', nt(jitter(400, 0.15)));
+          flickerHighlight();
+          await delay(jitter(300, 0.15));
+          await addLine('[DETECT] Type: ' + scenario.detectType, 'magenta', nt(jitter(300, 0.15)));
+          var anomalyEl = document.querySelector('.panel-value.magenta');
+          if (anomalyEl) { glitchNumber(anomalyEl); setTimeout(function() { anomalyEl.textContent = scenario.detectScore; anomalyEl.style.color = 'var(--magenta)'; }, 400); }
+          await delay(jitter(200, 0.15));
+
+          t = 0; nt(0);
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[DIAGNOSE] Tracing causal chain via NOVA...', 'cyan', nt(jitter(400, 0.15)));
+          await addLine('[INFO] constructing causal chain...', 'muted', nt(jitter(500, 0.15)));
+          await delay(jitter(700, 0.15));
+          var rcParts = scenario.rootCause.split('.');
+          await addLine('[DIAGNOSE] ' + rcParts[0] + '...', 'muted', nt(jitter(400, 0.15)));
+          await delay(jitter(600, 0.15));
+          if (rcParts.length > 1) await addLine('[DIAGNOSE] ' + rcParts[1] + '.', 'muted', nt(jitter(500, 0.15)));
+          await delay(jitter(800, 0.15));
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[DIAGNOSE] ROOT CAUSE IDENTIFIED', 'cyan', nt(jitter(300, 0.15)));
+          await delay(jitter(400, 0.15));
+          await addLine('  ' + scenario.rootCause, 'muted', nt(jitter(200, 0.15)));
+          switchTab(1);
+          await delay(jitter(300, 0.15));
+
+          t = 0; nt(0);
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[FIX] Generating candidate fixes...', 'cyan', nt(jitter(300, 0.15)));
+          await addLine('[INFO] scanning dependency graph for blast radius...', 'muted', nt(jitter(400, 0.15)));
+          await delay(jitter(600, 0.15));
+          await addLine('[FIX] Candidate options:', 'cyan', nt(jitter(300, 0.15)));
+          await delay(jitter(200, 0.15));
+          await addLine('  Option 1: ' + scenario.fixText + '   [confidence: ' + scenario.confidence + ']  <- SELECTED', 'success', nt(jitter(400, 0.15)));
+          await addLine('  Option 2: Revert to previous   [confidence: 0.62]', 'muted', nt(jitter(300, 0.15)));
+          await delay(jitter(400, 0.15));
+          await addLine('[FIX] Applying fix...', 'cyan', nt(jitter(350, 0.15)));
+          await delay(jitter(600, 0.15));
+          switchTab(2);
+          await delay(jitter(300, 0.15));
+          await addLine('[FIX APPLIED] ' + scenario.fixText, 'success', nt(jitter(350, 0.15)));
+          await addLine('[FIX] Pattern promoted to fix candidate pool', 'magenta', nt(jitter(250, 0.15)));
+
+          t = 0; nt(0);
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[VERIFY] Running sandbox tests via AURORA...', 'cyan', nt(jitter(300, 0.15)));
+          await delay(jitter(400, 0.15));
+          var testNames = ['Unit tests', 'Integration tests', 'Regression check', 'Long-form stress'];
+          var testDelays = [450, 520, 480, 1200];
+          for (var ti = 0; ti < 4; ti++) {
+            await addLine('[TEST ' + (ti+1) + '/4] ' + testNames[ti] + ' ...', 'muted', nt(jitter(200, 0.15)));
+            await delay(jitter(testDelays[ti], 0.1));
+            await addLine('  [chk] PASS', 'success', 0);
+            await delay(jitter(jitter(300, 0.15), 0));
+          }
+          switchTab(3);
+          await delay(jitter(300, 0.15));
+          await addLine('[VERIFY] All checks passed \u2014 AURORA gate: READY', 'success', nt(jitter(350, 0.15)));
+
+          t = 0; nt(0);
+          await addLine('', 'muted', nt(jitter(100, 0.15)));
+          await addLine('[LEARN] Updating Pattern Library...', 'magenta', nt(jitter(300, 0.15)));
+          var patternName = 'METEOR/' + scenario.detectType.replace(/\\s+/g, '_').toUpperCase();
+          await addLine('[LEARN] Pattern: ' + patternName, 'magenta', nt(jitter(250, 0.15)));
+          await addLine('[LEARN] Occurrences: 1 -> 2', 'magenta', nt(jitter(200, 0.15)));
+          await delay(jitter(jitter(450, 0.15), 0));
+          await delay(jitter(500, 0.15));
+          var learnPanel = document.querySelectorAll('.panel-tab')[4];
+          if (learnPanel) { learnPanel.style.boxShadow = '0 0 20px var(--magenta)'; setTimeout(function() { learnPanel.style.boxShadow = ''; }, 1500); }
+          await delay(jitter(400, 0.15));
+          await addLine('[LEARN] Pattern promoted  (+0.14)', 'magenta', nt(jitter(300, 0.15)));
+          var newConf = (parseFloat(scenario.confidence) + 0.04).toFixed(2);
+          await addLine('[LEARN] Confidence: ' + scenario.confidence + ' -> ' + newConf, 'magenta', nt(jitter(250, 0.15)));
+          await delay(jitter(300, 0.15));
+          switchTab(4);
+
+          await delay(jitter(500, 0.15));
+          await addLine('', 'muted', 0);
+          await addLine('----------------------------------------------', 'muted', nt(jitter(200, 0.15)));
+          await addLine('AURORA GATE: PASSED  (' + scenario.auroraGate + ')', 'success', nt(jitter(400, 0.15)));
+          await delay(jitter(700, 0.15));
+          await addLine('Session complete. Confidence: ' + scenario.confidence, 'success', nt(jitter(350, 0.15)));
+          await delay(jitter(500, 0.15));
+          await addLine(scenario.finalLine, 'muted', nt(jitter(800, 0.15)));
+          await delay(jitter(600, 0.15));
+          await addLine('[SYSTEM] VANTAGE idle \u2014 awaiting next target.', 'muted', 0);
+        }
+      })();
+    }
+    // Update time
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      const timeEl = document.getElementById('current-time');
+      if (timeEl) {
+        timeEl.textContent = 'Time: ' + timeStr;
+      }
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Odometer animation for dashboard metrics
+    function animateMetrics() {
+      const metricValues = document.querySelectorAll('.metric-value[data-count]');
+      metricValues.forEach(el => {
+        const target = parseFloat(el.dataset.count);
+        const suffix = el.dataset.suffix || '';
+        const duration = 1500;
+        const steps = 60;
+        const stepDuration = duration / steps;
+        let current = 0;
+        const increment = target / steps;
+
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = (Number.isInteger(target) ? Math.floor(current) : current.toFixed(target.toString().split('.')[1]?.length || 1)) + suffix;
+          el.classList.add('count-animate');
+        }, stepDuration);
+      });
+    }
+
+    // Trigger animation when dashboard is shown
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.target.id === 'dashboard' && mutation.target.classList.contains('active')) {
+          setTimeout(animateMetrics, 100);
+        }
+      });
+    });
+
+    const dashboardPage = document.getElementById('dashboard');
+    if (dashboardPage) {
+      observer.observe(dashboardPage, { attributes: true, attributeFilter: ['class'] });
+    }
+  </script>
+</body>
+</html>

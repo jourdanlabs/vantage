@@ -1,0 +1,45 @@
+---
+export interface Props {
+  title: string;
+  findings: Array<{ file: string; line?: number; type: string; description?: string }>;
+  variant?: 'tp' | 'fp' | 'fn';
+  max?: number;
+}
+
+const { title, findings, variant = 'tp', max = 20 } = Astro.props;
+
+const icon = { tp: '✓', fp: '✗', fn: '◌' }[variant];
+const color = { tp: 'var(--green)', fp: 'var(--red)', fn: 'var(--yellow)' }[variant];
+const displayed = findings.slice(0, max);
+const hidden = findings.length - displayed.length;
+---
+
+<div class="findings-section">
+  <h3 style={`color: ${color}`}>{icon} {title} ({findings.length})</h3>
+  {displayed.length === 0
+    ? <p style="color: var(--text2); font-style: italic">None</p>
+    : (
+      <table>
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Line</th>
+            <th>Type</th>
+            {findings.some(f => f.description) && <th>Notes</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {displayed.map(f => (
+            <tr>
+              <td style="font-family: var(--font); font-size: 0.8rem">{f.file.split('/').slice(-2).join('/')}</td>
+              <td style="font-family: var(--font); font-size: 0.8rem; color: var(--text2)">{f.line ?? '—'}</td>
+              <td><code>{f.type}</code></td>
+              {f.description && <td style="color: var(--text2); font-size: 0.85rem">{f.description}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  }
+  {hidden > 0 && <p style="color: var(--text2); font-size: 0.85rem; margin-top: 8px">… and {hidden} more</p>}
+</div>

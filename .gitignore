@@ -1,0 +1,20 @@
+node_modules/
+dist/
+vantage-report.json
+*.js.map
+__pycache__/
+*.pyc
+.DS_Store
+.scannerwork/
+*.tgz
+
+# Chamber agent souls — internal, never published
+.cursor/
+
+# Bench receipts / corpus — never `git add -A`
+*.sarif
+*.class
+testcode/
+receipts/internal-only-do-not-publish/
+receipts/**/target/
+receipts/**/*-enterprise-build/

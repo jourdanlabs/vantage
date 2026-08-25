@@ -1,0 +1,556 @@
+{
+  "generatedAt": "2026-04-19T19:26:09Z",
+  "scoringVersion": "v2",
+  "scoringChangeSummary": "Stricter file-match rule (endsWith + path-segment boundary); line=0 wildcard replaced with explicit scope field; runner path normalization at boundary.",
+  "tools": [
+    {
+      "rank": 1,
+      "name": "VANTAGE (pattern)",
+      "version": "1.0.0",
+      "runDate": "2026-04-19T18:59:42.607Z",
+      "commitSha": "e7531c2f14f7",
+      "aggregateF1": 0.8372093023255814,
+      "medianDurationMs": 243,
+      "scores": [
+        {
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "durationMs": 192,
+          "tpDetails": [
+            {
+              "file": "app/data/allocations-dao.js",
+              "line": 73,
+              "type": "injection"
+            },
+            {
+              "file": "app/data/allocations-dao.js",
+              "line": 78,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 32,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 33,
+              "type": "injection"
+            }
+          ],
+          "fpDetails": [],
+          "fnDetails": []
+        },
+        {
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 9,
+          "fp": 7,
+          "fn": 0,
+          "precision": 0.5625,
+          "recall": 1,
+          "f1": 0.72,
+          "durationMs": 294,
+          "tpDetails": [
+            {
+              "file": "lib/codingChallenges.ts",
+              "line": 76,
+              "type": "injection"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 23,
+              "type": "hardcoded-secret"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 44,
+              "type": "hardcoded-secret"
+            },
+            {
+              "file": "routes/chatbot.ts",
+              "line": 47,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/languages.ts",
+              "line": 18,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/recycles.ts",
+              "line": 14,
+              "type": "error-boundary"
+            },
+            {
+              "file": "routes/showProductReviews.ts",
+              "line": 36,
+              "type": "injection"
+            },
+            {
+              "file": "routes/trackOrder.ts",
+              "line": 18,
+              "type": "injection"
+            },
+            {
+              "file": "routes/verify.ts",
+              "line": 128,
+              "type": "error-boundary"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "lib/codingChallenges.ts",
+              "line": 78,
+              "type": "injection",
+              "description": "new RegExp() with non-literal argument \u2014 potential ReDoS if input is user-controlled"
+            },
+            {
+              "file": "routes/captcha.ts",
+              "line": 22,
+              "type": "injection",
+              "description": "eval() detected \u2014 verify input is not user-controlled"
+            },
+            {
+              "file": "routes/chatbot.ts",
+              "line": 49,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch \u2014 malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "routes/languages.ts",
+              "line": 32,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch \u2014 malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "routes/userProfile.ts",
+              "line": 62,
+              "type": "injection",
+              "description": "eval() detected \u2014 verify input is not user-controlled"
+            },
+            {
+              "file": "rsn/rsnUtil.ts",
+              "line": 27,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch \u2014 malformed JSON will throw SyntaxError"
+            },
+            {
+              "file": "server.ts",
+              "line": 323,
+              "type": "error-boundary",
+              "description": "JSON.parse() without try/catch \u2014 malformed JSON will throw SyntaxError"
+            }
+          ],
+          "fnDetails": []
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "name": "VANTAGE (semantic)",
+      "version": "1.0.0",
+      "runDate": "2026-04-19T19:26:09Z",
+      "commitSha": "e7531c2f14f7",
+      "aggregateF1": 0.649,
+      "medianDurationMs": 600,
+      "scores": [
+        {
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "precision": 0.667,
+          "recall": 1.0,
+          "f1": 0.8,
+          "durationMs": 250,
+          "tpDetails": [],
+          "fpDetails": [
+            {
+              "file": "app/routes/contributions.js",
+              "line": 34,
+              "type": "injection",
+              "description": "Third eval(req.body) one line beyond what GT documents \u2014 real vulnerability, GT is incomplete"
+            },
+            {
+              "file": "app/routes/index.js",
+              "line": 72,
+              "type": "edge-case",
+              "description": "Open redirect via res.redirect(req.query.url) \u2014 real CWE-601, not in GT"
+            }
+          ],
+          "fnDetails": []
+        },
+        {
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 9,
+          "fp": 15,
+          "fn": 0,
+          "precision": 0.375,
+          "recall": 1.0,
+          "f1": 0.545,
+          "durationMs": 640,
+          "tpDetails": [],
+          "fpDetails": [
+            {
+              "file": "routes/userProfile.ts",
+              "line": 87,
+              "type": "injection",
+              "description": "SSTI via pug.compile \u2014 real OWASP challenge, not in GT"
+            },
+            {
+              "file": "routes/userProfile.ts",
+              "line": 62,
+              "type": "injection",
+              "description": "eval of taint-traced user input \u2014 real bug, not in GT"
+            },
+            {
+              "file": "routes/profileImageFileUpload.ts",
+              "line": 43,
+              "type": "edge-case",
+              "description": "fs.writeFile with user-controlled path \u2014 arbitrary file write, not in GT"
+            },
+            {
+              "file": "routes/profileImageUrlUpload.ts",
+              "line": 24,
+              "type": "edge-case",
+              "description": "fetch with user-controlled URL \u2014 SSRF, not in GT"
+            }
+          ],
+          "fnDetails": []
+        }
+      ],
+      "notes": "Semantic mode findings that appear as FPs under strict scoring are real vulnerabilities the GT catalog does not document. See benchmarks/NEBULA_V0_DELTA.md for details."
+    },
+    {
+      "rank": 3,
+      "name": "Semgrep",
+      "version": "1.159.0",
+      "runDate": "2026-04-16T09:50:54.000Z",
+      "commitSha": "external",
+      "aggregateF1": 0.128,
+      "medianDurationMs": 9100,
+      "scores": [
+        {
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 2,
+          "fp": 13,
+          "fn": 2,
+          "precision": 0.133,
+          "recall": 0.5,
+          "f1": 0.211,
+          "durationMs": 3700,
+          "tpDetails": [
+            {
+              "file": "app/routes/contributions.js",
+              "line": 32,
+              "type": "injection"
+            },
+            {
+              "file": "app/routes/contributions.js",
+              "line": 33,
+              "type": "injection"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "server.js",
+              "line": 0,
+              "type": "csrf",
+              "description": "express-check-csurf (6 findings)"
+            },
+            {
+              "file": "various",
+              "line": 0,
+              "type": "other",
+              "description": "7 other FPs"
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "nodegoat-003",
+              "file": "app/data/allocations-dao.js",
+              "line": 73,
+              "type": "injection",
+              "description": " template literal \u2014 not in OWASP/nodejs/js packs"
+            },
+            {
+              "id": "nodegoat-004",
+              "file": "app/data/allocations-dao.js",
+              "line": 78,
+              "type": "injection",
+              "description": " string concat \u2014 not in OWASP/nodejs/js packs"
+            }
+          ]
+        },
+        {
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 1,
+          "fp": 17,
+          "fn": 8,
+          "precision": 0.056,
+          "recall": 0.1,
+          "f1": 0.071,
+          "durationMs": 14500,
+          "tpDetails": [
+            {
+              "file": "routes/chatbot.ts",
+              "line": 205,
+              "type": "xss",
+              "description": "raw-html-format (file match)"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "various",
+              "line": 0,
+              "type": "other",
+              "description": "17 false positives"
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "juiceshop-001",
+              "file": "lib/insecurity.ts",
+              "line": 23,
+              "type": "hardcoded-secret",
+              "description": "PEM key \u2014 not in OWASP/nodejs/js packs"
+            },
+            {
+              "id": "juiceshop-002",
+              "file": "lib/insecurity.ts",
+              "line": 44,
+              "type": "hardcoded-secret",
+              "description": "HMAC \u2014 not in OWASP/nodejs/js packs (only in auto)"
+            },
+            {
+              "id": "juiceshop-003",
+              "file": "routes/trackOrder.ts",
+              "line": 18,
+              "type": "injection",
+              "description": "NoSQL  \u2014 no rule"
+            },
+            {
+              "id": "juiceshop-004",
+              "file": "routes/showProductReviews.ts",
+              "line": 36,
+              "type": "injection",
+              "description": "NoSQL  \u2014 no rule"
+            },
+            {
+              "id": "juiceshop-005",
+              "file": "lib/codingChallenges.ts",
+              "line": 76,
+              "type": "injection",
+              "description": "ReDoS \u2014 not in OWASP/nodejs/js packs"
+            },
+            {
+              "id": "juiceshop-006",
+              "file": "routes/languages.ts",
+              "line": 18,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no rule"
+            },
+            {
+              "id": "juiceshop-007",
+              "file": "routes/verify.ts",
+              "line": 128,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no rule"
+            },
+            {
+              "id": "juiceshop-009",
+              "file": "routes/recycles.ts",
+              "line": 14,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no rule"
+            }
+          ]
+        }
+      ],
+      "pendingRebench": true,
+      "stalenessNote": "Awaiting rerun under new strict scoring rule \u2014 see benchmark-weekly GH Actions run"
+    },
+    {
+      "rank": 4,
+      "name": "SonarQube",
+      "version": "26.4.0 Community",
+      "runDate": "2026-04-16T09:50:54.000Z",
+      "commitSha": "external",
+      "aggregateF1": 0.029,
+      "medianDurationMs": 19000,
+      "scores": [
+        {
+          "corpus": "nodegoat",
+          "corpusLabel": "OWASP/NodeGoat",
+          "tp": 0,
+          "fp": 3,
+          "fn": 4,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "durationMs": 11000,
+          "tpDetails": [],
+          "fpDetails": [
+            {
+              "file": "artifacts/cert/server.key",
+              "line": 1,
+              "type": "hardcoded-secret",
+              "description": "Private key in repo \u2014 not in GT tier-1"
+            },
+            {
+              "file": "artifacts/db-reset.js",
+              "line": 18,
+              "type": "hardcoded-secret",
+              "description": "Hardcoded password in test fixture"
+            },
+            {
+              "file": "server.js",
+              "line": 121,
+              "type": "other",
+              "description": "Static middleware ordering \u2014 not in GT"
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "nodegoat-001",
+              "file": "app/routes/contributions.js",
+              "line": 32,
+              "type": "injection",
+              "description": "eval injection \u2014 no SonarJS eval rule"
+            },
+            {
+              "id": "nodegoat-002",
+              "file": "app/routes/contributions.js",
+              "line": 33,
+              "type": "injection",
+              "description": "eval injection \u2014 no SonarJS eval rule"
+            },
+            {
+              "id": "nodegoat-003",
+              "file": "app/data/allocations-dao.js",
+              "line": 73,
+              "type": "injection",
+              "description": "NoSQL  \u2014 no SonarJS rule"
+            },
+            {
+              "id": "nodegoat-004",
+              "file": "app/data/allocations-dao.js",
+              "line": 78,
+              "type": "injection",
+              "description": "NoSQL  \u2014 no SonarJS rule"
+            }
+          ]
+        },
+        {
+          "corpus": "juice-shop",
+          "corpusLabel": "OWASP Juice Shop",
+          "tp": 2,
+          "fp": 56,
+          "fn": 7,
+          "precision": 0.034,
+          "recall": 0.2,
+          "f1": 0.058,
+          "durationMs": 27000,
+          "tpDetails": [
+            {
+              "file": "lib/insecurity.ts",
+              "line": 23,
+              "type": "hardcoded-secret",
+              "description": "PEM key \u2014 BLOCKER"
+            },
+            {
+              "file": "lib/insecurity.ts",
+              "line": 44,
+              "type": "hardcoded-secret",
+              "description": "HMAC \u2014 BLOCKER"
+            }
+          ],
+          "fpDetails": [
+            {
+              "file": "test/api/*Spec.ts",
+              "line": 0,
+              "type": "hardcoded-secret",
+              "description": "43 test-fixture credentials (password/token fields in test specs)"
+            },
+            {
+              "file": "test/api/*Spec.ts",
+              "line": 0,
+              "type": "hardcoded-secret",
+              "description": "5 Authorization header values in tests"
+            },
+            {
+              "file": "various",
+              "line": 0,
+              "type": "other",
+              "description": "8 production files (JWT key, HMAC, server config, XSS)"
+            }
+          ],
+          "fnDetails": [
+            {
+              "id": "juiceshop-003",
+              "file": "routes/trackOrder.ts",
+              "line": 18,
+              "type": "injection",
+              "description": "NoSQL  \u2014 no SonarJS rule"
+            },
+            {
+              "id": "juiceshop-004",
+              "file": "routes/showProductReviews.ts",
+              "line": 36,
+              "type": "injection",
+              "description": "NoSQL  \u2014 no SonarJS rule"
+            },
+            {
+              "id": "juiceshop-005",
+              "file": "lib/codingChallenges.ts",
+              "line": 76,
+              "type": "injection",
+              "description": "ReDoS \u2014 no SonarJS rule"
+            },
+            {
+              "id": "juiceshop-006",
+              "file": "routes/languages.ts",
+              "line": 18,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no SonarJS rule"
+            },
+            {
+              "id": "juiceshop-007",
+              "file": "routes/verify.ts",
+              "line": 128,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no SonarJS rule"
+            },
+            {
+              "id": "juiceshop-008",
+              "file": "routes/chatbot.ts",
+              "line": 47,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no SonarJS rule"
+            },
+            {
+              "id": "juiceshop-009",
+              "file": "routes/recycles.ts",
+              "line": 14,
+              "type": "error-boundary",
+              "description": "JSON.parse no try/catch \u2014 no SonarJS rule"
+            }
+          ]
+        }
+      ],
+      "pendingRebench": true,
+      "stalenessNote": "Awaiting rerun under new strict scoring rule \u2014 see benchmark-weekly GH Actions run"
+    }
+  ]
+}

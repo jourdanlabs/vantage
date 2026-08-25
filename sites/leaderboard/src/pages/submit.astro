@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Submit a Tool" description="Add your static analysis tool to the VANTAGE benchmark leaderboard by submitting a runner PR.">
+  <h1>Submit a Tool</h1>
+  <p>Any static analysis tool can join the leaderboard. The benchmark is fully open and anyone can add a runner.</p>
+
+  <h2>Requirements</h2>
+  <ul style="color: var(--text2); padding-left: 20px; line-height: 2; margin-bottom: 24px">
+    <li>The tool must be publicly available (open source or free tier that covers CLI usage)</li>
+    <li>Results must be reproducible from the runner code alone — no manual steps</li>
+    <li>The runner must implement the <code>Runner</code> interface in <a href="https://github.com/jourdanlabs/vantage/blob/main/packages/vantage-bench/src/runners/base.ts"><code>src/runners/base.ts</code></a></li>
+  </ul>
+
+  <h2>How to Add a Runner</h2>
+
+  <h3>1. Fork the repo</h3>
+  <pre><code>git clone https://github.com/jourdanlabs/vantage
+cd vantage/packages/vantage-bench</code></pre>
+
+  <h3>2. Create your runner</h3>
+  <p>Add a file at <code>src/runners/&lt;toolname&gt;.ts</code>. The interface is simple:</p>
+  <pre><code>import &#123; Runner, RunResult, normalizeType &#125; from './base';
+
+export class MyToolRunner implements Runner &#123;
+  name = 'MyTool';
+
+  async run(targetPath: string): Promise&lt;RunResult&gt; &#123;
+    // 1. Run your tool against targetPath
+    // 2. Parse its output
+    // 3. Normalize finding types with normalizeType()
+    // 4. Return findings + durationMs + toolVersion
+    return &#123;
+      findings: [...],
+      durationMs: elapsed,
+      toolVersion: '1.2.3',
+    &#125;;
+  &#125;
+&#125;</code></pre>
+
+  <h3>3. Register it</h3>
+  <p>Add your runner to <code>ALL_RUNNERS</code> in <code>src/index.ts</code>.</p>
+
+  <h3>4. Test locally</h3>
+  <pre><code>npx . run --tool MyTool --clone</code></pre>
+
+  <h3>5. Submit a PR</h3>
+  <p>Open a pull request on <a href="https://github.com/jourdanlabs/vantage" target="_blank" rel="noopener">github.com/jourdanlabs/vantage</a>. Include the runner file and the output of a local run in the PR description. The maintainers will verify the results and merge.</p>
+
+  <h2>What Gets Published</h2>
+  <p>Once merged, the weekly workflow runs your tool against both corpora and publishes results to this site. The full per-finding breakdown (TPs, FPs, FNs) is public — there is no option to publish only aggregate numbers. This is what makes the benchmark credible.</p>
+
+  <div class="card">
+    <strong>Want to dispute a result?</strong><br />
+    <p style="margin-top: 8px">Open a GitHub issue referencing the specific finding and explain why it is incorrectly classified. If the dispute is valid (wrong GT entry, scoring bug, tool misconfiguration), the harness will be updated and results will be re-run. The dispute and resolution are always visible in the issue tracker.</p>
+  </div>
+</Base>

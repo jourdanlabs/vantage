@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vantage-x"
+version = "1.0.0"
+description = "VANTAGE — Autonomous Code Evolution Engine. Deterministic static analysis and verified auto-fix for JavaScript, TypeScript, and Python. METEOR → NOVA → NEBULA → ECLIPSE → PULSAR → AURORA."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "JourdanLabs", email = "hello@jourdanlabs.ai" },
+]
+keywords = [
+  "static-analysis",
+  "security",
+  "taint-analysis",
+  "code-review",
+  "autofix",
+  "mcp",
+  "sast",
+  "python",
+  "javascript",
+  "typescript",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: POSIX",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+]
+# Deliberately zero runtime dependencies — the Python package shells to the
+# locally installed `vantage` binary. Keeps supply-chain surface area at zero,
+# makes enterprise procurement reviews trivial.
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jourdanlabs/vantage"
+Documentation = "https://github.com/jourdanlabs/vantage#readme"
+Repository = "https://github.com/jourdanlabs/vantage"
+Issues = "https://github.com/jourdanlabs/vantage/issues"
+Benchmark = "https://benchmark.vantage.dev"
+
+[project.scripts]
+vantage-py = "vantage.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vantage"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/vantage/**",
+  "README.md",
+  "LICENSE",
+  "pyproject.toml",
+]

@@ -1,0 +1,112 @@
+{
+  "name": "vantage-vscode",
+  "displayName": "VANTAGE",
+  "description": "VANTAGE static analysis in VS Code — security + quality surfaces, AURORA verdict, Problems panel diagnostics. Same engine as the CLI and MCP server.",
+  "version": "1.0.0",
+  "publisher": "jourdanlabs",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "security",
+    "static-analysis",
+    "taint",
+    "vantage",
+    "nebula",
+    "javascript",
+    "typescript"
+  ],
+  "activationEvents": [
+    "onCommand:vantage.scanWorkspace",
+    "onCommand:vantage.scanFolder",
+    "onCommand:vantage.clearDiagnostics",
+    "workspaceContains:**/*.{js,ts,jsx,tsx,mjs,cjs}"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vantage.scanWorkspace",
+        "title": "VANTAGE: Scan Workspace",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "vantage.scanFolder",
+        "title": "VANTAGE: Scan Folder…"
+      },
+      {
+        "command": "vantage.clearDiagnostics",
+        "title": "VANTAGE: Clear Diagnostics"
+      },
+      {
+        "command": "vantage.showReport",
+        "title": "VANTAGE: Open Last Report"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "vantage.scanWorkspace"
+        },
+        {
+          "command": "vantage.scanFolder"
+        },
+        {
+          "command": "vantage.clearDiagnostics"
+        },
+        {
+          "command": "vantage.showReport"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "VANTAGE",
+      "properties": {
+        "vantage.cliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the vantage CLI (node entry or binary). Empty = auto-detect monorepo bin/vantage.js or PATH."
+        },
+        "vantage.semantic": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable NEBULA semantic/taint analysis (slower, more findings)."
+        },
+        "vantage.surface": {
+          "type": "string",
+          "enum": ["security", "quality", "all"],
+          "default": "security",
+          "description": "Which finding surface to show in Problems. Default security for IDE product demos."
+        },
+        "vantage.includeTests": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include test/spec/fixture paths."
+        },
+        "vantage.threshold": {
+          "type": "number",
+          "default": 0.8,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "AURORA approval threshold (0–1)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npm run compile && npx @vscode/vsce package --no-dependencies",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.1",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.8.3"
+  }
+}

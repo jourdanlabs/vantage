@@ -1,0 +1,87 @@
+name: Benchmark — PR validation
+
+on:
+  pull_request:
+    paths:
+      - 'packages/vantage-bench/**'
+      - 'src/engines/**'
+      - 'src/types.ts'
+
+jobs:
+  validate-harness:
+    name: Validate benchmark harness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          cd packages/vantage-bench && npm install
+
+      - name: TypeScript typecheck
+        run: |
+          cd packages/vantage-bench
+          npx tsc --noEmit 2>&1
+
+      - name: Validate ground truth JSON schemas
+        run: |
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const gtDir = 'packages/vantage-bench/src/ground-truth';
+            const files = fs.readdirSync(gtDir).filter(f => f.endsWith('.json'));
+            let errors = 0;
+            for (const file of files) {
+              const data = JSON.parse(fs.readFileSync(path.join(gtDir, file), 'utf8'));
+              if (!data.corpus || !data.vulnerabilities) {
+                console.error('Invalid GT file:', file, '— missing corpus or vulnerabilities');
+                errors++;
+                continue;
+              }
+              for (const v of data.vulnerabilities) {
+                if (!v.id || !v.file || !v.type) {
+                  console.error('Invalid GT entry in', file, ':', JSON.stringify(v).slice(0, 100));
+                  errors++;
+                }
+              }
+              console.log('  ✓', file, '—', data.vulnerabilities.length, 'entries');
+            }
+            if (errors > 0) process.exit(1);
+          "
+
+      - name: Smoke test — VANTAGE runner on vantage/src
+        run: |
+          cd packages/vantage-bench
+          node -e "
+            require('ts-node').register({ project: 'tsconfig.json', transpileOnly: true });
+            const { VantageRunner } = require('./src/runners/vantage');
+            const runner = new VantageRunner();
+            runner.run('../../src').then(result => {
+              console.log('VANTAGE runner smoke test:');
+              console.log('  toolVersion:', result.toolVersion);
+              console.log('  findings:', result.findings.length);
+              console.log('  durationMs:', result.durationMs);
+              if (result.error) console.log('  error:', result.error);
+              process.exit(result.error ? 1 : 0);
+            }).catch(e => { console.error(e); process.exit(1); });
+          "
+
+      - name: Check runner interface compliance
+        run: |
+          node -e "
+            require('ts-node').register({ project: 'packages/vantage-bench/tsconfig.json', transpileOnly: true });
+            const { ALL_RUNNERS } = require('./packages/vantage-bench/src/index');
+            let ok = true;
+            for (const runner of ALL_RUNNERS) {
+              if (typeof runner.name !== 'string') { console.error(runner, 'missing name'); ok = false; }
+              if (typeof runner.run !== 'function') { console.error(runner.name, 'missing run()'); ok = false; }
+              else console.log('  ✓', runner.name);
+            }
+            process.exit(ok ? 0 : 1);
+          "

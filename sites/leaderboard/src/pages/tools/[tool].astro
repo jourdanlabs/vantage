@@ -1,0 +1,100 @@
+---
+import Base from '../../layouts/Base.astro';
+import FindingsList from '../../components/FindingsList.astro';
+import type { LeaderboardData, LeaderboardEntry } from '../../types';
+import resultsJson from '../../data/results.json';
+
+export async function getStaticPaths() {
+  const data = resultsJson as LeaderboardData;
+  return data.tools.map(tool => ({
+    params: { tool: tool.name.toLowerCase() },
+    props: { tool },
+  }));
+}
+
+const { tool } = Astro.props as { tool: LeaderboardEntry };
+
+function pct(n: number | null): string {
+  if (n === null || n === undefined) return '—';
+  return `${(n * 100).toFixed(1)}%`;
+}
+
+function ms(n: number): string {
+  if (n < 1000) return `${n.toFixed(0)} ms`;
+  return `${(n / 1000).toFixed(1)} s`;
+}
+---
+
+<Base title={`${tool.name} — Tool Detail`}>
+  <div style="margin-bottom: 8px">
+    <a href="/" style="color: var(--text2); font-size: 0.9rem">← Leaderboard</a>
+  </div>
+
+  <h1>{tool.name}</h1>
+  <p style="color: var(--text2)">Version {tool.version} · Run {tool.runDate.slice(0, 10)} · <code style="font-size: 0.8rem">{tool.commitSha}</code></p>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="stat-value" style={tool.aggregateF1 !== null && tool.aggregateF1 >= 0.8 ? 'color: var(--green)' : tool.aggregateF1 !== null && tool.aggregateF1 >= 0.4 ? 'color: var(--yellow)' : 'color: var(--red)'}>{pct(tool.aggregateF1)}</div>
+      <div class="stat-label">Aggregate F1</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">#{tool.rank}</div>
+      <div class="stat-label">Leaderboard rank</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="font-family: var(--font)">{ms(tool.medianDurationMs)}</div>
+      <div class="stat-label">Median runtime</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{tool.scores.reduce((a, s) => a + s.tp, 0)}</div>
+      <div class="stat-label">Total TPs</div>
+    </div>
+  </div>
+
+  <h2>Per-Corpus Breakdown</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Corpus</th>
+        <th>TP</th>
+        <th>FP</th>
+        <th>FN</th>
+        <th>Precision</th>
+        <th>Recall</th>
+        <th>F1</th>
+        <th>Runtime</th>
+      </tr>
+    </thead>
+    <tbody>
+      {tool.scores.map(s => (
+        <tr>
+          <td><a href={`https://github.com/${s.corpus === 'nodegoat' ? 'OWASP/NodeGoat' : 'juice-shop/juice-shop'}`} target="_blank" rel="noopener">{s.corpusLabel}</a></td>
+          <td style="color: var(--green)">{s.tp}</td>
+          <td style="color: var(--red)">{s.fp}</td>
+          <td style="color: var(--yellow)">{s.fn}</td>
+          <td>{pct(s.precision)}</td>
+          <td>{pct(s.recall)}</td>
+          <td style="font-weight: 700">{pct(s.f1)}</td>
+          <td style="font-family: var(--font); font-size: 0.85rem; color: var(--text2)">{ms(s.durationMs)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  {tool.scores.map(s => (
+    <div class="card">
+      <h2 style="margin-top: 0">{s.corpusLabel} — Findings Detail</h2>
+      <FindingsList title="True Positives" findings={s.tpDetails} variant="tp" />
+      <FindingsList title="False Positives" findings={s.fpDetails} variant="fp" />
+      <FindingsList title="False Negatives (missed)" findings={s.fnDetails} variant="fn" />
+    </div>
+  ))}
+
+  <div class="card" style="margin-top: 24px; font-size: 0.85rem; color: var(--text2)">
+    <strong>Reproducibility:</strong> Results were produced by
+    <a href="https://github.com/jourdanlabs/vantage/tree/main/packages/vantage-bench">vantage-bench</a>
+    at commit <code>{tool.commitSha}</code>.
+    To reproduce: <code>npx @jourdanlabs/vantage-bench run --tool {tool.name.toLowerCase()} --clone</code>
+  </div>
+</Base>

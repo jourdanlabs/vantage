@@ -1,0 +1,80 @@
+{
+  "name": "vantage",
+  "version": "1.0.0",
+  "description": "VANTAGE — Autonomous Code Evolution Engine. Finds bugs, fixes them, gates commits.",
+  "main": "dist/cli.js",
+  "bin": {
+    "vantage": "./bin/vantage.js",
+    "vantage-mcp": "./bin/vantage-mcp.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jourdanlabs/vantage.git"
+  },
+  "homepage": "https://github.com/jourdanlabs/vantage#readme",
+  "bugs": {
+    "url": "https://github.com/jourdanlabs/vantage/issues"
+  },
+  "scripts": {
+    "dev": "electron .",
+    "build": "tsc",
+    "build:mcp": "tsc -p tsconfig.mcp.json",
+    "prepublishOnly": "npm run build:mcp",
+    "start": "electron .",
+    "cli": "ts-node src/cli.ts",
+    "analyze": "ts-node src/cli.ts analyze",
+    "mcp": "ts-node src/mcp/server.ts",
+    "install-hook": "node bin/install-hook.js",
+    "verify": "bash scripts/verify.sh",
+    "test": "bash scripts/verify.sh"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "src/cli.ts",
+    "src/engines/",
+    "src/languages.ts",
+    "src/types.ts",
+    "src/vantage/",
+    "src/mcp/",
+    "hooks/",
+    ".pre-commit-hooks.yaml",
+    "tsconfig.json",
+    "tsconfig.mcp.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "static-analysis",
+    "security",
+    "taint-analysis",
+    "code-review",
+    "autofix",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "cursor",
+    "javascript",
+    "typescript",
+    "cosmic",
+    "aurora"
+  ],
+  "author": "JourdanLabs",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.1",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "typescript": "^5.8.3",
+    "zod": "^4.3.6"
+  }
+}

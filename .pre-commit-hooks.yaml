@@ -1,0 +1,8 @@
+- id: vantage-gate
+  name: VANTAGE Code Quality Gate
+  description: Runs the VANTAGE COSMIC pipeline and blocks commits when AURORA score is below 0.80.
+  language: script
+  entry: hooks/pre-commit/run-vantage.sh
+  pass_filenames: false
+  always_run: true
+  stages: [commit]

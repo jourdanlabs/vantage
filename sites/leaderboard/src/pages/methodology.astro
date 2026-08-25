@@ -1,0 +1,139 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Methodology" description="How the VANTAGE benchmark measures static analysis tool quality: ground truth, scoring rules, and reproducibility standards.">
+  <h1>Benchmark Methodology</h1>
+  <p>This page documents how the benchmark works, how ground truth was constructed, and how to interpret the numbers. It is the authoritative reference for anyone citing these results.</p>
+
+  <h2>Corpora</h2>
+  <p>The benchmark uses two intentionally-vulnerable Node.js/TypeScript applications from OWASP, each with a documented vulnerability set:</p>
+
+  <table>
+    <thead><tr><th>Corpus</th><th>Files</th><th>LOC</th><th>GT Vulns</th><th>License</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://github.com/OWASP/NodeGoat" target="_blank">OWASP/NodeGoat</a></td><td>47</td><td>3,335</td><td>4</td><td>Apache-2.0</td></tr>
+      <tr><td><a href="https://github.com/juice-shop/juice-shop" target="_blank">OWASP Juice Shop</a></td><td>385</td><td>33,113</td><td>9</td><td>MIT</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Ground Truth</h2>
+  <p>Ground truth catalogs are maintained under <strong>CC-BY-4.0</strong> in <a href="https://github.com/jourdanlabs/vantage/tree/main/packages/vantage-bench/src/ground-truth">packages/vantage-bench/src/ground-truth/</a>. Each entry specifies:</p>
+  <ul style="color: var(--text2); padding-left: 20px; line-height: 2; margin-bottom: 16px">
+    <li>File path (relative to corpus root)</li>
+    <li>Canonical line number</li>
+    <li>Vulnerability type (normalized category)</li>
+    <li>CWE identifier where applicable</li>
+    <li>OWASP Top 10 category</li>
+    <li>Description of the vulnerability</li>
+  </ul>
+
+  <p>The catalog includes only <strong>tier-1 entries</strong>: vulnerabilities that are in-scope for pattern-based static analysis tools. Architectural issues (missing CSRF middleware, missing Content-Security-Policy headers) are documented separately as "known out of scope" entries.</p>
+
+  <h2>Scoring Rules</h2>
+
+  <h3>True Positive</h3>
+  <p>A tool finding is a <strong>true positive</strong> if all three conditions hold:</p>
+  <ol style="color: var(--text2); padding-left: 20px; line-height: 2; margin-bottom: 16px">
+    <li>The finding's corpus-relative path <strong>ends with</strong> the GT file fragment on a path-segment boundary (so <code>foobar.js</code> does not match GT <code>bar.js</code>)</li>
+    <li>The normalized finding type equals the GT type (after the alias map below)</li>
+    <li>When GT <code>scope</code> is <code>file</code> (default): finding line is within ±5 of the GT line. When <code>scope</code> is <code>project</code>: line is ignored (used for whole-file vulnerabilities; every such GT entry documents why)</li>
+  </ol>
+  <p>Each GT entry can claim at most one TP. Each finding can be at most one TP (no double-counting). <strong>Substring and basename matches do not count</strong> — the suffix rule is deliberate to prevent findings in a different file with the same name from claiming credit.</p>
+
+  <h4>Runner path normalization</h4>
+  <p>Every runner (VANTAGE, Semgrep, SonarQube, CodeQL) normalizes its reported file paths to corpus-relative POSIX form at the runner boundary, via <code>toCorpusRelativePosix()</code> in <a href="https://github.com/jourdanlabs/vantage/blob/main/packages/vantage-bench/src/runners/base.ts"><code>src/runners/base.ts</code></a>. This matters because tools report paths inconsistently: Semgrep emits relative paths, SonarQube prefixes with its project key, CodeQL uses <code>file://</code> URIs, VANTAGE emits absolute paths. Normalizing once at the boundary ensures the scoring layer treats every tool's output identically — there is no per-tool path bias.</p>
+
+  <h3>False Positive</h3>
+  <p>A tool finding that does not match any GT entry is a <strong>false positive</strong>.</p>
+
+  <h3>False Negative</h3>
+  <p>A GT entry that was not claimed by any TP is a <strong>false negative</strong>.</p>
+
+  <h3>Precision, Recall, F1</h3>
+  <p>Standard definitions:</p>
+  <pre><code>Precision = TP / (TP + FP)
+Recall    = TP / (TP + FN)
+F1        = 2 × Precision × Recall / (Precision + Recall)</code></pre>
+
+  <p><strong>Aggregate F1</strong> is the harmonic mean of per-corpus F1 scores. If a tool errors out on any corpus (tool crashed, timeout, misconfiguration) the aggregate is <code>null</code> — we do not drop failing corpora from the average, because "the tool couldn't run" is itself information about the tool. If the tool runs successfully on every corpus but scores 0 on at least one, the aggregate is 0.</p>
+
+  <h2>Type Normalization</h2>
+  <p>Different tools use different type strings for the same vulnerability class. The harness normalizes these before matching:</p>
+
+  <table>
+    <thead><tr><th>Raw type (example)</th><th>Normalized</th></tr></thead>
+    <tbody>
+      <tr><td><code>eval-injection</code>, <code>nosql-injection</code>, <code>code-injection</code></td><td><code>injection</code></td></tr>
+      <tr><td><code>hardcoded-password</code>, <code>hardcoded-credentials</code>, <code>private-key</code></td><td><code>hardcoded-secret</code></td></tr>
+      <tr><td><code>missing-error-handling</code></td><td><code>error-boundary</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>Full normalization map: <a href="https://github.com/jourdanlabs/vantage/blob/main/packages/vantage-bench/src/runners/base.ts"><code>src/runners/base.ts</code></a>.</p>
+
+  <h2>Runtime Measurement</h2>
+  <p>Runtime is wall-clock time from tool invocation to last finding output, excluding:</p>
+  <ul style="color: var(--text2); padding-left: 20px; line-height: 2; margin-bottom: 16px">
+    <li>Container startup time (SonarQube Docker)</li>
+    <li>Rule download / caching (Semgrep)</li>
+    <li>CodeQL database build time</li>
+  </ul>
+  <p>These exclusions favor the external tools. VANTAGE has no startup cost.</p>
+
+  <h2>Tool Configurations</h2>
+
+  <table>
+    <thead><tr><th>Tool</th><th>Version</th><th>Configuration</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>VANTAGE</td>
+        <td>1.0.0</td>
+        <td>Full COSMIC pipeline, default threshold 0.80, <code>skipTestFiles=true</code></td>
+      </tr>
+      <tr>
+        <td>Semgrep</td>
+        <td>1.159.0</td>
+        <td><code>p/owasp-top-ten p/nodejs p/javascript</code> (see note below)</td>
+      </tr>
+      <tr>
+        <td>SonarQube</td>
+        <td>26.4.0 Community</td>
+        <td>Docker, default JS/TS ruleset, exclusions: <code>node_modules, dist, *.min.js</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Why these Semgrep rulesets and not <code>--config auto</code>?</h4>
+  <p>Semgrep's <code>auto</code> mode runs whatever ruleset Semgrep's server decides is appropriate for the project, which is opaque, can change between runs, and cannot be reproduced from a commit SHA alone. For a leaderboard that has to be reproducible <em>indefinitely</em>, we instead pin three explicit rule packs that match the threat model of the corpora: <code>p/owasp-top-ten</code> (the OWASP Top 10 ruleset, directly aligned with the GT vulnerabilities), <code>p/nodejs</code> (Node.js-specific patterns), and <code>p/javascript</code> (the language baseline). All three are first-party Semgrep packs maintained by the Semgrep team.</p>
+
+  <p>For comparison, we periodically run <code>--config auto</code> and publish those numbers in the <a href="https://github.com/jourdanlabs/vantage/tree/main/packages/vantage-bench/notes">notes</a> directory. Empirically the F1 difference between <code>auto</code> and the pinned config on these corpora is within 5 percentage points; the pinned config is slightly higher because it includes the OWASP pack which directly targets the GT classes. We use the pinned config for the leaderboard so the result is reproducible from <code>commitSha</code> alone.</p>
+
+  <p>If the Semgrep team would prefer a different default for this benchmark, or wants to publish their own configuration via the leaderboard's submission flow, that PR is welcome.</p>
+
+  <h2>Updating the Ground Truth</h2>
+  <p>The ground truth catalogs are versioned. If a researcher believes an entry is incorrect — wrong file, wrong line, wrong type, or should not count as a vulnerability — they should open a GitHub issue with the argument. The maintainers will either update the catalog or explain why the entry stands. The decision and reasoning are always public.</p>
+
+  <h2>Reproducibility</h2>
+  <p>Every leaderboard entry includes a <code>commitSha</code> of the harness version that produced it. To reproduce any result:</p>
+  <pre><code>git clone https://github.com/jourdanlabs/vantage
+git checkout &lt;commitSha&gt;
+cd packages/vantage-bench
+npx . run --tool &lt;name&gt; --clone</code></pre>
+
+  <h2>Semantic mode (NEBULA)</h2>
+
+  <p>VANTAGE ships an optional semantic-analysis engine called <strong>NEBULA</strong> that performs intraprocedural taint tracking in addition to the pattern-based PULSAR engine. When enabled (<code>analyze --semantic</code>), NEBULA traces user-input taint from sources (Express request fields, process env, etc.) through assignments and function calls to dangerous sinks (<code>eval</code>, <code>pug.compile</code>, <code>child_process.exec</code>, etc.), catching bugs whose source-to-sink path crosses multiple statements — a class pattern matchers structurally cannot detect.</p>
+
+  <p>The leaderboard as currently published uses the pattern-only path for all tools, so the numbers reflect what pattern matching catches. Semantic-path numbers for VANTAGE are published separately in <a href="https://github.com/jourdanlabs/vantage/blob/main/benchmarks/NEBULA_V0_DELTA.md"><code>benchmarks/NEBULA_V0_DELTA.md</code></a>. Once competitor tools that support semantic analysis (CodeQL, Semgrep taint mode) can be invoked in parity-equivalent configurations, a second leaderboard track for semantic-mode results will appear here.</p>
+
+  <p>NEBULA is opt-in for a reason: it's roughly 3–10× slower than the pattern-only path, and its source/sink/sanitizer catalog is still narrow. The default <code>analyze</code> path preserves VANTAGE's sub-100ms scan envelope.</p>
+
+  <h2>Known Limitations</h2>
+  <ul style="color: var(--text2); padding-left: 20px; line-height: 2">
+    <li>Only Node.js/TypeScript corpora are benchmarked. Language coverage will expand as new corpora are added.</li>
+    <li>The GT catalogs cover pattern-detectable vulnerabilities. Architectural issues (CSRF, insecure session config) are excluded from scoring.</li>
+    <li>Commercial tools (Snyk Code, Veracode) are not yet included — results would need vendor participation to stay current.</li>
+    <li>VANTAGE's Juice Shop <code>captcha.ts:22</code> FP is a legitimate debatable finding — the eval operates on a math expression but the pattern fires because the variable name is not in the "known-safe" list.</li>
+  </ul>
+</Base>

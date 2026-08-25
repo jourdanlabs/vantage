@@ -1,0 +1,491 @@
+{
+  "generatedAt": "2026-04-16T08:38:51.888Z",
+  "apiHealthy": true,
+  "results": [
+    {
+      "id": "express",
+      "label": "Small — expressjs/express",
+      "sha": "8e022edc9185f540a3fcecaf5e56b850d919cdac",
+      "expectedLOC": "~21k",
+      "actualFiles": 141,
+      "actualLOC": 21487,
+      "runs": [
+        {
+          "runIndex": 1,
+          "totalMs": 42.550542000000064,
+          "engineMs": {
+            "METEOR": 33.03362500000003,
+            "NOVA": 1.5830829999999878,
+            "ECLIPSE": 7.521541999999954,
+            "PULSAR": 0.09387500000002547,
+            "AURORA": 0.26387499999998454
+          },
+          "peakRssBytes": 374276096,
+          "baselineRssBytes": 373080064,
+          "auroraScore": 0.9594053279541488,
+          "auroraVerdict": "APPROVED",
+          "fileCount": 145,
+          "locCount": 25688,
+          "functionCount": 1772,
+          "issuesBySeveity": {
+            "HIGH": 0,
+            "MED": 5,
+            "LOW": 0
+          },
+          "circularDeps": 0,
+          "godModules": 0
+        },
+        {
+          "runIndex": 2,
+          "totalMs": 43.53033299999993,
+          "engineMs": {
+            "METEOR": 33.91687500000012,
+            "NOVA": 1.1249170000000959,
+            "ECLIPSE": 8.247334000000137,
+            "PULSAR": 0.03674999999998363,
+            "AURORA": 0.1402499999999236
+          },
+          "peakRssBytes": 397737984,
+          "baselineRssBytes": 374292480,
+          "auroraScore": 0.9594053279541488,
+          "auroraVerdict": "APPROVED",
+          "fileCount": 145,
+          "locCount": 25688,
+          "functionCount": 1772,
+          "issuesBySeveity": {
+            "HIGH": 0,
+            "MED": 5,
+            "LOW": 0
+          },
+          "circularDeps": 0,
+          "godModules": 0
+        },
+        {
+          "runIndex": 3,
+          "totalMs": 42.63495799999987,
+          "engineMs": {
+            "METEOR": 31.833208000000013,
+            "NOVA": 1.5080000000000382,
+            "ECLIPSE": 9.079917000000023,
+            "PULSAR": 0.020207999999911408,
+            "AURORA": 0.14016700000001947
+          },
+          "peakRssBytes": 401162240,
+          "baselineRssBytes": 400867328,
+          "auroraScore": 0.9594053279541488,
+          "auroraVerdict": "APPROVED",
+          "fileCount": 145,
+          "locCount": 25688,
+          "functionCount": 1772,
+          "issuesBySeveity": {
+            "HIGH": 0,
+            "MED": 5,
+            "LOW": 0
+          },
+          "circularDeps": 0,
+          "godModules": 0
+        }
+      ],
+      "medianTotalMs": 42.63495799999987,
+      "medianEngineMs": {
+        "METEOR": 33.03362500000003,
+        "NOVA": 1.5080000000000382,
+        "ECLIPSE": 8.247334000000137,
+        "PULSAR": 0.03674999999998363,
+        "AURORA": 0.1402499999999236
+      },
+      "medianPeakRssMB": 1.140625,
+      "variancePct": 2.1000958884492413,
+      "stabilityFlag": false,
+      "summary": "APPROVED (96%) | 145 files | 25,688 LOC | 1772 fns"
+    },
+    {
+      "id": "react",
+      "label": "Medium — facebook/react (packages/react)",
+      "sha": "00f063c31d60308f8e4e0fd349b89ed043b9ea54",
+      "expectedLOC": "~16.5k",
+      "actualFiles": 82,
+      "actualLOC": 16633,
+      "runs": [
+        {
+          "runIndex": 1,
+          "totalMs": 19.100541999999678,
+          "engineMs": {
+            "METEOR": 14.951415999999881,
+            "NOVA": 0.6766250000000582,
+            "ECLIPSE": 3.3236659999997755,
+            "PULSAR": 0.0063329999998131825,
+            "AURORA": 0.11591599999974278
+          },
+          "peakRssBytes": 401375232,
+          "baselineRssBytes": 401195008,
+          "auroraScore": 0.688856801892892,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 83,
+          "locCount": 16671,
+          "functionCount": 591,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 6,
+            "LOW": 0
+          },
+          "circularDeps": 4,
+          "godModules": 2
+        },
+        {
+          "runIndex": 2,
+          "totalMs": 16.51579099999981,
+          "engineMs": {
+            "METEOR": 12.677500000000236,
+            "NOVA": 0.47395800000003874,
+            "ECLIPSE": 3.240624999999909,
+            "PULSAR": 0.006041000000095664,
+            "AURORA": 0.09133299999984956
+          },
+          "peakRssBytes": 401588224,
+          "baselineRssBytes": 401375232,
+          "auroraScore": 0.688856801892892,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 83,
+          "locCount": 16671,
+          "functionCount": 591,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 6,
+            "LOW": 0
+          },
+          "circularDeps": 4,
+          "godModules": 2
+        },
+        {
+          "runIndex": 3,
+          "totalMs": 30.36845799999992,
+          "engineMs": {
+            "METEOR": 24.313458999999966,
+            "NOVA": 0.7423330000001442,
+            "ECLIPSE": 5.135874999999942,
+            "PULSAR": 0.007499999999708962,
+            "AURORA": 0.13733300000012605
+          },
+          "peakRssBytes": 401670144,
+          "baselineRssBytes": 401637376,
+          "auroraScore": 0.688856801892892,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 83,
+          "locCount": 16671,
+          "functionCount": 591,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 6,
+            "LOW": 0
+          },
+          "circularDeps": 4,
+          "godModules": 2
+        }
+      ],
+      "medianTotalMs": 19.100541999999678,
+      "medianEngineMs": {
+        "METEOR": 14.951415999999881,
+        "NOVA": 0.6766250000000582,
+        "ECLIPSE": 3.3236659999997755,
+        "PULSAR": 0.0063329999998131825,
+        "AURORA": 0.11591599999974278
+      },
+      "medianPeakRssMB": 0.171875,
+      "variancePct": 58.99265057504876,
+      "stabilityFlag": true,
+      "summary": "REJECTED (69%) | 83 files | 16,671 LOC | 591 fns"
+    },
+    {
+      "id": "typescript",
+      "label": "Large — microsoft/TypeScript (src/compiler)",
+      "sha": "f1a9288c23c04e785bbfb092077a7b70747c5b76",
+      "expectedLOC": "~192k",
+      "actualFiles": 77,
+      "actualLOC": 192636,
+      "runs": [
+        {
+          "runIndex": 1,
+          "totalMs": 772.1000410000001,
+          "engineMs": {
+            "METEOR": 744.2771250000001,
+            "NOVA": 4.402833000000101,
+            "ECLIPSE": 7.908666000000267,
+            "PULSAR": 15.373875000000226,
+            "AURORA": 0.0946670000002996
+          },
+          "peakRssBytes": 418332672,
+          "baselineRssBytes": 412745728,
+          "auroraScore": 0.6193288195158771,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 77,
+          "locCount": 192636,
+          "functionCount": 8901,
+          "issuesBySeveity": {
+            "HIGH": 2,
+            "MED": 4,
+            "LOW": 0
+          },
+          "circularDeps": 0,
+          "godModules": 36
+        },
+        {
+          "runIndex": 2,
+          "totalMs": 771.5208330000005,
+          "engineMs": {
+            "METEOR": 743.5711670000001,
+            "NOVA": 4.444625000000087,
+            "ECLIPSE": 9.33283400000073,
+            "PULSAR": 14.05462499999976,
+            "AURORA": 0.07404200000019046
+          },
+          "peakRssBytes": 418152448,
+          "baselineRssBytes": 406994944,
+          "auroraScore": 0.6193288195158771,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 77,
+          "locCount": 192636,
+          "functionCount": 8901,
+          "issuesBySeveity": {
+            "HIGH": 2,
+            "MED": 4,
+            "LOW": 0
+          },
+          "circularDeps": 0,
+          "godModules": 36
+        },
+        {
+          "runIndex": 3,
+          "totalMs": 772.5498750000006,
+          "engineMs": {
+            "METEOR": 745.2497079999994,
+            "NOVA": 4.3292499999997744,
+            "ECLIPSE": 8.469457999999577,
+            "PULSAR": 14.40783300000021,
+            "AURORA": 0.059707999999773165
+          },
+          "peakRssBytes": 417923072,
+          "baselineRssBytes": 407339008,
+          "auroraScore": 0.6193288195158771,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 77,
+          "locCount": 192636,
+          "functionCount": 8901,
+          "issuesBySeveity": {
+            "HIGH": 2,
+            "MED": 4,
+            "LOW": 0
+          },
+          "circularDeps": 0,
+          "godModules": 36
+        }
+      ],
+      "medianTotalMs": 772.1000410000001,
+      "medianEngineMs": {
+        "METEOR": 744.2771250000001,
+        "NOVA": 4.402833000000101,
+        "ECLIPSE": 8.469457999999577,
+        "PULSAR": 14.40783300000021,
+        "AURORA": 0.07404200000019046
+      },
+      "medianPeakRssMB": 10.09375,
+      "variancePct": 0.07501722176435592,
+      "stabilityFlag": false,
+      "summary": "REJECTED (62%) | 77 files | 192,636 LOC | 8901 fns"
+    },
+    {
+      "id": "superset",
+      "label": "Polyglot — apache/superset (Python + TypeScript)",
+      "sha": "e7b9fb277eb68c1dae5e61432ded2c0c9dfc49d0",
+      "expectedLOC": "~555k",
+      "actualFiles": 2942,
+      "actualLOC": 558917,
+      "runs": [
+        {
+          "runIndex": 1,
+          "totalMs": 4157.023542000001,
+          "engineMs": {
+            "METEOR": 435.4943749999993,
+            "NOVA": 146.44337500000074,
+            "ECLIPSE": 3572.7595839999994,
+            "PULSAR": 1.1567919999997684,
+            "AURORA": 1.1092499999995198
+          },
+          "peakRssBytes": 451215360,
+          "baselineRssBytes": 420806656,
+          "auroraScore": 0.640361889028429,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 2958,
+          "locCount": 573824,
+          "functionCount": 9171,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 7,
+            "LOW": 0
+          },
+          "circularDeps": 17,
+          "godModules": 18
+        },
+        {
+          "runIndex": 2,
+          "totalMs": 4093.2766249999986,
+          "engineMs": {
+            "METEOR": 458.18995800000084,
+            "NOVA": 148.926958,
+            "ECLIPSE": 3484.0208330000005,
+            "PULSAR": 1.080667000001995,
+            "AURORA": 1.0113339999988966
+          },
+          "peakRssBytes": 422510592,
+          "baselineRssBytes": 414662656,
+          "auroraScore": 0.640361889028429,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 2958,
+          "locCount": 573824,
+          "functionCount": 9171,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 7,
+            "LOW": 0
+          },
+          "circularDeps": 17,
+          "godModules": 18
+        },
+        {
+          "runIndex": 3,
+          "totalMs": 4113.747167000001,
+          "engineMs": {
+            "METEOR": 480.3342080000002,
+            "NOVA": 140.15454200000022,
+            "ECLIPSE": 3491.0654590000013,
+            "PULSAR": 1.063666000001831,
+            "AURORA": 1.0763330000008864
+          },
+          "peakRssBytes": 422641664,
+          "baselineRssBytes": 415956992,
+          "auroraScore": 0.640361889028429,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 2958,
+          "locCount": 573824,
+          "functionCount": 9171,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 7,
+            "LOW": 0
+          },
+          "circularDeps": 17,
+          "godModules": 18
+        }
+      ],
+      "medianTotalMs": 4113.747167000001,
+      "medianEngineMs": {
+        "METEOR": 458.18995800000084,
+        "NOVA": 146.44337500000074,
+        "ECLIPSE": 3491.0654590000013,
+        "PULSAR": 1.080667000001995,
+        "AURORA": 1.0763330000008864
+      },
+      "medianPeakRssMB": 7.484375,
+      "variancePct": 1.0519940395743685,
+      "stabilityFlag": false,
+      "summary": "REJECTED (64%) | 2958 files | 573,824 LOC | 9171 fns"
+    },
+    {
+      "id": "linux",
+      "label": "XL — torvalds/linux (drivers/net)",
+      "sha": "1d51b370a0f8f642f4fc84c795fbedac0fcdbbd2",
+      "expectedLOC": "~5.25M (actual — significantly above brief estimate)",
+      "actualFiles": 6158,
+      "actualLOC": 5255105,
+      "runs": [
+        {
+          "runIndex": 1,
+          "totalMs": 26770.319417000002,
+          "engineMs": {
+            "METEOR": 9129.440292,
+            "NOVA": 171.5825420000001,
+            "ECLIPSE": 17466.635874999996,
+            "PULSAR": 0.25229099999705795,
+            "AURORA": 2.360625000001164
+          },
+          "peakRssBytes": 556105728,
+          "baselineRssBytes": 382238720,
+          "auroraScore": 0.6739328696185631,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 6158,
+          "locCount": 5255105,
+          "functionCount": 12,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 3,
+            "LOW": 0
+          },
+          "circularDeps": 8,
+          "godModules": 0
+        },
+        {
+          "runIndex": 2,
+          "totalMs": 27815.050500000005,
+          "engineMs": {
+            "METEOR": 9882.384250000003,
+            "NOVA": 174.24029200000223,
+            "ECLIPSE": 17755.694375,
+            "PULSAR": 0.17529099999228492,
+            "AURORA": 2.510374999998021
+          },
+          "peakRssBytes": 782123008,
+          "baselineRssBytes": 555565056,
+          "auroraScore": 0.6739328696185631,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 6158,
+          "locCount": 5255105,
+          "functionCount": 12,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 3,
+            "LOW": 0
+          },
+          "circularDeps": 8,
+          "godModules": 0
+        },
+        {
+          "runIndex": 3,
+          "totalMs": 27332.609750000003,
+          "engineMs": {
+            "METEOR": 9753.939333000002,
+            "NOVA": 177.07241700000304,
+            "ECLIPSE": 17399.078458000004,
+            "PULSAR": 0.10858299999381416,
+            "AURORA": 2.370666999995592
+          },
+          "peakRssBytes": 722993152,
+          "baselineRssBytes": 665780224,
+          "auroraScore": 0.6739328696185631,
+          "auroraVerdict": "REJECTED",
+          "fileCount": 6158,
+          "locCount": 5255105,
+          "functionCount": 12,
+          "issuesBySeveity": {
+            "HIGH": 3,
+            "MED": 3,
+            "LOW": 0
+          },
+          "circularDeps": 8,
+          "godModules": 0
+        }
+      ],
+      "medianTotalMs": 27332.609750000003,
+      "medianEngineMs": {
+        "METEOR": 9753.939333000002,
+        "NOVA": 174.24029200000223,
+        "ECLIPSE": 17466.635874999996,
+        "PULSAR": 0.17529099999228492,
+        "AURORA": 2.370666999995592
+      },
+      "medianPeakRssMB": 165.8125,
+      "variancePct": 2.0572142146067876,
+      "stabilityFlag": false,
+      "summary": "REJECTED (67%) | 6158 files | 5,255,105 LOC | 12 fns"
+    }
+  ]
+}
